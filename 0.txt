@@ -1,0 +1,143 @@
+{
+        "path": "e00078v",
+        "formulas": [
+            {
+                "path": "e00100v",
+                "value": "(e00099v * 100)/ e00019v",
+                "update": {
+                    "doctype": "Contract Measurement",
+                    "fieldname": "saldopercentual"
+                },
+                "parsed": {
+                    "aggr": [],
+                    "vars": [
+                        "e00099v",
+                        "e00019v"
+                    ],
+                    "dag_paths": [
+                        "e00099v",
+                        "e00019v"
+                    ]
+                }
+            },
+            {
+                "path": "e00089v",
+                "value": "valor_ativo = sum(e00108v, contains(e00083v, 'Sim') and e00108v > 100 and (e00108v <=2000 or e00108v >= 500))",
+                "update": {
+                    "doctype": "Contract Measurement",
+                    "fieldname": "faturamentodireto"
+                },
+                "parsed": {
+                    "aggr": [
+                        {
+                            "base": "sum(e00108v)",
+                            "vars": [
+                                "e00108v"
+                            ],
+                            "filter": "contains(e00083v, 'Sim') and e00108v > 100 and (e00108v <=2000 or e00108v >= 500)",
+                            "filter_vars": [
+                                "e00083v"
+                            ]
+                        }
+                    ],
+                    "vars": [],
+                    "dag_paths": [
+                        "e00108v",
+                        "e00083v"
+                    ]
+                }
+            },
+            {
+                "path": "e00091v",
+                "value": "valor_percentual = (lastd(e00026v) * e00088v)/100\nreid_acumulado = sum(e00091v * e00092v, e00083v == 'Não') + valor_percentual\nvalor_maximo = (e00019v * 3,65)/100\n\nif reid_acumulado > valor_maximo:\n    return e00088v\nelse\n\treturn e00088v - valor_percentual",
+                "update": {
+                    "doctype": "Contract Measurement",
+                    "fieldname": "descontoreidi"
+                },
+                "parsed": {
+                    "aggr": [
+                        {
+                            "base": "sum(e00091v * e00092v)",
+                            "vars": [
+                                "e00091v",
+                                "e00092v"
+                            ],
+                            "filter": "e00083v == 'Não'",
+                            "filter_vars": [
+                                "e00083v"
+                            ]
+                        }
+                    ],
+                    "vars": [
+                        "e00026v",
+                        "e00088v",
+                        "e00019v"
+                    ],
+                    "dag_paths": [
+                        "e00091v",
+                        "e00092v",
+                        "e00083v",
+                        "e00026v",
+                        "e00088v",
+                        "e00019v"
+                    ]
+                }
+            }       
+        ],
+        "ids": [
+            {
+                "id": "0196c4d0-b7ad-7b23-ad96-b316ce979d6f",
+                "formulas":[
+                    {
+                        "path": "e00100v",
+                        ### Exemplo de valores fora de funcoes de agregacao
+                        "vars": [
+                            "e00099v": [Primeiro valor da arvore para no nivel do ID, ou primeiro valor de toda a arvore],
+                            "e00019v": [Primeiro valor da arvore para no nivel do ID, ou primeiro valor de toda a arvore]
+                        ]
+                    },
+                    {
+                        "path": "e00089v",
+                        ### Exemplo de valores dentro de funcao de agregacao
+                        "e00108v" : [Lista de valores a nivel do id que atendam ao criterio de pesquisa contains(e00083v, 'Sim'), ou a lista de valores da arvore que atenda ao criterio contains(e00083v, 'Sim')]
+                    },
+                    {
+                        "path": "e00091v",
+                        ### Exemplo de valores mistos
+                        "e00091v": [Lista de valores a nivel do id que atendam ao criteiro de pesquisa "e00083v == 'Não'", ou lista de valores da arvore que atenda ao criterio "e00083v == 'Não'"]
+                        "e00092v": [Lista de valores a nivel do id que atendam ao criteiro de pesquisa "e00083v == 'Não'", ou lista de valores da arvore que atenda ao criterio "e00083v == 'Não'"]
+                        "e00026v": [Primeiro valor da arvore para no nivel do ID, ou primeiro valor de toda a arvore],
+                        "e00088v": [Primeiro valor da arvore para no nivel do ID, ou primeiro valor de toda a arvore]
+                        "e00019v": [Primeiro valor da arvore para no nivel do ID, ou primeiro valor de toda a arvore]
+                    }
+                ]
+            },
+            {
+                "id": "0196c6ad-c158-7883-9b7a-351ef0cf0772",
+                "formulas":[
+                    {
+                        "path": "e00100v",
+                        ### Exemplo de valores fora de funcoes de agregacao
+                        "vars": [
+                            "e00099v": [Primeiro valor da arvore para no nivel do ID, ou primeiro valor de toda a arvore],
+                            "e00019v": [Primeiro valor da arvore para no nivel do ID, ou primeiro valor de toda a arvore]
+                        ]
+                    },
+                    {
+                        "path": "e00089v",
+                        ### Exemplo de valores dentro de funcao de agregacao
+                        "e00108v" : [Lista de valores a nivel do id que atendam ao criterio de pesquisa contains(e00083v, 'Sim'), ou a lista de valores da arvore que atenda ao criterio contains(e00083v, 'Sim')]
+                    },
+                    {
+                        "path": "e00091v",
+                        ### Exemplo de valores mistos
+                        "e00091v": [Lista de valores a nivel do id que atendam ao criteiro de pesquisa "e00083v == 'Não'", ou lista de valores da arvore que atenda ao criterio "e00083v == 'Não'"]
+                        "e00092v": [Lista de valores a nivel do id que atendam ao criteiro de pesquisa "e00083v == 'Não'", ou lista de valores da arvore que atenda ao criterio "e00083v == 'Não'"]
+                        "e00026v": [Primeiro valor da arvore para no nivel do ID, ou primeiro valor de toda a arvore],
+                        "e00088v": [Primeiro valor da arvore para no nivel do ID, ou primeiro valor de toda a arvore]
+                        "e00019v": [Primeiro valor da arvore para no nivel do ID, ou primeiro valor de toda a arvore]
+                    }
+                ]
+            }
+        ]
+    },
