@@ -294,10 +294,22 @@ def process_formula_variables(extracted_formulas: List[Dict[str, Any]], tree_dat
             # For each formula, extract variable values
             for formula in formula_group["formulas"]:
                 
-                # Paths vars
-                for var_path in formula.get("parsed", []).get("vars", []):
-                    node = filter_tree_data(tree_data, "True", [var_path], id_value)
-                    id_result["formulas"].append(node)
+                # Paths vars, non-aggregated
+                vars = formula.get("parsed", []).get("vars", [])
+                node = filter_tree_data(tree_data, [f"first({v})" for v in vars], id_value)
+                id_result["formulas"].append(n for n in node)
+
+                # Aggr functions
+                for aggr in formula.get("parsed", []).get("aggr", []):
+                    vars = aggr["vars"]
+                    filter_expr = aggr["filter"]
+                    if filter_expr:
+                        # For variables in aggregation functions with filter
+                        node = filter_tree_data(tree_data, vars, id_value, filter_expr)
+                    else:
+                        # If no filter, just get all values
+                        node = filter_tree_data(tree_data, vars, id_value)
+                    id_result["formulas"].append(n for n in node)
             
             # Add this ID's results to the group
             group_result["ids"].append(id_result)

@@ -12,12 +12,12 @@
                 "parsed": {
                     "aggr": [],
                     "vars": [
-                        "e00099v",
-                        "e00019v"
+                        "e00019v",
+                        "e00099v"
                     ],
                     "dag_paths": [
-                        "e00099v",
-                        "e00019v"
+                        "e00019v",
+                        "e00099v"
                     ]
                 }
             },
@@ -42,7 +42,7 @@
             },
             {
                 "path": "e00091v",
-                "value": "valor_percentual = (lastd(e00026v) * e00088v)/100\nreid_acumulado = sum(e00091v * e00092v, e00083v == 'Não') + valor_percentual\nvalor_maximo = (e00019v * 3,65)/100\n\nif reid_acumulado > valor_maximo:\n    return e00088v\nelse\n\treturn e00088v - valor_percentual",
+                "value": "valor_percentual = (e00026v * e00088v)/100\nreid_acumulado = sum(e00091v, e00083v == 'Não') + valor_percentual\nvalor_maximo = (e00019v * 3,65)/100\n\nif reid_acumulado > valor_maximo:\n    return e00088v\nelse\n\treturn e00088v - valor_percentual",
                 "update": {
                     "doctype": "Contract Measurement",
                     "fieldname": "descontoreidi"
@@ -50,11 +50,8 @@
                 "parsed": {
                     "aggr": [
                         {
-                            "base": "sum(e00091v * e00092v)",
-                            "vars": [
-                                "e00091v",
-                                "e00092v"
-                            ],
+                            "base": "sum(e00091v)",
+                            "vars": [],
                             "filter": "e00083v == 'Não'",
                             "filter_vars": [
                                 "e00083v"
@@ -62,17 +59,16 @@
                         }
                     ],
                     "vars": [
-                        "e00088v",
                         "e00019v",
-                        "e00026v"
+                        "e00026v",
+                        "e00088v"
                     ],
                     "dag_paths": [
                         "e00091v",
-                        "e00092v",
                         "e00083v",
-                        "e00088v",
                         "e00019v",
-                        "e00026v"
+                        "e00026v",
+                        "e00088v"
                     ]
                 }
             },
@@ -106,9 +102,7 @@
                     "aggr": [
                         {
                             "base": "sum(e00088v)",
-                            "vars": [
-                                "e00088v"
-                            ],
+                            "vars": [],
                             "filter": "e00083v == 'Não'",
                             "filter_vars": [
                                 "e00083v"
@@ -127,7 +121,7 @@
             },
             {
                 "path": "e00096v",
-                "value": "sum(e00120v, e00083v == 'Não')+first(e00089v)",
+                "value": "sum(e00120v, e00083v == 'Não')+e00089v",
                 "update": {
                     "doctype": "Contract Measurement",
                     "fieldname": "ftdacumulado"
@@ -143,17 +137,11 @@
                             "filter_vars": [
                                 "e00083v"
                             ]
-                        },
-                        {
-                            "base": "first(e00089v)",
-                            "vars": [
-                                "e00089v"
-                            ],
-                            "filter": "",
-                            "filter_vars": []
                         }
                     ],
-                    "vars": [],
+                    "vars": [
+                        "e00089v"
+                    ],
                     "dag_paths": [
                         "e00120v",
                         "e00083v",
@@ -172,9 +160,7 @@
                     "aggr": [
                         {
                             "base": "sum(e00088v)",
-                            "vars": [
-                                "e00088v"
-                            ],
+                            "vars": [],
                             "filter": "e00083v == 'Sim'",
                             "filter_vars": [
                                 "e00083v"
@@ -190,7 +176,7 @@
             },
             {
                 "path": "e00089v",
-                "value": "valor_ativo = sum(e00108v, contains(e00083v, 'Sim'))",
+                "value": "valor_ativo = sum(e00108v, e00083v = 'Sim')",
                 "update": {
                     "doctype": "Contract Measurement",
                     "fieldname": "faturamentodireto"
@@ -202,7 +188,7 @@
                             "vars": [
                                 "e00108v"
                             ],
-                            "filter": "contains(e00083v, 'Sim')",
+                            "filter": "e00083v = 'Sim'",
                             "filter_vars": [
                                 "e00083v"
                             ]
@@ -220,671 +206,4 @@
             {
                 "id": "0196c4d0-b7ad-7b23-ad96-b316ce979d6f",
                 "formulas": [
-                    {
-                        "path": "e00100v",
-                        "vars": {
-                            "e00099v": 30581422.17
-                        }
-                    },
-                    {
-                        "path": "e00097v",
-                        "vars": {
-                            "e00096v": 2100000.0,
-                            "e00095v": 36932798.15
-                        }
-                    },
-                    {
-                        "path": "e00091v",
-                        "vars": {
-                            "e00088v": 735893.49,
-                            "e00091v": [
-                                385893.49
-                            ]
-                        }
-                    },
-                    {
-                        "path": "e00090v",
-                        "vars": {
-                            "e00089v": 350000.0,
-                            "e00088v": 735893.49
-                        }
-                    },
-                    {
-                        "path": "e00099v",
-                        "vars": {
-                            "e00088v": [
-                                735893.49
-                            ]
-                        }
-                    },
-                    {
-                        "path": "e00096v",
-                        "vars": {
-                            "e00089v": [
-                                350000.0
-                            ]
-                        }
-                    },
-                    {
-                        "path": "e00088v",
-                        "vars": {}
-                    },
-                    {
-                        "path": "e00089v",
-                        "vars": {}
-                    }
-                ]
-            },
-            {
-                "id": "0196c6ad-c158-7883-9b7a-351ef0cf0772",
-                "formulas": [
-                    {
-                        "path": "e00100v",
-                        "vars": {
-                            "e00099v": 29937290.08
-                        }
-                    },
-                    {
-                        "path": "e00097v",
-                        "vars": {
-                            "e00096v": 2100000.0,
-                            "e00095v": 36932798.15
-                        }
-                    },
-                    {
-                        "path": "e00091v",
-                        "vars": {
-                            "e00088v": 644132.08
-                        }
-                    },
-                    {
-                        "path": "e00090v",
-                        "vars": {
-                            "e00089v": 350000.0,
-                            "e00088v": 644132.08
-                        }
-                    },
-                    {
-                        "path": "e00099v",
-                        "vars": {}
-                    },
-                    {
-                        "path": "e00096v",
-                        "vars": {
-                            "e00089v": [
-                                350000.0
-                            ]
-                        }
-                    },
-                    {
-                        "path": "e00088v",
-                        "vars": {
-                            "e00088v": [
-                                644132.08
-                            ]
-                        }
-                    },
-                    {
-                        "path": "e00089v",
-                        "vars": {}
-                    }
-                ]
-            }
-        ]
-    },
-    {
-        "path": "e00103v",
-        "formulas": [
-            {
-                "path": "e00109v",
-                "value": "sum(e00088v)",
-                "update": {
-                    "doctype": "Contract Measurement SAP Order",
-                    "fieldname": "acumuladoatual"
-                },
-                "parsed": {
-                    "aggr": [
-                        {
-                            "base": "sum(e00088v)",
-                            "vars": [
-                                "e00088v"
-                            ],
-                            "filter": "",
-                            "filter_vars": []
-                        }
-                    ],
-                    "vars": [],
-                    "dag_paths": [
-                        "e00088v"
-                    ]
-                }
-            },
-            {
-                "path": "e00106v",
-                "value": "e00019v",
-                "update": {
-                    "doctype": "Contract Measurement SAP Order",
-                    "fieldname": "valortotalvigente"
-                },
-                "parsed": {
-                    "aggr": [],
-                    "vars": [
-                        "e00019v"
-                    ],
-                    "dag_paths": [
-                        "e00019v"
-                    ]
-                }
-            }
-        ],
-        "ids": [
-            {
-                "id": "0196c4ed-90aa-75a1-8ffa-b453675ab422",
-                "formulas": [
-                    {
-                        "path": "e00109v",
-                        "vars": {}
-                    },
-                    {
-                        "path": "e00106v",
-                        "vars": {}
-                    }
-                ]
-            },
-            {
-                "id": "0196c8d0-74b8-7832-9049-d3f62e3dee90",
-                "formulas": [
-                    {
-                        "path": "e00109v",
-                        "vars": {}
-                    },
-                    {
-                        "path": "e00106v",
-                        "vars": {}
-                    }
-                ]
-            },
-            {
-                "id": "0196c4ed-90aa-75a1-8ffa-b4640699dc42",
-                "formulas": [
-                    {
-                        "path": "e00109v",
-                        "vars": {}
-                    },
-                    {
-                        "path": "e00106v",
-                        "vars": {}
-                    }
-                ]
-            },
-            {
-                "id": "0196c4ed-90aa-75a1-8ffa-b478128dc114",
-                "formulas": [
-                    {
-                        "path": "e00109v",
-                        "vars": {}
-                    },
-                    {
-                        "path": "e00106v",
-                        "vars": {}
-                    }
-                ]
-            },
-            {
-                "id": "0196c4ed-90aa-75a1-8ffa-b48679b401d2",
-                "formulas": [
-                    {
-                        "path": "e00109v",
-                        "vars": {}
-                    },
-                    {
-                        "path": "e00106v",
-                        "vars": {}
-                    }
-                ]
-            },
-            {
-                "id": "0196c4ed-90aa-75a1-8ffa-b49e965b973f",
-                "formulas": [
-                    {
-                        "path": "e00109v",
-                        "vars": {}
-                    },
-                    {
-                        "path": "e00106v",
-                        "vars": {}
-                    }
-                ]
-            },
-            {
-                "id": "0196c4ed-90aa-75a1-8ffa-b4a36e2a581c",
-                "formulas": [
-                    {
-                        "path": "e00109v",
-                        "vars": {}
-                    },
-                    {
-                        "path": "e00106v",
-                        "vars": {}
-                    }
-                ]
-            },
-            {
-                "id": "0196c4ed-90aa-75a1-8ffa-b4b81f0272df",
-                "formulas": [
-                    {
-                        "path": "e00109v",
-                        "vars": {}
-                    },
-                    {
-                        "path": "e00106v",
-                        "vars": {}
-                    }
-                ]
-            },
-            {
-                "id": "0196c4ed-90aa-75a1-8ffa-b4caeb9a5571",
-                "formulas": [
-                    {
-                        "path": "e00109v",
-                        "vars": {}
-                    },
-                    {
-                        "path": "e00106v",
-                        "vars": {}
-                    }
-                ]
-            },
-            {
-                "id": "0196c4ed-90aa-75a1-8ffa-b4d71c3a8818",
-                "formulas": [
-                    {
-                        "path": "e00109v",
-                        "vars": {}
-                    },
-                    {
-                        "path": "e00106v",
-                        "vars": {}
-                    }
-                ]
-            },
-            {
-                "id": "0196c4ed-90aa-75a1-8ffa-b4eacdb157be",
-                "formulas": [
-                    {
-                        "path": "e00109v",
-                        "vars": {}
-                    },
-                    {
-                        "path": "e00106v",
-                        "vars": {}
-                    }
-                ]
-            },
-            {
-                "id": "0196c4ed-90aa-75a1-8ffa-b4fde20c938a",
-                "formulas": [
-                    {
-                        "path": "e00109v",
-                        "vars": {}
-                    },
-                    {
-                        "path": "e00106v",
-                        "vars": {}
-                    }
-                ]
-            },
-            {
-                "id": "0196c4ed-90aa-75a1-8ffa-b5089c1c6208",
-                "formulas": [
-                    {
-                        "path": "e00109v",
-                        "vars": {}
-                    },
-                    {
-                        "path": "e00106v",
-                        "vars": {}
-                    }
-                ]
-            },
-            {
-                "id": "0196c4ed-90aa-75a1-8ffa-b5145b1be9f0",
-                "formulas": [
-                    {
-                        "path": "e00109v",
-                        "vars": {}
-                    },
-                    {
-                        "path": "e00106v",
-                        "vars": {}
-                    }
-                ]
-            },
-            {
-                "id": "0196c4ed-90aa-75a1-8ffa-b52883c5ad3e",
-                "formulas": [
-                    {
-                        "path": "e00109v",
-                        "vars": {}
-                    },
-                    {
-                        "path": "e00106v",
-                        "vars": {}
-                    }
-                ]
-            },
-            {
-                "id": "0196c4ed-90aa-75a1-8ffa-b53107cf2522",
-                "formulas": [
-                    {
-                        "path": "e00109v",
-                        "vars": {}
-                    },
-                    {
-                        "path": "e00106v",
-                        "vars": {}
-                    }
-                ]
-            },
-            {
-                "id": "0196c4ed-90aa-75a1-8ffa-b54d9bfd13f1",
-                "formulas": [
-                    {
-                        "path": "e00109v",
-                        "vars": {}
-                    },
-                    {
-                        "path": "e00106v",
-                        "vars": {}
-                    }
-                ]
-            },
-            {
-                "id": "0196c4ed-90aa-75a1-8ffa-b553dd4f1520",
-                "formulas": [
-                    {
-                        "path": "e00109v",
-                        "vars": {}
-                    },
-                    {
-                        "path": "e00106v",
-                        "vars": {}
-                    }
-                ]
-            },
-            {
-                "id": "0196c4ed-90aa-75a1-8ffa-b56f81abdc06",
-                "formulas": [
-                    {
-                        "path": "e00109v",
-                        "vars": {}
-                    },
-                    {
-                        "path": "e00106v",
-                        "vars": {}
-                    }
-                ]
-            },
-            {
-                "id": "0196c4ed-90aa-75a1-8ffa-b571949b72a3",
-                "formulas": [
-                    {
-                        "path": "e00109v",
-                        "vars": {}
-                    },
-                    {
-                        "path": "e00106v",
-                        "vars": {}
-                    }
-                ]
-            },
-            {
-                "id": "0196c4ed-90aa-75a1-8ffa-b58e01a66c75",
-                "formulas": [
-                    {
-                        "path": "e00109v",
-                        "vars": {}
-                    },
-                    {
-                        "path": "e00106v",
-                        "vars": {}
-                    }
-                ]
-            },
-            {
-                "id": "0196c4ed-90aa-75a1-8ffa-b59779b59a9b",
-                "formulas": [
-                    {
-                        "path": "e00109v",
-                        "vars": {}
-                    },
-                    {
-                        "path": "e00106v",
-                        "vars": {}
-                    }
-                ]
-            },
-            {
-                "id": "0196c4ed-90aa-75a1-8ffa-b5ae62c4f633",
-                "formulas": [
-                    {
-                        "path": "e00109v",
-                        "vars": {}
-                    },
-                    {
-                        "path": "e00106v",
-                        "vars": {}
-                    }
-                ]
-            },
-            {
-                "id": "0196c4ed-90aa-75a1-8ffa-b5b740ba5545",
-                "formulas": [
-                    {
-                        "path": "e00109v",
-                        "vars": {}
-                    },
-                    {
-                        "path": "e00106v",
-                        "vars": {}
-                    }
-                ]
-            },
-            {
-                "id": "0196c4ed-90ab-7bc1-9e25-2b5ab29318d9",
-                "formulas": [
-                    {
-                        "path": "e00109v",
-                        "vars": {}
-                    },
-                    {
-                        "path": "e00106v",
-                        "vars": {}
-                    }
-                ]
-            },
-            {
-                "id": "0196c4ed-90ab-7bc1-9e25-2b695493e277",
-                "formulas": [
-                    {
-                        "path": "e00109v",
-                        "vars": {}
-                    },
-                    {
-                        "path": "e00106v",
-                        "vars": {}
-                    }
-                ]
-            },
-            {
-                "id": "0196c4ed-90ab-7bc1-9e25-2b72f1f511c7",
-                "formulas": [
-                    {
-                        "path": "e00109v",
-                        "vars": {}
-                    },
-                    {
-                        "path": "e00106v",
-                        "vars": {}
-                    }
-                ]
-            },
-            {
-                "id": "0196c4ed-90ab-7bc1-9e25-2b8b8ab04908",
-                "formulas": [
-                    {
-                        "path": "e00109v",
-                        "vars": {}
-                    },
-                    {
-                        "path": "e00106v",
-                        "vars": {}
-                    }
-                ]
-            },
-            {
-                "id": "0196c916-96e9-7fc0-90e8-d4396368e7b8",
-                "formulas": [
-                    {
-                        "path": "e00109v",
-                        "vars": {}
-                    },
-                    {
-                        "path": "e00106v",
-                        "vars": {}
-                    }
-                ]
-            },
-            {
-                "id": "0196c916-96ea-72e3-9e21-a3a33734dac2",
-                "formulas": [
-                    {
-                        "path": "e00109v",
-                        "vars": {}
-                    },
-                    {
-                        "path": "e00106v",
-                        "vars": {}
-                    }
-                ]
-            },
-            {
-                "id": "0196c916-96ea-72e3-9e21-a3b873dadfcf",
-                "formulas": [
-                    {
-                        "path": "e00109v",
-                        "vars": {}
-                    },
-                    {
-                        "path": "e00106v",
-                        "vars": {}
-                    }
-                ]
-            },
-            {
-                "id": "0196c916-96ea-72e3-9e21-a3c312f89032",
-                "formulas": [
-                    {
-                        "path": "e00109v",
-                        "vars": {}
-                    },
-                    {
-                        "path": "e00106v",
-                        "vars": {}
-                    }
-                ]
-            },
-            {
-                "id": "0196c916-96ea-72e3-9e21-a3dae0140333",
-                "formulas": [
-                    {
-                        "path": "e00109v",
-                        "vars": {}
-                    },
-                    {
-                        "path": "e00106v",
-                        "vars": {}
-                    }
-                ]
-            },
-            {
-                "id": "0196c916-96ea-72e3-9e21-a3e40c7259a6",
-                "formulas": [
-                    {
-                        "path": "e00109v",
-                        "vars": {}
-                    },
-                    {
-                        "path": "e00106v",
-                        "vars": {}
-                    }
-                ]
-            },
-            {
-                "id": "0196c916-96ea-72e3-9e21-a3f0a48aa740",
-                "formulas": [
-                    {
-                        "path": "e00109v",
-                        "vars": {}
-                    },
-                    {
-                        "path": "e00106v",
-                        "vars": {}
-                    }
-                ]
-            },
-            {
-                "id": "0196c916-96ea-72e3-9e21-a404430eb424",
-                "formulas": [
-                    {
-                        "path": "e00109v",
-                        "vars": {}
-                    },
-                    {
-                        "path": "e00106v",
-                        "vars": {}
-                    }
-                ]
-            },
-            {
-                "id": "0196c916-96ea-72e3-9e21-a4121329a286",
-                "formulas": [
-                    {
-                        "path": "e00109v",
-                        "vars": {}
-                    },
-                    {
-                        "path": "e00106v",
-                        "vars": {}
-                    }
-                ]
-            },
-            {
-                "id": "0196c916-96ea-72e3-9e21-a42867d5cabf",
-                "formulas": [
-                    {
-                        "path": "e00109v",
-                        "vars": {}
-                    },
-                    {
-                        "path": "e00106v",
-                        "vars": {}
-                    }
-                ]
-            },
-            {
-                "id": "0196c916-96ea-72e3-9e21-a4339621f068",
-                "formulas": [
-                    {
-                        "path": "e00109v",
-                        "vars": {}
-                    },
-                    {
-                        "path": "e00106v",
-                        "vars": {}
-                    }
-                ]
-            }
-        ]
-    }
-]
+                    
