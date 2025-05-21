@@ -14,7 +14,7 @@ import json
 import copy
 from typing import Dict, List, Any, Optional
 from filters.filters_paths import filter_tree_data
-from formula_parser import parse_formulas
+from engine_parser import parse_formulas
 
 def load_tree_data(file_path: str) -> Dict[str, Any]:
     """
@@ -64,7 +64,7 @@ def process_formula_variables(extracted_formulas: List[Dict[str, Any]], tree_dat
                 vars = formula.get("parsed", []).get("vars", [])
                 node = filter_tree_data(tree_data, [f"first({v})" for v in vars], id_value)
                 for n in node:
-                    formula_ids[formula["path"]].append(n)
+                    formula_ids[formula["path"]].append({"non_aggr": n})
 
                 # Aggr functions
                 for aggr in formula.get("parsed", []).get("aggr", []):
@@ -83,7 +83,7 @@ def process_formula_variables(extracted_formulas: List[Dict[str, Any]], tree_dat
                             node = filter_tree_data(tree_data, vars)
                         # Append all values to the formula_ids
                         for n in node:
-                            formula_ids[formula["path"]].append(n)
+                            formula_ids[formula["path"]].append({"aggr": {"base": aggr["base"], "vars": n}})
 
                     # If not global, we need to filter the values in ID and subnodes
                     else:
@@ -96,7 +96,7 @@ def process_formula_variables(extracted_formulas: List[Dict[str, Any]], tree_dat
                             node = filter_tree_data(tree_data, vars, id_value, lock_node = True)
                         
                         for n in node:  
-                            formula_ids[formula["path"]].append(n)
+                            formula_ids[formula["path"]].append({"aggr": aggr["base"], "vars": n})
 
             # Temporarily store the results for this ID
             id_result = {
@@ -137,6 +137,10 @@ def main():
     try:
         extracted_formulas = parse_formulas(tree_data)
         print(f"Successfully extracted {len(extracted_formulas)} formula groups.")
+        
+        with open(output_path, 'w', encoding='utf-8') as f:
+            json.dump(extracted_formulas, f, indent=4, ensure_ascii=False)
+
     except Exception as e:
         print(f"Error extracting formulas: {e}")
         return

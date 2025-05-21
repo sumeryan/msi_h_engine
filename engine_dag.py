@@ -272,8 +272,9 @@ if __name__ == "__main__":
     console_handler.setFormatter(logging.Formatter('%(levelname)s - %(message)s'))
     logger.addHandler(console_handler)
     
-    if len(sys.argv) > 1:
-        file_path = sys.argv[1]
+    #if len(sys.argv) > 1:
+    if True:
+        file_path = "/Users/igordanielgabardogoncalves/Library/CloudStorage/OneDrive-Pessoal/GitHub/hierarquical_engine/tree_data.json"
         try:
             # Build the DAG
             logger.info(f"Processing file: {file_path}")

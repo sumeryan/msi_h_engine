@@ -19,7 +19,7 @@ import re
 from typing import Dict, List, Any, Optional, Tuple
 from config import get_config
 from log.logger import get_logger
-from formulas_dag import get_ordered_formulas
+from engine_dag import get_ordered_formulas
 from log import get_logger
 
 # Initialize logger for this module
@@ -262,10 +262,15 @@ class FormulaParser:
                     arg_vars = self.extract_variables(arg_expr)
                     filter_vars = self.extract_variables(filter_expr)
                     
+                    full_func = f"{found_func}({content})"
+
                     # Build the aggregation object
                     # Include aggregation function without the internal filter
-                    base_func = f"{found_func}({arg_expr})"
-                    full_func = f"{found_func}({content})"
+                    if found_func in ["first", "last","firstc", "lastc"]:
+                        # Special case for first/last functions
+                        base_func = f"{arg_expr}"                        
+                    else:
+                        base_func = f"{found_func.replace('_node','')}({arg_expr})"
                     
                     logger.debug(f"Base function: {base_func}")
                     logger.debug(f"Full function: {full_func}")
@@ -273,7 +278,8 @@ class FormulaParser:
                     filter_expr = self._fix_comparison_operators(filter_expr)
 
                     aggr_obj = {
-                        "base": base_func,  # Aggregation without filter
+                        "base": full_func,  # Aggregation without filter
+                        "eval": base_func,
                         "vars": arg_vars,
                         "global": (not "_node" in base_func),
                         "filter": filter_expr,

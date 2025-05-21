@@ -12,12 +12,12 @@
                 "parsed": {
                     "aggr": [],
                     "vars": [
-                        "e00099v",
-                        "e00019v"
+                        "e00019v",
+                        "e00099v"
                     ],
                     "dag_paths": [
-                        "e00099v",
-                        "e00019v"
+                        "e00019v",
+                        "e00099v"
                     ]
                 }
             },
@@ -50,10 +50,12 @@
                 "parsed": {
                     "aggr": [
                         {
-                            "base": "sum(e00091v)",
+                            "base": "sum(e00091v, e00083v == 'Não')",
+                            "eval": "sum(e00091v)",
                             "vars": [
                                 "e00091v"
                             ],
+                            "global": true,
                             "filter": "e00083v == 'Não'",
                             "filter_vars": [
                                 "e00083v"
@@ -62,15 +64,15 @@
                     ],
                     "vars": [
                         "e00026v",
-                        "e00088v",
-                        "e00019v"
+                        "e00019v",
+                        "e00088v"
                     ],
                     "dag_paths": [
                         "e00091v",
                         "e00083v",
                         "e00026v",
-                        "e00088v",
-                        "e00019v"
+                        "e00019v",
+                        "e00088v"
                     ]
                 }
             },
@@ -84,12 +86,12 @@
                 "parsed": {
                     "aggr": [],
                     "vars": [
-                        "e00089v",
-                        "e00088v"
+                        "e00088v",
+                        "e00089v"
                     ],
                     "dag_paths": [
-                        "e00089v",
-                        "e00088v"
+                        "e00088v",
+                        "e00089v"
                     ]
                 }
             },
@@ -103,10 +105,12 @@
                 "parsed": {
                     "aggr": [
                         {
-                            "base": "sum(e00088v)",
+                            "base": "sum(e00088v, e00083v == 'Não')",
+                            "eval": "sum(e00088v)",
                             "vars": [
                                 "e00088v"
                             ],
+                            "global": true,
                             "filter": "e00083v == 'Não'",
                             "filter_vars": [
                                 "e00083v"
@@ -133,10 +137,12 @@
                 "parsed": {
                     "aggr": [
                         {
-                            "base": "sum(e00120v)",
+                            "base": "sum(e00120v, e00083v == 'Não')",
+                            "eval": "sum(e00120v)",
                             "vars": [
                                 "e00120v"
                             ],
+                            "global": true,
                             "filter": "e00083v == 'Não'",
                             "filter_vars": [
                                 "e00083v"
@@ -163,10 +169,12 @@
                 "parsed": {
                     "aggr": [
                         {
-                            "base": "sum(e00088v)",
+                            "base": "sum(e00088v, e00083v == 'Sim')",
+                            "eval": "sum(e00088v)",
                             "vars": [
                                 "e00088v"
                             ],
+                            "global": true,
                             "filter": "e00083v == 'Sim'",
                             "filter_vars": [
                                 "e00083v"
@@ -190,10 +198,12 @@
                 "parsed": {
                     "aggr": [
                         {
-                            "base": "sum(e00108v)",
+                            "base": "sum(e00108v, e00083v = 'Sim')",
+                            "eval": "sum(e00108v)",
                             "vars": [
                                 "e00108v"
                             ],
+                            "global": true,
                             "filter": "e00083v == 'Sim'",
                             "filter_vars": [
                                 "e00083v"
@@ -221,6 +231,43 @@
         "path": "e00103v",
         "formulas": [
             {
+                "path": "e00030v",
+                "value": "sum_node(e00088v) + sum_node(e00108v)",
+                "update": {
+                    "doctype": "Contract Measurement SAP Order",
+                    "fieldname": "acumuladoatual"
+                },
+                "parsed": {
+                    "aggr": [
+                        {
+                            "base": "sum_node(e00088v)",
+                            "eval": "sum(e00088v)",
+                            "vars": [
+                                "e00088v"
+                            ],
+                            "global": true,
+                            "filter": "",
+                            "filter_vars": []
+                        },
+                        {
+                            "base": "sum_node(e00108v)",
+                            "eval": "sum(e00108v)",
+                            "vars": [
+                                "e00108v"
+                            ],
+                            "global": true,
+                            "filter": "",
+                            "filter_vars": []
+                        }
+                    ],
+                    "vars": [],
+                    "dag_paths": [
+                        "e00088v",
+                        "e00108v"
+                    ]
+                }
+            },
+            {
                 "path": "e00109v",
                 "value": "sum(e00088v)",
                 "update": {
@@ -231,9 +278,11 @@
                     "aggr": [
                         {
                             "base": "sum(e00088v)",
+                            "eval": "sum(e00088v)",
                             "vars": [
                                 "e00088v"
                             ],
+                            "global": true,
                             "filter": "",
                             "filter_vars": []
                         }
@@ -241,6 +290,42 @@
                     "vars": [],
                     "dag_paths": [
                         "e00088v"
+                    ]
+                }
+            },
+            {
+                "path": "e00025v",
+                "value": "sum(e00108v) + sum_node(e00108v)",
+                "update": {
+                    "doctype": "Contract Measurement SAP Order",
+                    "fieldname": "acumuladoatual"
+                },
+                "parsed": {
+                    "aggr": [
+                        {
+                            "base": "sum(e00108v)",
+                            "eval": "sum(e00108v)",
+                            "vars": [
+                                "e00108v"
+                            ],
+                            "global": true,
+                            "filter": "",
+                            "filter_vars": []
+                        },
+                        {
+                            "base": "sum_node(e00108v)",
+                            "eval": "sum(e00108v)",
+                            "vars": [
+                                "e00108v"
+                            ],
+                            "global": true,
+                            "filter": "",
+                            "filter_vars": []
+                        }
+                    ],
+                    "vars": [],
+                    "dag_paths": [
+                        "e00108v"
                     ]
                 }
             },

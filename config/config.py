@@ -31,11 +31,9 @@ class EngineConfig(BaseModel):
 # Global configuration instance
 default_config = EngineConfig()
 
-
 def get_config() -> EngineConfig:
     """Returns the global configuration."""
     return default_config
-
 
 def update_config(config_updates: Dict[str, Any]) -> None:
     """Updates the global configuration with the provided values."""
