@@ -18,6 +18,7 @@ Main features:
 - Navigation in nested data structures with specific paths
 - Hierarchical evaluation of conditions in nested data structures
 """
+import json
 import os
 import sys
 import os
@@ -884,6 +885,8 @@ def filter_tree_data(tree_data: Dict, filter_expr: str, return_paths: List[str] 
     logger.info(f"Starting filter operation with expression: {filter_expr}")
     if record_id:
         logger.info(f"Filtering with record_id: {record_id}")
+    # if path_expr:
+    #     logger.info(f"Using path expression: {path_expr}")
     if return_paths:
         logger.info(f"Extracting values for paths: {return_paths}")
     

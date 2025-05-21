@@ -18,7 +18,6 @@ Main features:
 - Navigation in nested data structures with specific paths
 - Hierarchical evaluation of conditions in nested data structures
 """
-import json
 import os
 import sys
 import os
@@ -173,8 +172,6 @@ class tree_data_filter:
         'expression : LASTC LPAREN expression RPAREN'
         # Create an AST node for lastc function: (type, path)
         p[0] = ('lastc', p[3])
-
-    # ----- TERMINAL EXPRESSIONS -----
 
     # Identifier (field name)
     def p_expression_identifier(self, p):
@@ -364,9 +361,7 @@ class tree_data_filter:
     
     def _evaluate_condition(self, ast_node, record, tree_data):
         """
-        Evaluates a (non-hierarchical) condition on a specific record.
-        This function does not recursively check sublevels, serving as a basic evaluator
-        for expressions at a single level of the hierarchy.
+        Evaluates a condition on a specific record.
         
         Args:
             ast_node: AST node to be evaluated
@@ -489,6 +484,7 @@ class tree_data_filter:
             return False
             
         elif node_type == 'identifier':
+
             # Look for the field value in the current record
             if 'fields' in record and record['fields'] is not None:
                 for field in record['fields']:
@@ -606,7 +602,68 @@ class tree_data_filter:
         if ast_node[0] == 'identifier':
             return ast_node[1]
         return None
+
+    def _find_value_for_path(self, path, data_nodes):
+        """
+        Finds value for a given path in the tree data.
         
+        Args:
+            path: Path to be searched (ex: "e00001v")
+            data_nodes: List of data nodes to be searched
+            
+        Returns:
+            The list value found for the path or None if not found
+        """
+        # Variable to store the values
+        # Uses a list to allow modification inside the nested function
+        values = []
+        
+        # Traverse the data nodes recursively
+        def search_nodes(nodes):
+
+            # Ignore if not a list
+            if not nodes or not isinstance(nodes, list):
+                return None
+                
+            for node in nodes:
+
+                # If the node is a list, search recursively
+                if isinstance(node, list):
+                    search_nodes(node)
+
+                # Check if the node has fields
+                if 'fields' in node and node['fields'] is not None:
+                    for field in node['fields']:
+                        if field.get('path') == path:
+                            values.append(field.get('value'))
+                
+                # Search in subnodes recursively
+                if 'data' in node and node['data']:
+                    # First, try to search directly in the data list
+                    for data_item in node['data']:
+                            
+                        if isinstance(data_item, dict) and 'path' in data_item and data_item['path'] == path and 'data' in data_item and data_item['data']:
+                            # If found a node with the correct path, return the first value
+                            sub_node = data_item['data'][0]
+                            if 'fields' in sub_node and sub_node['fields']:
+                                values.append(sub_node['fields'][0].get('value'))
+                    
+                    # If not found, search recursively in all subnodes
+                    search_nodes(node['data'])
+                        
+                # If the node is a dictionary with nested subnodes
+                elif 'data' in node and isinstance(node['data'], list):
+                    search_nodes(node['data'])
+
+            # Check if we found any values
+            if not values:
+                return [None]
+            
+            return values
+            
+        return_values = search_nodes(data_nodes)
+        return return_values
+
     def _find_first_value_for_path(self, path, data_nodes):
         """
         Finds the first value for a given path in the tree data.
@@ -859,8 +916,7 @@ class tree_data_filter:
         # Return the value of the node with the oldest creation date
         return sorted_nodes[0]['value'] if sorted_nodes else None
     
-#def filter_tree_data(tree_data: Dict, filter_expr: str, return_paths: List[str] = None, record_id: str = None, path_expr: str = None) -> Union[List[Dict], Dict[str, Any]]:
-def filter_tree_data(tree_data: Dict, filter_expr: str, return_paths: List[str] = None, record_id: str = None) -> Union[List[Dict], Dict[str, Any]]:
+def filter_tree_data(tree_data: Dict, return_paths: List[str], record_id: str = None, filter_expr: str = None, lock_node: bool = False) -> Union[List[Dict], Dict[str, Any]]:
     """
     Filters tree data using a custom conditional expression.
     
@@ -875,6 +931,7 @@ def filter_tree_data(tree_data: Dict, filter_expr: str, return_paths: List[str] 
                      If provided, the function returns a dictionary mapping each path
                      to its corresponding values from the filtered records.
         record_id: Optional record ID to limit the search
+        lock_node: Optional flag to lock the search on the record ID
         
     Returns:
         If return_paths is None:
@@ -882,221 +939,157 @@ def filter_tree_data(tree_data: Dict, filter_expr: str, return_paths: List[str] 
         If return_paths is provided:
             Dictionary mapping each path to the list of values extracted from filtered records
     """
-    logger.info(f"Starting filter operation with expression: {filter_expr}")
+
+    def filter_global(records):
+
+        g_filtered_records = []
+
+        # Apply the filter function to each record
+        for record in records:
+            
+            if 'id' in record and isinstance(record, dict) and filter_function(record, tree_data):
+                return record
+            
+            if isinstance(record, dict) and 'data' in record and record['data']:
+                f_record = filter_global(record["data"])
+                if f_record:
+                    g_filtered_records.append(f_record)
+
+        return g_filtered_records
+
+    if filter_expr:
+        logger.info(f"Starting filter operation with expression: {filter_expr}")
     if record_id:
         logger.info(f"Filtering with record_id: {record_id}")
-    # if path_expr:
-    #     logger.info(f"Using path expression: {path_expr}")
     if return_paths:
         logger.info(f"Extracting values for paths: {return_paths}")
     
-    # To check if path is internal or global
-    # return_paths_internal = [{"global": False, "path": path} for path in return_paths] if return_paths else []
-
     # Initialize the expression converter
     converter = tree_data_filter()
     
     # Convert the expression to a Python filter function
-    try:
-        logger.debug("Converting filter expression to Python function")
-        filter_function = converter.convert_to_python_function(filter_expr)
-        logger.debug("Filter function created successfully")
-    except Exception as e:
-        error_msg = f"Error converting expression '{filter_expr}': {str(e)}"
-        logger.error(error_msg)
-        print(error_msg)  # Keep original behavior for backward compatibility
-        return []
+    if filter_expr:
+        try:
+            logger.debug("Converting filter expression to Python function")
+            filter_function = converter.convert_to_python_function(filter_expr)
+            logger.debug("Filter function created successfully")
+        except Exception as e:
+            error_msg = f"Error converting expression '{filter_expr}': {str(e)}"
+            logger.error(error_msg)
+            print(error_msg)  # Keep original behavior for backward compatibility
+            return []
     
     values_return = []
 
     # If we have a record_id, we need to check if the path (path_expr) is internal to that record
     if record_id:
         logger.debug(f"Looking for record with ID: {record_id}")
-        # Find the record with the specified ID
-        record_node = _find_record_by_id(tree_data, record_id)
-        
-        # # Check if the path_expr specifies a path internal to the record
-        # for r in return_paths_internal:
-            
-        #     # If the path starts with an index (ex: "data[0]"), consider it a global path
-        #     # and not specific to the node, so we ignore the record_id
-        #     has_index_pattern = re.match(r'^\w+\[\d+\]', path_expr)
-        #     has_valid_path = path_expr.startswith("data") or "." in path_expr
 
+        # Find the record and childs with the specified ID
+        record_node = _find_record_by_id(tree_data, record_id)
+
+        # If the record is found, first we can limit the search to this record and its children
         if record_node:
+
             logger.info(f"Found record with ID: {record_id}")
 
-            # Check if the path_expr specifies a path internal to the record
-            if return_paths:
-
-                # The path seems to be internal to the record, so we limit the search to this record
-                # and its children
-                records = _extract_records_from_node(record_node)
-                logger.debug(f"Extracted {len(records)} records from node with ID: {record_id}")
-                
-                # Apply the filter function to each record
+            # The path seems to be internal to the record, so we limit the search to this record
+            # and its children
+            records = _extract_records_from_node(record_node)
+            logger.debug(f"Extracted {len(records)} records from node with ID: {record_id}")
+            
+            # Apply the filter function to each record
+            if filter_expr:
                 filtered_records = []
                 for record in records:
                     if isinstance(record, dict) and filter_function(record, tree_data):
                         filtered_records.append(record)
-                
-                logger.info(f"Found {len(filtered_records)} matching records in record with ID: {record_id}")
-                
-                # Extract values for specified paths if return_paths is provided
-                if return_paths:
-                    logger.debug(f"Extracting values for {len(return_paths)} paths from filtered records")
-                    result = _extract_values_for_paths(filtered_records, return_paths, tree_data)
-                    logger.info(f"Extracted values for {len(result)} paths")
-                    for path in return_paths:                        
-                        if len(result[path])>0:
-                            values_return.append({"path": path, "values": result[path]})
-                else:
-                    return filtered_records
-
-                #################
-                # path_expr = ""
-                # # If the path starts with an index (ex: "data[0]"), consider it a global path
-                # # and not specific to the node, so we ignore the record_id
-                # has_index_pattern = re.match(r'^\w+\[\d+\]', path_expr)
-                # has_valid_path = path_expr.startswith("data") or "." in path_expr
-                
-                # if not has_index_pattern and has_valid_path:
-                #     logger.debug(f"Path '{path_expr}' is internal to record with ID: {record_id}")
-                #     # The path seems to be internal to the record, so we limit the search to this record
-                #     # and its children
-                #     records = _extract_records_from_node(record_node)
-                #     logger.debug(f"Extracted {len(records)} records from node with ID: {record_id}")
-                    
-                #     # Apply the filter function to each record
-                #     filtered_records = []
-                #     for record in records:
-                #         if isinstance(record, dict) and filter_function(record, tree_data):
-                #             filtered_records.append(record)
-                    
-                #     logger.info(f"Found {len(filtered_records)} matching records in record with ID: {record_id}")
-                    
-                #     # Extract values for specified paths if return_paths is provided
-                #     if return_paths:
-                #         logger.debug(f"Extracting values for {len(return_paths)} paths from filtered records")
-                #         result = _extract_values_for_paths(filtered_records, return_paths, tree_data)
-                #         logger.info(f"Extracted values for {len(result)} paths")
-                #         return result
-                #     else:
-                #         return filtered_records
-                # else:
-                #     logger.debug(f"Path '{path_expr}' is not internal to record, using global search")
-                ##############
-
-                # If the path doesn't seem to be internal, we continue with the global search below
-                for path in values_return:
-                    return_paths.remove(path["path"])
-
-                # All paths returned
-                if return_paths == []:
-                    return values_return
-
-                # If the path doesn't seem to be internal, we continue with the global search below
             else:
-                logger.debug(f"No path specified, searching within record {record_id} and its children")
-                # If no path is specified, we use the record itself and its children
-                records = _extract_records_from_node(record_node)
-                logger.debug(f"Extracted {len(records)} records from node with ID: {record_id}")
-                
-                # Apply the filter function to each record
-                filtered_records = []
-                for record in records:
-                    if isinstance(record, dict) and filter_function(record, tree_data):
-                        filtered_records.append(record)
-                
-                logger.info(f"Found {len(filtered_records)} matching records in record with ID: {record_id}")
-                
-                # Extract values for specified paths if return_paths is provided
-                if return_paths:
-                    logger.debug(f"Extracting values for {len(return_paths)} paths from filtered records")
-                    result = _extract_values_for_paths(filtered_records, return_paths, tree_data)
-                    logger.info(f"Extracted values for {len(result)} paths")
-                    return result
-                else:
-                    return filtered_records
-        else:
-            logger.warning(f"Record with ID '{record_id}' not found")
+                filtered_records = records
 
-        # # Check all paths return
-        # for r in record_id_result:
-        #     if len(r>0):
-        #         return_paths.remove(r)
+            logger.info(f"Found {len(filtered_records)} matching records in record with ID: {record_id}")
+            logger.debug(f"Extracting values for {len(return_paths)} paths from filtered records")
 
-        # if len(return_paths) == 0:
-        #     return record_id_result
-        
-        # # No records found for the specified record_id
-        # logger.warning(f"No records found for record_id '{record_id}', perform global search!")
-        
-    
+            # Extract values for specified paths if return_paths is provided
+            result = _extract_values_for_paths(filtered_records, return_paths)
+            
+            logger.info(f"Extracted values for {len(result)} paths")
+
+            # Check if the paths are internal to the record
+            for path in return_paths:                        
+                if len(result[path])>0:
+                    values_return.append({"path": path, "values": result[path]})
+
+            # If the path doesn't seem to be internal, we continue with the global search below
+            for path in values_return:
+                return_paths.remove(path["path"])
+
+            # All paths are internal to the record, so we return the values
+            if return_paths == []:
+                return values_return
+
+            # Aggr function with _node, lock search on the record
+            if lock_node:
+                for path in return_paths:
+                    values_return.append({"path": path, "values": []})
+                return values_return
+
     # If we get here, we're not limiting the search to a specific record
     # or the path_expr is not inside the record_id, so we ignore the record_id
     logger.debug("Performing global search without record_id restriction")
+
+    # Get all records from the tree data
+    # records = []
+    # data_nodes = tree_data.get('data', [])
+    records = tree_data.get('data', [])
     
-    # Determine the path for the records to be filtered
-    # if path_expr:
-    #     logger.debug(f"Using JMESPath expression: {path_expr}")
-    #     # Use jmespath to navigate the data using a path expression
-    #     records = jmespath.search(path_expr, tree_data) or []
-    #     if not isinstance(records, list):
-    #         records = [records]
-    #         logger.debug("Converted single result to list")
-    #     logger.debug(f"JMESPath found {len(records)} records")
-    # else:
-    #     logger.debug("No path specified, searching all records")
-    #     # If no path is specified, search all records
-    #     records = []
-    #     data_nodes = tree_data.get('data', [])
-        
-    #     for node in data_nodes:
-    #         if 'data' in node:
-    #             nodes_data = node['data']
-    #             if isinstance(nodes_data, list):
-    #                 records.extend(nodes_data)
-    #     logger.debug(f"Found {len(records)} records to filter")
-    
-    logger.debug("No path specified, searching all records")
-    # If no path is specified, search all records
-    records = []
-    data_nodes = tree_data.get('data', [])
-    
-    for node in data_nodes:
-        if 'data' in node:
-            nodes_data = node['data']
-            if isinstance(nodes_data, list):
-                records.extend(nodes_data)
+    # Traverse the tree data to extract all records, only first level
+    # for node in data_nodes:
+    #     if 'data' in node:
+    #         nodes_data = node['data']
+    #         if isinstance(nodes_data, list):
+    #             records.extend(nodes_data)
+
     logger.debug(f"Found {len(records)} records to filter")
 
-
     # Apply the filter function to each record
-    filtered_records = []
-    for record in records:
-        if isinstance(record, dict) and filter_function(record, tree_data):
-            filtered_records.append(record)
+    if filter_expr:
+        r_global = filter_global(records)
+        if isinstance(r_global, dict) and 'data' in r_global:
+            filtered_records = r_global['data']
+        elif isinstance(r_global, list):
+            filtered_records = r_global
+        else:
+            filtered_records = []
+        # for record in records:
+        #     if isinstance(record, dict) and filter_function(record, tree_data):
+        #         filtered_records.append(record)            
+    else:
+        filtered_records = records
     
     logger.info(f"Filter applied: found {len(filtered_records)} matching records out of {len(records)}")
     
     # Extract values for specified paths if return_paths is provided
-    if return_paths:
-        logger.debug(f"Extracting values for {len(return_paths)} paths from filtered records")
-        result = _extract_values_for_paths(filtered_records, return_paths, tree_data)
-        logger.info(f"Extracted values for {len(result)} paths")
-        return result
-    else:
-        return filtered_records
+    logger.debug(f"Extracting values for {len(return_paths)} paths from filtered records")
+    result = _extract_values_for_paths(filtered_records, return_paths)
+    logger.info(f"Extracted values for {len(result)} paths")
 
-def _extract_values_for_paths(records: List[Dict], paths: List[str], tree_data: Dict) -> Dict[str, List[Any]]:
+    for path in return_paths:                        
+        if len(result[path])>0:
+            values_return.append({"path": path, "values": result[path]})
+
+    return values_return
+
+def filter_tree_data_aggr(tree_data: Dict, return_paths: List[str], record_id: str = None, filter_expr: str = None) -> Union[List[Dict], Dict[str, Any]]:
+    return filter_tree_data_aggr(tree_data, return_paths, record_id, filter_expr, aggr=True)
+
+def _extract_values_for_paths(records: List[Dict], paths: List[str]) -> Dict[str, List[Any]]:
     """
     Extracts values for specified paths from a list of records.
     
     Args:
         records: List of filtered records to extract values from
         paths: List of paths to extract values for
-        tree_data: Complete tree data (used for special functions like first, last, etc.)
         
     Returns:
         Dictionary mapping each path to a list of values extracted from the records
@@ -1114,97 +1107,62 @@ def _extract_values_for_paths(records: List[Dict], paths: List[str], tree_data: 
 
         # Handle special functions (first, last, firstc, lastc)
         if path.startswith("first(") and path.endswith(")"):
+
             # Extract the field path from first(...)
             field_path = path[6:-1]
             logger.debug(f"Extracting first value for field: {field_path}")
-            if tree_data and 'data' in tree_data:
-                value = converter._find_first_value_for_path(field_path, tree_data['data'])
-                result[path] = [value] if value is not None else []
+            value = converter._find_first_value_for_path(field_path, records)
+            result[path] = [value] if value is not None else []
+            if value:
                 logger.debug(f"First value for {field_path}: {value}")
             else:
-                logger.warning(f"Cannot extract first value: tree_data['data'] not found")
+                logger.warning(f"Cannot extract first value: {field_path} not found")
             continue
             
         elif path.startswith("last(") and path.endswith(")"):
             # Extract the field path from last(...)
             field_path = path[5:-1]
             logger.debug(f"Extracting last value for field: {field_path}")
-            if tree_data and 'data' in tree_data:
-                value = converter._find_last_value_for_path(field_path, tree_data['data'])
-                result[path] = [value] if value is not None else []
-                logger.debug(f"Last value for {field_path}: {value}")
+            value = converter._find_last_value_for_path(field_path, records)
+            result[path] = [value] if value is not None else []
+            if value:
+                logger.debug(f"Last value for {field_path}: {value}")            
             else:
-                logger.warning(f"Cannot extract last value: tree_data['data'] not found")
+                logger.warning(f"Cannot extract last value: {field_path} not found")
             continue
             
         elif path.startswith("firstc(") and path.endswith(")"):
             # Extract the field path from firstc(...)
             field_path = path[7:-1]
             logger.debug(f"Extracting first value by creation date for field: {field_path}")
-            if tree_data and 'data' in tree_data:
-                value = converter._find_firstc_value_for_path(field_path, tree_data['data'])
-                result[path] = [value] if value is not None else []
+            value = converter._find_firstc_value_for_path(field_path, records)
+            result[path] = [value] if value is not None else []
+            if value:
                 logger.debug(f"First value by creation date for {field_path}: {value}")
             else:
-                logger.warning(f"Cannot extract firstc value: tree_data['data'] not found")
+                logger.warning(f"Cannot extract firstc value: {field_path} not found")
             continue
             
         elif path.startswith("lastc(") and path.endswith(")"):
             # Extract the field path from lastc(...)
             field_path = path[6:-1]
             logger.debug(f"Extracting last value by creation date for field: {field_path}")
-            if tree_data and 'data' in tree_data:
-                value = converter._find_lastc_value_for_path(field_path, tree_data['data'])
-                result[path] = [value] if value is not None else []
+            value = converter._find_lastc_value_for_path(field_path, records)
+            result[path] = [value] if value is not None else []
+            if value:
                 logger.debug(f"Last value by creation date for {field_path}: {value}")
             else:
-                logger.warning(f"Cannot extract lastc value: tree_data['data'] not found")
+                logger.warning(f"Cannot extract lastc value: {field_path} not found")
             continue
         
         # Regular field path
         logger.debug(f"Extracting values for regular path: {path}")
-        value_count = 0
-        
-        for record in records:
-            record_id = record.get('id', 'unknown')
-            # Look for the field in the record
-            if 'fields' in record and record['fields'] is not None:
-                for field in record['fields']:
-                    if field.get('path') == path:
-                        value = field.get('value')
-                        result[path].append(value)
-                        value_count += 1
-                        logger.debug(f"Found value for path '{path}' in record {record_id}: {value}")
-                        break
-            
-            # If not found at this level, look in subnodes
-            if 'data' in record and record['data'] is not None:
-                subnode_count = 0
-                for subnode in record['data']:
-                    # Look in specific property nodes
-                    if isinstance(subnode, dict) and 'path' in subnode and subnode['path'] == path and 'data' in subnode and subnode['data']:
-                        for data_item in subnode['data']:
-                            if 'fields' in data_item and data_item['fields']:
-                                value = data_item['fields'][0].get('value')
-                                result[path].append(value)
-                                value_count += 1
-                                subnode_count += 1
-                                logger.debug(f"Found value for path '{path}' in subnode of record {record_id}: {value}")
-                    
-                    # Look in generic subnodes
-                    elif isinstance(subnode, dict) and 'fields' in subnode and subnode['fields']:
-                        for field in subnode['fields']:
-                            if field.get('path') == path:
-                                value = field.get('value')
-                                result[path].append(value)
-                                value_count += 1
-                                subnode_count += 1
-                                logger.debug(f"Found value for path '{path}' in generic subnode of record {record_id}: {value}")
-                
-                if subnode_count > 0:
-                    logger.debug(f"Found {subnode_count} values for path '{path}' in subnodes of record {record_id}")
-        
-        logger.info(f"Extracted {value_count} values for path '{path}' from {len(records)} records")
+        values = converter._find_value_for_path(path, records)
+        result[path] = values if values is not None else []
+        if values:
+            logger.debug(f"Last value by creation date for {path}: {values}")
+        else:
+            logger.warning(f"Cannot extract lastc value: {path} not found")        
     
     logger.debug(f"Extraction complete. Result has {len(result)} paths")
 

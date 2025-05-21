@@ -42,7 +42,7 @@
             },
             {
                 "path": "e00091v",
-                "value": "valor_percentual = (lastd(e00026v) * e00088v)/100\nreid_acumulado = sum(e00091v * e00092v, e00083v == 'Não') + valor_percentual\nvalor_maximo = (e00019v * 3,65)/100\n\nif reid_acumulado > valor_maximo:\n    return e00088v\nelse\n\treturn e00088v - valor_percentual",
+                "value": "valor_percentual = (e00026v * e00088v)/100\nreid_acumulado = sum(e00091v, e00083v == 'Não') + valor_percentual\nvalor_maximo = (e00019v * 3,65)/100\n\nif reid_acumulado > valor_maximo:\n    return e00088v\nelse\n\treturn e00088v - valor_percentual",
                 "update": {
                     "doctype": "Contract Measurement",
                     "fieldname": "descontoreidi"
@@ -50,10 +50,9 @@
                 "parsed": {
                     "aggr": [
                         {
-                            "base": "sum(e00091v * e00092v)",
+                            "base": "sum(e00091v)",
                             "vars": [
-                                "e00091v",
-                                "e00092v"
+                                "e00091v"
                             ],
                             "filter": "e00083v == 'Não'",
                             "filter_vars": [
@@ -62,17 +61,16 @@
                         }
                     ],
                     "vars": [
-                        "e00019v",
                         "e00026v",
-                        "e00088v"
+                        "e00088v",
+                        "e00019v"
                     ],
                     "dag_paths": [
                         "e00091v",
-                        "e00092v",
                         "e00083v",
-                        "e00019v",
                         "e00026v",
-                        "e00088v"
+                        "e00088v",
+                        "e00019v"
                     ]
                 }
             },
@@ -127,7 +125,7 @@
             },
             {
                 "path": "e00096v",
-                "value": "sum(e00120v, e00083v == 'Não')+first(e00089v)",
+                "value": "sum(e00120v, e00083v == 'Não')+e00089v",
                 "update": {
                     "doctype": "Contract Measurement",
                     "fieldname": "ftdacumulado"
@@ -143,17 +141,11 @@
                             "filter_vars": [
                                 "e00083v"
                             ]
-                        },
-                        {
-                            "base": "first(e00089v)",
-                            "vars": [
-                                "e00089v"
-                            ],
-                            "filter": "",
-                            "filter_vars": []
                         }
                     ],
-                    "vars": [],
+                    "vars": [
+                        "e00089v"
+                    ],
                     "dag_paths": [
                         "e00120v",
                         "e00083v",
@@ -190,7 +182,7 @@
             },
             {
                 "path": "e00089v",
-                "value": "valor_ativo = sum(e00108v, contains(e00083v, 'Sim'))",
+                "value": "valor_ativo = sum(e00108v, e00083v = 'Sim')",
                 "update": {
                     "doctype": "Contract Measurement",
                     "fieldname": "faturamentodireto"
@@ -202,7 +194,7 @@
                             "vars": [
                                 "e00108v"
                             ],
-                            "filter": "contains(e00083v, 'Sim')",
+                            "filter": "e00083v == 'Sim'",
                             "filter_vars": [
                                 "e00083v"
                             ]

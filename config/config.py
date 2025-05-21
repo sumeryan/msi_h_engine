@@ -11,7 +11,9 @@ class EngineConfig(BaseModel):
     
     # Allowed safe agregate functions
     safe_aggr_functions: Set[str] = {
-        "sum", "avg", "count", "max", "min", "abs", "len", "round", "first", "last","firstc", "lastc"
+        "sum", "avg", "count", "max", "min", "abs", "len", "round", 
+        "first", "last","firstc", "lastc",
+        "sum_node", "avg_node", "count_node", "max_node", "min_node" 
     }
 
     # Allowed safe functions

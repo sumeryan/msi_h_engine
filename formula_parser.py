@@ -16,11 +16,11 @@ import json
 import os
 import os
 import re
-import logging
 from typing import Dict, List, Any, Optional, Tuple
 from config import get_config
 from log.logger import get_logger
 from formulas_dag import get_ordered_formulas
+from log import get_logger
 
 # Initialize logger for this module
 logger = get_logger("formula_parser")
@@ -92,6 +92,15 @@ class FormulaParser:
         logger.debug(f"Extracted variables: {unique_vars}")
         return unique_vars
     
+    def _fix_comparison_operators(self, str_expr):
+        """
+        Substitui ocorrências inválidas de '=' por '==' em uma string de expressão.
+        Garante que apenas comparações sejam ajustadas, evitando múltiplos '==' consecutivos.
+        """
+        import re
+        # Substitui '=' por '==' apenas quando não for parte de '==' ou '===' e evita duplicação
+        return re.sub(r'(?<![=!<>])=(?![=])', '==', str_expr).replace('== ==', '==')
+
     def _parse_aggregate_call(self, match) -> Dict:
         """
         Analisa uma chamada de função de agregação e extrai seus componentes.
@@ -105,7 +114,8 @@ class FormulaParser:
         func_name = match.group(1)
         arg_expr = match.group(2).strip() if match.group(2) else ""
         filter_expr = match.group(3).strip() if match.group(3) else ""
-        
+        filter_expr = self._fix_comparison_operators(filter_expr)
+    
         # Extrai variáveis do argumento principal
         arg_vars = self.extract_variables(arg_expr)
         
@@ -259,10 +269,13 @@ class FormulaParser:
                     
                     logger.debug(f"Base function: {base_func}")
                     logger.debug(f"Full function: {full_func}")
-                    
+
+                    filter_expr = self._fix_comparison_operators(filter_expr)
+
                     aggr_obj = {
                         "base": base_func,  # Aggregation without filter
                         "vars": arg_vars,
+                        "global": (not "_node" in base_func),
                         "filter": filter_expr,
                         "filter_vars": filter_vars
                     }
@@ -541,16 +554,8 @@ def parse_formulas(data: Any) -> List[Dict]:
 # Function for direct module testing
 if __name__ == "__main__":
     # Configure logging for console output
-    logging.basicConfig(
-        level=logging.INFO,
-        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-        handlers=[
-            logging.StreamHandler(),
-            logging.FileHandler(os.path.join(os.path.dirname(__file__), "../logs/formula_parser.log"))
-        ]
-    )
-    
-    logger.info("Starting formula parser")
+
+    logger = get_logger("Formula Parser")
     
     input_path = os.path.join(os.path.dirname(__file__), "tree_data.json")
     output_path = os.path.join(os.path.dirname(__file__), "extracted_formulas.json")
