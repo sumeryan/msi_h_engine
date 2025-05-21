@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Engine Eval Log Console</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap">
+    <script src="https://cdn.jsdelivr.net/npm/ansi_up@5.1.0/ansi_up.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Engine Eval Log Console</h1>
+            <div class="controls">
+                <div class="control-group">
+                    <label for="log-file">Log File:</label>
+                    <select id="log-file">
+                        {% for file in log_files %}
+                        <option value="{{ file }}">{{ file }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label for="log-level">Log Level:</label>
+                    <select id="log-level">
+                        <option value="">All Levels</option>
+                        {% for level in log_levels %}
+                        <option value="{{ level }}">{{ level }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label for="log-module">Module:</label>
+                    <select id="log-module">
+                        <option value="">All Modules</option>
+                        {% for module in log_modules %}
+                        <option value="{{ module }}">{{ module }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label for="search-text">Search:</label>
+                    <input type="text" id="search-text" placeholder="Filter logs...">
+                </div>
+                <div class="control-group">
+                    <label for="auto-scroll">Auto-scroll:</label>
+                    <input type="checkbox" id="auto-scroll" checked>
+                </div>
+                <div class="control-group">
+                    <label for="auto-refresh">Auto-refresh:</label>
+                    <input type="checkbox" id="auto-refresh" checked>
+                </div>
+                <div class="control-group">
+                    <button id="refresh-btn">Refresh</button>
+                    <button id="clear-btn">Clear</button>
+                </div>
+            </div>
+        </header>
+        
+        <main>
+            <div class="console-container">
+                <div id="console-output"></div>
+            </div>
+            
+            <div class="status-bar">
+                <div id="log-count">0 log entries</div>
+                <div id="last-update"></div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // DOM elements
+        const consoleOutput = document.getElementById('console-output');
+        const logFileSelect = document.getElementById('log-file');
+        const logLevelSelect = document.getElementById('log-level');
+        const logModuleSelect = document.getElementById('log-module');
+        const searchTextInput = document.getElementById('search-text');
+        const autoScrollCheckbox = document.getElementById('auto-scroll');
+        const autoRefreshCheckbox = document.getElementById('auto-refresh');
+        const refreshBtn = document.getElementById('refresh-btn');
+        const clearBtn = document.getElementById('clear-btn');
+        const logCountElem = document.getElementById('log-count');
+        const lastUpdateElem = document.getElementById('last-update');
+        
+        // State variables
+        let lastTimestamp = null;
+        let pollInterval = 1000; // 1 second
+        let pollIntervalId = null;
+        let logCount = 0;
+        
+        // Utility function to format log entries
+        function formatLogEntry(log) {
+            const timestamp = `<span class="timestamp">${log.timestamp}</span>`;
+            const level = `<span class="level level-${log.level.toLowerCase()}">${log.level}</span>`;
+            const module = `<span class="module">${log.module}</span>`;
+            const message = `<span class="message">${formatMessage(log.message)}</span>`;
+            
+            return `<div class="log-entry">${timestamp} ${level} ${module} ${message}</div>`;
+        }
+        
+        // Format special parts of messages (e.g., highlight formula strings, variables)
+        function formatMessage(message) {
+            // Convert ANSI color codes if present
+            const ansiUp = new AnsiUp();
+            let formattedMsg = ansiUp.ansi_to_html(message);
+            
+            // Highlight formula strings
+            formattedMsg = formattedMsg.replace(/'([^']+)'/g, (match, formula) => {
+                // Only highlight if it looks like a formula
+                if (formula.includes('+') || formula.includes('-') || 
+                    formula.includes('*') || formula.includes('/') ||
+                    formula.includes('(') || formula.includes('[') ||
+                    /\b[a-zA-Z]+\d+_\d+\b/.test(formula)) {
+                    return `'<span class="formula">${formula}</span>'`;
+                }
+                return match;
+            });
+            
+            // Highlight variable names (e.g., e12345v_123)
+            formattedMsg = formattedMsg.replace(/\b([a-zA-Z]+\d+_\d+)\b/g, '<span class="variable">$1</span>');
+            
+            // Highlight numbers
+            formattedMsg = formattedMsg.replace(/\b(\d+(\.\d+)?)\b/g, '<span class="number">$1</span>');
+            
+            return formattedMsg;
+        }
+        
+        // Initial fetch of all logs
+        function fetchInitialLogs() {
+            const logFile = logFileSelect.value;
+            const logLevel = logLevelSelect.value;
+            const logModule = logModuleSelect.value;
+            const searchText = searchTextInput.value;
+            
+            // Construct the API URL with filters
+            let url = `/api/logs?file=${encodeURIComponent(logFile)}`;
+            if (logLevel) url += `&level=${encodeURIComponent(logLevel)}`;
+            if (logModule) url += `&module=${encodeURIComponent(logModule)}`;
+            if (searchText) url += `&search=${encodeURIComponent(searchText)}`;
+            
+            // Clear console first
+            consoleOutput.innerHTML = '';
+            logCount = 0;
+            
+            // Show loading indicator
+            consoleOutput.innerHTML = '<div class="log-entry">Loading logs...</div>';
+            
+            fetch(url)
+                .then(response => response.json())
+                .then(logs => {
+                    // Clear console again
+                    consoleOutput.innerHTML = '';
+                    
+                    // Add each log entry to the console
+                    logs.forEach(log => {
+                        consoleOutput.innerHTML += formatLogEntry(log);
+                        logCount++;
+                    });
+                    
+                    // Update log count
+                    logCountElem.textContent = `${logCount} log entries`;
+                    
+                    // Update last update time
+                    const now = new Date();
+                    lastUpdateElem.textContent = `Last updated: ${now.toLocaleTimeString()}`;
+                    lastTimestamp = now.toISOString().replace('T', ' ').replace('Z', '');
+                    
+                    // Scroll to bottom if auto-scroll is enabled
+                    if (autoScrollCheckbox.checked) {
+                        consoleOutput.scrollTop = consoleOutput.scrollHeight;
+                    }
+                    
+                    // Start polling for updates if auto-refresh is enabled
+                    if (autoRefreshCheckbox.checked) {
+                        startPolling();
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching logs:', error);
+                    consoleOutput.innerHTML = `<div class="log-entry error">Error fetching logs: ${error.message}</div>`;
+                });
+        }
+        
+        // Poll for log updates
+        function pollUpdates() {
+            if (!lastTimestamp) {
+                return;
+            }
+            
+            const logFile = logFileSelect.value;
+            const logLevel = logLevelSelect.value;
+            const logModule = logModuleSelect.value;
+            const searchText = searchTextInput.value;
+            
+            // Construct the API URL with filters
+            let url = `/api/logs/updates?since=${encodeURIComponent(lastTimestamp)}&file=${encodeURIComponent(logFile)}`;
+            if (logLevel) url += `&level=${encodeURIComponent(logLevel)}`;
+            if (logModule) url += `&module=${encodeURIComponent(logModule)}`;
+            if (searchText) url += `&search=${encodeURIComponent(searchText)}`;
+            
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.logs && data.logs.length > 0) {
+                        // Add each new log entry to the console
+                        data.logs.forEach(log => {
+                            consoleOutput.innerHTML += formatLogEntry(log);
+                            logCount++;
+                        });
+                        
+                        // Update log count
+                        logCountElem.textContent = `${logCount} log entries`;
+                        
+                        // Scroll to bottom if auto-scroll is enabled
+                        if (autoScrollCheckbox.checked) {
+                            consoleOutput.scrollTop = consoleOutput.scrollHeight;
+                        }
+                    }
+                    
+                    // Update last update time and timestamp
+                    lastUpdateElem.textContent = `Last updated: ${new Date().toLocaleTimeString()}`;
+                    lastTimestamp = data.timestamp;
+                })
+                .catch(error => {
+                    console.error('Error polling log updates:', error);
+                    // Don't display error in console, just log to browser console
+                });
+        }
+        
+        // Start polling for updates
+        function startPolling() {
+            // Clear existing interval if any
+            if (pollIntervalId) {
+                clearInterval(pollIntervalId);
+            }
+            
+            // Set up new polling interval
+            pollIntervalId = setInterval(pollUpdates, pollInterval);
+        }
+        
+        // Stop polling for updates
+        function stopPolling() {
+            if (pollIntervalId) {
+                clearInterval(pollIntervalId);
+                pollIntervalId = null;
+            }
+        }
+        
+        // Handle filter changes
+        function handleFilterChange() {
+            // Stop existing polling
+            stopPolling();
+            
+            // Fetch initial logs with new filters
+            fetchInitialLogs();
+        }
+        
+        // Event listeners
+        logFileSelect.addEventListener('change', handleFilterChange);
+        logLevelSelect.addEventListener('change', handleFilterChange);
+        logModuleSelect.addEventListener('change', handleFilterChange);
+        searchTextInput.addEventListener('input', debounce(handleFilterChange, 500));
+        refreshBtn.addEventListener('click', handleFilterChange);
+        
+        autoRefreshCheckbox.addEventListener('change', function() {
+            if (this.checked) {
+                startPolling();
+            } else {
+                stopPolling();
+            }
+        });
+        
+        clearBtn.addEventListener('click', () => {
+            consoleOutput.innerHTML = '';
+            logCount = 0;
+            logCountElem.textContent = '0 log entries';
+        });
+        
+        // Utility function to debounce rapid input events
+        function debounce(func, delay) {
+            let timeout;
+            return function() {
+                const context = this;
+                const args = arguments;
+                clearTimeout(timeout);
+                timeout = setTimeout(() => func.apply(context, args), delay);
+            };
+        }
+        
+        // Initial load
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchInitialLogs();
+        });
+    </script>
+</body>
+</html>

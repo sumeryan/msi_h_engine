@@ -36,6 +36,7 @@ from log.logger import get_logger
 
 # Get a logger instance for this module
 logger = get_logger("filters")
+logger.info("Filters module initialized")
 
 class tree_data_filter:
     """
@@ -110,9 +111,10 @@ class tree_data_filter:
 
     # Handling lexical errors (unrecognized characters)
     def t_error(self, t):
-        error_msg = f"Illegal character '{t.value[0]}'"
+        error_msg = f"Illegal character '{t.value[0]}' at position {t.lexpos}"
         logger.error(error_msg)
         print(error_msg)  # Keep original behavior for backward compatibility
+        logger.debug(f"Skipping illegal character and continuing lexical analysis")
         t.lexer.skip(1)  # Skip the unrecognized character
 
     # Operator precedence (from lowest to highest)
@@ -200,13 +202,15 @@ class tree_data_filter:
     # Handling syntactic errors
     def p_error(self, p):
         if p:
-            error_msg = f"Syntax error at '{p.value}'"
+            error_msg = f"Syntax error at '{p.value}' (token type: {p.type}, position: {p.lexpos})"
             logger.error(error_msg)
             print(error_msg)  # Keep original behavior for backward compatibility
+            logger.debug(f"Parser state at error: {self.parser.state}")
         else:
-            error_msg = "Syntax error at the end of expression"
+            error_msg = "Syntax error at the end of expression (unexpected end of input)"
             logger.error(error_msg)
             print(error_msg)  # Keep original behavior for backward compatibility
+            logger.debug("No token information available for this syntax error")
 
     def __init__(self):
         """
@@ -214,7 +218,9 @@ class tree_data_filter:
         """
         logger.debug("Initializing tree_data_filter parser")
         # Initialize the lexer (lexical analyzer) and parser (syntactic analyzer)
+        logger.debug("Creating lexical analyzer using PLY lex")
         self.lexer = lex.lex(module=self)
+        logger.debug("Creating syntactic analyzer using PLY yacc")
         self.parser = yacc.yacc(module=self)
         logger.info("Filter expression parser initialized successfully")
         
@@ -917,6 +923,7 @@ class tree_data_filter:
         return sorted_nodes[0]['value'] if sorted_nodes else None
     
 def filter_tree_data(tree_data: Dict, return_paths: List[str], record_id: str = None, filter_expr: str = None, lock_node: bool = False) -> Union[List[Dict], Dict[str, Any]]:
+    logger.info(f"===== Starting filter operation =====")
     """
     Filters tree data using a custom conditional expression.
     
@@ -941,7 +948,7 @@ def filter_tree_data(tree_data: Dict, return_paths: List[str], record_id: str = 
     """
 
     def filter_global(records):
-
+        logger.debug(f"Performing global recursive filter on {len(records) if isinstance(records, list) else 'non-list'} records")
         g_filtered_records = []
 
         # Apply the filter function to each record
@@ -965,6 +972,7 @@ def filter_tree_data(tree_data: Dict, return_paths: List[str], record_id: str = 
         logger.info(f"Extracting values for paths: {return_paths}")
     
     # Initialize the expression converter
+    logger.debug("Creating tree_data_filter instance for parsing and evaluating expressions")
     converter = tree_data_filter()
     
     # Convert the expression to a Python filter function
@@ -1026,6 +1034,7 @@ def filter_tree_data(tree_data: Dict, return_paths: List[str], record_id: str = 
 
             # All paths are internal to the record, so we return the values
             if return_paths == []:
+                logger.info(f"All paths processed internally to record {record_id}, returning {len(values_return)} results")
                 return values_return
 
             # Aggr function with _node, lock search on the record
