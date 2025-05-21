@@ -1,0 +1,12 @@
+CREATE TABLE IF NOT EXISTS requests (
+  id SERIAL PRIMARY KEY,
+  payload JSONB NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS responses (
+  id SERIAL PRIMARY KEY,
+  request_id INT REFERENCES requests(id),
+  result JSONB NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT now()
+);

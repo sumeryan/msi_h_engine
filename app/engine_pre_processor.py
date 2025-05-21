@@ -37,9 +37,9 @@ import os
 import json
 import copy
 from typing import Dict, List, Any, Optional
-from filters.filters_paths import filter_tree_data
-from engine_parser import parse_formulas
-from log.logger import get_logger
+from app.filters.filters_paths import filter_tree_data
+from app.engine_parser import parse_formulas
+from app.log.logger import get_logger
 
 # Get a logger instance for this module
 logger = get_logger("engine_pre_processor")

@@ -1,0 +1,12 @@
+fastapi
+uvicorn[standard]
+pika
+asyncpg
+sqlalchemy
+databases
+psycopg2-binary
+numpy
+networkx
+jmespath
+ply
+asteval
