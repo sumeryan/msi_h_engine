@@ -1089,9 +1089,6 @@ def filter_tree_data(tree_data: Dict, return_paths: List[str], record_id: str = 
 
     return values_return
 
-def filter_tree_data_aggr(tree_data: Dict, return_paths: List[str], record_id: str = None, filter_expr: str = None) -> Union[List[Dict], Dict[str, Any]]:
-    return filter_tree_data_aggr(tree_data, return_paths, record_id, filter_expr, aggr=True)
-
 def _extract_values_for_paths(records: List[Dict], paths: List[str]) -> Dict[str, List[Any]]:
     """
     Extracts values for specified paths from a list of records.

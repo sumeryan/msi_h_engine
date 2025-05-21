@@ -1,10 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
+Powered by Renoir
+Author: Igor Daniel G Goncalves - igor.goncalves@renoirgroup.com
+
 Formula DAG Module
 -----------------
-Powered by Renoir
-Created by igor.goncalves@renoirgroup.com
 
 This module builds a Directed Acyclic Graph (DAG) to define the execution order
 of formulas based on their dependencies.
