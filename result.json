@@ -1,0 +1,1069 @@
+{
+    "results": [
+        {
+            "entity_id": "0196c4d0-b7ad-7b23-ad96-b316ce979d6f",
+            "formula_results": [
+                {
+                    "formula_path": "e00100v",
+                    "status": "success",
+                    "result": 82.80288443295218
+                },
+                {
+                    "formula_path": "e00097v",
+                    "status": "success",
+                    "result": 34832798.15
+                },
+                {
+                    "formula_path": "e00091v",
+                    "status": "error",
+                    "error": "ExceptionHolder(<class 'SyntaxError'>, expected ':' (<unknown>, line 7))"
+                },
+                {
+                    "formula_path": "e00090v",
+                    "status": "success",
+                    "result": 385893.49
+                },
+                {
+                    "formula_path": "e00099v",
+                    "status": "success",
+                    "result": 36932798.15
+                },
+                {
+                    "formula_path": "e00096v",
+                    "status": "success",
+                    "result": 350000.0
+                },
+                {
+                    "formula_path": "e00088v",
+                    "status": "success",
+                    "result": 0
+                },
+                {
+                    "formula_path": "e00089v",
+                    "status": "error",
+                    "error": "Unknown error"
+                }
+            ]
+        },
+        {
+            "entity_id": "0196c6ad-c158-7883-9b7a-351ef0cf0772",
+            "formula_results": [
+                {
+                    "formula_path": "e00100v",
+                    "status": "success",
+                    "result": 81.05881920566043
+                },
+                {
+                    "formula_path": "e00097v",
+                    "status": "success",
+                    "result": 34832798.15
+                },
+                {
+                    "formula_path": "e00091v",
+                    "status": "error",
+                    "error": "ExceptionHolder(<class 'SyntaxError'>, expected ':' (<unknown>, line 7))"
+                },
+                {
+                    "formula_path": "e00090v",
+                    "status": "success",
+                    "result": 294132.07999999996
+                },
+                {
+                    "formula_path": "e00099v",
+                    "status": "success",
+                    "result": 36932798.15
+                },
+                {
+                    "formula_path": "e00096v",
+                    "status": "success",
+                    "result": 350000.0
+                },
+                {
+                    "formula_path": "e00088v",
+                    "status": "success",
+                    "result": 0
+                },
+                {
+                    "formula_path": "e00089v",
+                    "status": "error",
+                    "error": "Unknown error"
+                }
+            ]
+        },
+        {
+            "entity_id": "0196c4ed-90aa-75a1-8ffa-b453675ab422",
+            "formula_results": [
+                {
+                    "formula_path": "e00030v",
+                    "status": "success",
+                    "result": 0
+                },
+                {
+                    "formula_path": "e00109v",
+                    "status": "success",
+                    "result": 0
+                },
+                {
+                    "formula_path": "e00025v",
+                    "status": "success",
+                    "result": 0
+                },
+                {
+                    "formula_path": "e00106v",
+                    "status": "success",
+                    "result": 36932798.15
+                }
+            ]
+        },
+        {
+            "entity_id": "0196c8d0-74b8-7832-9049-d3f62e3dee90",
+            "formula_results": [
+                {
+                    "formula_path": "e00030v",
+                    "status": "success",
+                    "result": 0
+                },
+                {
+                    "formula_path": "e00109v",
+                    "status": "success",
+                    "result": 0
+                },
+                {
+                    "formula_path": "e00025v",
+                    "status": "success",
+                    "result": 0
+                },
+                {
+                    "formula_path": "e00106v",
+                    "status": "success",
+                    "result": 36932798.15
+                }
+            ]
+        },
+        {
+            "entity_id": "0196c4ed-90aa-75a1-8ffa-b4640699dc42",
+            "formula_results": [
+                {
+                    "formula_path": "e00030v",
+                    "status": "success",
+                    "result": 0
+                },
+                {
+                    "formula_path": "e00109v",
+                    "status": "success",
+                    "result": 0
+                },
+                {
+                    "formula_path": "e00025v",
+                    "status": "success",
+                    "result": 0
+                },
+                {
+                    "formula_path": "e00106v",
+                    "status": "success",
+                    "result": 36932798.15
+                }
+            ]
+        },
+        {
+            "entity_id": "0196c4ed-90aa-75a1-8ffa-b478128dc114",
+            "formula_results": [
+                {
+                    "formula_path": "e00030v",
+                    "status": "success",
+                    "result": 0
+                },
+                {
+                    "formula_path": "e00109v",
+                    "status": "success",
+                    "result": 0
+                },
+                {
+                    "formula_path": "e00025v",
+                    "status": "success",
+                    "result": 0
+                },
+                {
+                    "formula_path": "e00106v",
+                    "status": "success",
+                    "result": 36932798.15
+                }
+            ]
+        },
+        {
+            "entity_id": "0196c4ed-90aa-75a1-8ffa-b48679b401d2",
+            "formula_results": [
+                {
+                    "formula_path": "e00030v",
+                    "status": "success",
+                    "result": 0
+                },
+                {
+                    "formula_path": "e00109v",
+                    "status": "success",
+                    "result": 0
+                },
+                {
+                    "formula_path": "e00025v",
+                    "status": "success",
+                    "result": 0
+                },
+                {
+                    "formula_path": "e00106v",
+                    "status": "success",
+                    "result": 36932798.15
+                }
+            ]
+        },
+        {
+            "entity_id": "0196c4ed-90aa-75a1-8ffa-b49e965b973f",
+            "formula_results": [
+                {
+                    "formula_path": "e00030v",
+                    "status": "success",
+                    "result": 0
+                },
+                {
+                    "formula_path": "e00109v",
+                    "status": "success",
+                    "result": 0
+                },
+                {
+                    "formula_path": "e00025v",
+                    "status": "success",
+                    "result": 0
+                },
+                {
+                    "formula_path": "e00106v",
+                    "status": "success",
+                    "result": 36932798.15
+                }
+            ]
+        },
+        {
+            "entity_id": "0196c4ed-90aa-75a1-8ffa-b4a36e2a581c",
+            "formula_results": [
+                {
+                    "formula_path": "e00030v",
+                    "status": "success",
+                    "result": 0
+                },
+                {
+                    "formula_path": "e00109v",
+                    "status": "success",
+                    "result": 0
+                },
+                {
+                    "formula_path": "e00025v",
+                    "status": "success",
+                    "result": 0
+                },
+                {
+                    "formula_path": "e00106v",
+                    "status": "success",
+                    "result": 36932798.15
+                }
+            ]
+        },
+        {
+            "entity_id": "0196c4ed-90aa-75a1-8ffa-b4b81f0272df",
+            "formula_results": [
+                {
+                    "formula_path": "e00030v",
+                    "status": "success",
+                    "result": 0
+                },
+                {
+                    "formula_path": "e00109v",
+                    "status": "success",
+                    "result": 0
+                },
+                {
+                    "formula_path": "e00025v",
+                    "status": "success",
+                    "result": 0
+                },
+                {
+                    "formula_path": "e00106v",
+                    "status": "success",
+                    "result": 36932798.15
+                }
+            ]
+        },
+        {
+            "entity_id": "0196c4ed-90aa-75a1-8ffa-b4caeb9a5571",
+            "formula_results": [
+                {
+                    "formula_path": "e00030v",
+                    "status": "success",
+                    "result": 0
+                },
+                {
+                    "formula_path": "e00109v",
+                    "status": "success",
+                    "result": 0
+                },
+                {
+                    "formula_path": "e00025v",
+                    "status": "success",
+                    "result": 0
+                },
+                {
+                    "formula_path": "e00106v",
+                    "status": "success",
+                    "result": 36932798.15
+                }
+            ]
+        },
+        {
+            "entity_id": "0196c4ed-90aa-75a1-8ffa-b4d71c3a8818",
+            "formula_results": [
+                {
+                    "formula_path": "e00030v",
+                    "status": "success",
+                    "result": 0
+                },
+                {
+                    "formula_path": "e00109v",
+                    "status": "success",
+                    "result": 0
+                },
+                {
+                    "formula_path": "e00025v",
+                    "status": "success",
+                    "result": 0
+                },
+                {
+                    "formula_path": "e00106v",
+                    "status": "success",
+                    "result": 36932798.15
+                }
+            ]
+        },
+        {
+            "entity_id": "0196c4ed-90aa-75a1-8ffa-b4eacdb157be",
+            "formula_results": [
+                {
+                    "formula_path": "e00030v",
+                    "status": "success",
+                    "result": 0
+                },
+                {
+                    "formula_path": "e00109v",
+                    "status": "success",
+                    "result": 0
+                },
+                {
+                    "formula_path": "e00025v",
+                    "status": "success",
+                    "result": 0
+                },
+                {
+                    "formula_path": "e00106v",
+                    "status": "success",
+                    "result": 36932798.15
+                }
+            ]
+        },
+        {
+            "entity_id": "0196c4ed-90aa-75a1-8ffa-b4fde20c938a",
+            "formula_results": [
+                {
+                    "formula_path": "e00030v",
+                    "status": "success",
+                    "result": 0
+                },
+                {
+                    "formula_path": "e00109v",
+                    "status": "success",
+                    "result": 0
+                },
+                {
+                    "formula_path": "e00025v",
+                    "status": "success",
+                    "result": 0
+                },
+                {
+                    "formula_path": "e00106v",
+                    "status": "success",
+                    "result": 36932798.15
+                }
+            ]
+        },
+        {
+            "entity_id": "0196c4ed-90aa-75a1-8ffa-b5089c1c6208",
+            "formula_results": [
+                {
+                    "formula_path": "e00030v",
+                    "status": "success",
+                    "result": 0
+                },
+                {
+                    "formula_path": "e00109v",
+                    "status": "success",
+                    "result": 0
+                },
+                {
+                    "formula_path": "e00025v",
+                    "status": "success",
+                    "result": 0
+                },
+                {
+                    "formula_path": "e00106v",
+                    "status": "success",
+                    "result": 36932798.15
+                }
+            ]
+        },
+        {
+            "entity_id": "0196c4ed-90aa-75a1-8ffa-b5145b1be9f0",
+            "formula_results": [
+                {
+                    "formula_path": "e00030v",
+                    "status": "success",
+                    "result": 0
+                },
+                {
+                    "formula_path": "e00109v",
+                    "status": "success",
+                    "result": 0
+                },
+                {
+                    "formula_path": "e00025v",
+                    "status": "success",
+                    "result": 0
+                },
+                {
+                    "formula_path": "e00106v",
+                    "status": "success",
+                    "result": 36932798.15
+                }
+            ]
+        },
+        {
+            "entity_id": "0196c4ed-90aa-75a1-8ffa-b52883c5ad3e",
+            "formula_results": [
+                {
+                    "formula_path": "e00030v",
+                    "status": "success",
+                    "result": 0
+                },
+                {
+                    "formula_path": "e00109v",
+                    "status": "success",
+                    "result": 0
+                },
+                {
+                    "formula_path": "e00025v",
+                    "status": "success",
+                    "result": 0
+                },
+                {
+                    "formula_path": "e00106v",
+                    "status": "success",
+                    "result": 36932798.15
+                }
+            ]
+        },
+        {
+            "entity_id": "0196c4ed-90aa-75a1-8ffa-b53107cf2522",
+            "formula_results": [
+                {
+                    "formula_path": "e00030v",
+                    "status": "success",
+                    "result": 0
+                },
+                {
+                    "formula_path": "e00109v",
+                    "status": "success",
+                    "result": 0
+                },
+                {
+                    "formula_path": "e00025v",
+                    "status": "success",
+                    "result": 0
+                },
+                {
+                    "formula_path": "e00106v",
+                    "status": "success",
+                    "result": 36932798.15
+                }
+            ]
+        },
+        {
+            "entity_id": "0196c4ed-90aa-75a1-8ffa-b54d9bfd13f1",
+            "formula_results": [
+                {
+                    "formula_path": "e00030v",
+                    "status": "success",
+                    "result": 0
+                },
+                {
+                    "formula_path": "e00109v",
+                    "status": "success",
+                    "result": 0
+                },
+                {
+                    "formula_path": "e00025v",
+                    "status": "success",
+                    "result": 0
+                },
+                {
+                    "formula_path": "e00106v",
+                    "status": "success",
+                    "result": 36932798.15
+                }
+            ]
+        },
+        {
+            "entity_id": "0196c4ed-90aa-75a1-8ffa-b553dd4f1520",
+            "formula_results": [
+                {
+                    "formula_path": "e00030v",
+                    "status": "success",
+                    "result": 0
+                },
+                {
+                    "formula_path": "e00109v",
+                    "status": "success",
+                    "result": 0
+                },
+                {
+                    "formula_path": "e00025v",
+                    "status": "success",
+                    "result": 0
+                },
+                {
+                    "formula_path": "e00106v",
+                    "status": "success",
+                    "result": 36932798.15
+                }
+            ]
+        },
+        {
+            "entity_id": "0196c4ed-90aa-75a1-8ffa-b56f81abdc06",
+            "formula_results": [
+                {
+                    "formula_path": "e00030v",
+                    "status": "success",
+                    "result": 0
+                },
+                {
+                    "formula_path": "e00109v",
+                    "status": "success",
+                    "result": 0
+                },
+                {
+                    "formula_path": "e00025v",
+                    "status": "success",
+                    "result": 0
+                },
+                {
+                    "formula_path": "e00106v",
+                    "status": "success",
+                    "result": 36932798.15
+                }
+            ]
+        },
+        {
+            "entity_id": "0196c4ed-90aa-75a1-8ffa-b571949b72a3",
+            "formula_results": [
+                {
+                    "formula_path": "e00030v",
+                    "status": "success",
+                    "result": 0
+                },
+                {
+                    "formula_path": "e00109v",
+                    "status": "success",
+                    "result": 0
+                },
+                {
+                    "formula_path": "e00025v",
+                    "status": "success",
+                    "result": 0
+                },
+                {
+                    "formula_path": "e00106v",
+                    "status": "success",
+                    "result": 36932798.15
+                }
+            ]
+        },
+        {
+            "entity_id": "0196c4ed-90aa-75a1-8ffa-b58e01a66c75",
+            "formula_results": [
+                {
+                    "formula_path": "e00030v",
+                    "status": "success",
+                    "result": 0
+                },
+                {
+                    "formula_path": "e00109v",
+                    "status": "success",
+                    "result": 0
+                },
+                {
+                    "formula_path": "e00025v",
+                    "status": "success",
+                    "result": 0
+                },
+                {
+                    "formula_path": "e00106v",
+                    "status": "success",
+                    "result": 36932798.15
+                }
+            ]
+        },
+        {
+            "entity_id": "0196c4ed-90aa-75a1-8ffa-b59779b59a9b",
+            "formula_results": [
+                {
+                    "formula_path": "e00030v",
+                    "status": "success",
+                    "result": 0
+                },
+                {
+                    "formula_path": "e00109v",
+                    "status": "success",
+                    "result": 0
+                },
+                {
+                    "formula_path": "e00025v",
+                    "status": "success",
+                    "result": 0
+                },
+                {
+                    "formula_path": "e00106v",
+                    "status": "success",
+                    "result": 36932798.15
+                }
+            ]
+        },
+        {
+            "entity_id": "0196c4ed-90aa-75a1-8ffa-b5ae62c4f633",
+            "formula_results": [
+                {
+                    "formula_path": "e00030v",
+                    "status": "success",
+                    "result": 0
+                },
+                {
+                    "formula_path": "e00109v",
+                    "status": "success",
+                    "result": 0
+                },
+                {
+                    "formula_path": "e00025v",
+                    "status": "success",
+                    "result": 0
+                },
+                {
+                    "formula_path": "e00106v",
+                    "status": "success",
+                    "result": 36932798.15
+                }
+            ]
+        },
+        {
+            "entity_id": "0196c4ed-90aa-75a1-8ffa-b5b740ba5545",
+            "formula_results": [
+                {
+                    "formula_path": "e00030v",
+                    "status": "success",
+                    "result": 0
+                },
+                {
+                    "formula_path": "e00109v",
+                    "status": "success",
+                    "result": 0
+                },
+                {
+                    "formula_path": "e00025v",
+                    "status": "success",
+                    "result": 0
+                },
+                {
+                    "formula_path": "e00106v",
+                    "status": "success",
+                    "result": 36932798.15
+                }
+            ]
+        },
+        {
+            "entity_id": "0196c4ed-90ab-7bc1-9e25-2b5ab29318d9",
+            "formula_results": [
+                {
+                    "formula_path": "e00030v",
+                    "status": "success",
+                    "result": 0
+                },
+                {
+                    "formula_path": "e00109v",
+                    "status": "success",
+                    "result": 0
+                },
+                {
+                    "formula_path": "e00025v",
+                    "status": "success",
+                    "result": 0
+                },
+                {
+                    "formula_path": "e00106v",
+                    "status": "success",
+                    "result": 36932798.15
+                }
+            ]
+        },
+        {
+            "entity_id": "0196c4ed-90ab-7bc1-9e25-2b695493e277",
+            "formula_results": [
+                {
+                    "formula_path": "e00030v",
+                    "status": "success",
+                    "result": 0
+                },
+                {
+                    "formula_path": "e00109v",
+                    "status": "success",
+                    "result": 0
+                },
+                {
+                    "formula_path": "e00025v",
+                    "status": "success",
+                    "result": 0
+                },
+                {
+                    "formula_path": "e00106v",
+                    "status": "success",
+                    "result": 36932798.15
+                }
+            ]
+        },
+        {
+            "entity_id": "0196c4ed-90ab-7bc1-9e25-2b72f1f511c7",
+            "formula_results": [
+                {
+                    "formula_path": "e00030v",
+                    "status": "success",
+                    "result": 0
+                },
+                {
+                    "formula_path": "e00109v",
+                    "status": "success",
+                    "result": 0
+                },
+                {
+                    "formula_path": "e00025v",
+                    "status": "success",
+                    "result": 0
+                },
+                {
+                    "formula_path": "e00106v",
+                    "status": "success",
+                    "result": 36932798.15
+                }
+            ]
+        },
+        {
+            "entity_id": "0196c4ed-90ab-7bc1-9e25-2b8b8ab04908",
+            "formula_results": [
+                {
+                    "formula_path": "e00030v",
+                    "status": "success",
+                    "result": 0
+                },
+                {
+                    "formula_path": "e00109v",
+                    "status": "success",
+                    "result": 0
+                },
+                {
+                    "formula_path": "e00025v",
+                    "status": "success",
+                    "result": 0
+                },
+                {
+                    "formula_path": "e00106v",
+                    "status": "success",
+                    "result": 36932798.15
+                }
+            ]
+        },
+        {
+            "entity_id": "0196c916-96e9-7fc0-90e8-d4396368e7b8",
+            "formula_results": [
+                {
+                    "formula_path": "e00030v",
+                    "status": "success",
+                    "result": 0
+                },
+                {
+                    "formula_path": "e00109v",
+                    "status": "success",
+                    "result": 0
+                },
+                {
+                    "formula_path": "e00025v",
+                    "status": "success",
+                    "result": 0
+                },
+                {
+                    "formula_path": "e00106v",
+                    "status": "success",
+                    "result": 36932798.15
+                }
+            ]
+        },
+        {
+            "entity_id": "0196c916-96ea-72e3-9e21-a3a33734dac2",
+            "formula_results": [
+                {
+                    "formula_path": "e00030v",
+                    "status": "success",
+                    "result": 0
+                },
+                {
+                    "formula_path": "e00109v",
+                    "status": "success",
+                    "result": 0
+                },
+                {
+                    "formula_path": "e00025v",
+                    "status": "success",
+                    "result": 0
+                },
+                {
+                    "formula_path": "e00106v",
+                    "status": "success",
+                    "result": 36932798.15
+                }
+            ]
+        },
+        {
+            "entity_id": "0196c916-96ea-72e3-9e21-a3b873dadfcf",
+            "formula_results": [
+                {
+                    "formula_path": "e00030v",
+                    "status": "success",
+                    "result": 0
+                },
+                {
+                    "formula_path": "e00109v",
+                    "status": "success",
+                    "result": 0
+                },
+                {
+                    "formula_path": "e00025v",
+                    "status": "success",
+                    "result": 0
+                },
+                {
+                    "formula_path": "e00106v",
+                    "status": "success",
+                    "result": 36932798.15
+                }
+            ]
+        },
+        {
+            "entity_id": "0196c916-96ea-72e3-9e21-a3c312f89032",
+            "formula_results": [
+                {
+                    "formula_path": "e00030v",
+                    "status": "success",
+                    "result": 0
+                },
+                {
+                    "formula_path": "e00109v",
+                    "status": "success",
+                    "result": 0
+                },
+                {
+                    "formula_path": "e00025v",
+                    "status": "success",
+                    "result": 0
+                },
+                {
+                    "formula_path": "e00106v",
+                    "status": "success",
+                    "result": 36932798.15
+                }
+            ]
+        },
+        {
+            "entity_id": "0196c916-96ea-72e3-9e21-a3dae0140333",
+            "formula_results": [
+                {
+                    "formula_path": "e00030v",
+                    "status": "success",
+                    "result": 0
+                },
+                {
+                    "formula_path": "e00109v",
+                    "status": "success",
+                    "result": 0
+                },
+                {
+                    "formula_path": "e00025v",
+                    "status": "success",
+                    "result": 0
+                },
+                {
+                    "formula_path": "e00106v",
+                    "status": "success",
+                    "result": 36932798.15
+                }
+            ]
+        },
+        {
+            "entity_id": "0196c916-96ea-72e3-9e21-a3e40c7259a6",
+            "formula_results": [
+                {
+                    "formula_path": "e00030v",
+                    "status": "success",
+                    "result": 0
+                },
+                {
+                    "formula_path": "e00109v",
+                    "status": "success",
+                    "result": 0
+                },
+                {
+                    "formula_path": "e00025v",
+                    "status": "success",
+                    "result": 0
+                },
+                {
+                    "formula_path": "e00106v",
+                    "status": "success",
+                    "result": 36932798.15
+                }
+            ]
+        },
+        {
+            "entity_id": "0196c916-96ea-72e3-9e21-a3f0a48aa740",
+            "formula_results": [
+                {
+                    "formula_path": "e00030v",
+                    "status": "success",
+                    "result": 0
+                },
+                {
+                    "formula_path": "e00109v",
+                    "status": "success",
+                    "result": 0
+                },
+                {
+                    "formula_path": "e00025v",
+                    "status": "success",
+                    "result": 0
+                },
+                {
+                    "formula_path": "e00106v",
+                    "status": "success",
+                    "result": 36932798.15
+                }
+            ]
+        },
+        {
+            "entity_id": "0196c916-96ea-72e3-9e21-a404430eb424",
+            "formula_results": [
+                {
+                    "formula_path": "e00030v",
+                    "status": "success",
+                    "result": 0
+                },
+                {
+                    "formula_path": "e00109v",
+                    "status": "success",
+                    "result": 0
+                },
+                {
+                    "formula_path": "e00025v",
+                    "status": "success",
+                    "result": 0
+                },
+                {
+                    "formula_path": "e00106v",
+                    "status": "success",
+                    "result": 36932798.15
+                }
+            ]
+        },
+        {
+            "entity_id": "0196c916-96ea-72e3-9e21-a4121329a286",
+            "formula_results": [
+                {
+                    "formula_path": "e00030v",
+                    "status": "success",
+                    "result": 0
+                },
+                {
+                    "formula_path": "e00109v",
+                    "status": "success",
+                    "result": 0
+                },
+                {
+                    "formula_path": "e00025v",
+                    "status": "success",
+                    "result": 0
+                },
+                {
+                    "formula_path": "e00106v",
+                    "status": "success",
+                    "result": 36932798.15
+                }
+            ]
+        },
+        {
+            "entity_id": "0196c916-96ea-72e3-9e21-a42867d5cabf",
+            "formula_results": [
+                {
+                    "formula_path": "e00030v",
+                    "status": "success",
+                    "result": 0
+                },
+                {
+                    "formula_path": "e00109v",
+                    "status": "success",
+                    "result": 0
+                },
+                {
+                    "formula_path": "e00025v",
+                    "status": "success",
+                    "result": 0
+                },
+                {
+                    "formula_path": "e00106v",
+                    "status": "success",
+                    "result": 36932798.15
+                }
+            ]
+        },
+        {
+            "entity_id": "0196c916-96ea-72e3-9e21-a4339621f068",
+            "formula_results": [
+                {
+                    "formula_path": "e00030v",
+                    "status": "success",
+                    "result": 0
+                },
+                {
+                    "formula_path": "e00109v",
+                    "status": "success",
+                    "result": 0
+                },
+                {
+                    "formula_path": "e00025v",
+                    "status": "success",
+                    "result": 0
+                },
+                {
+                    "formula_path": "e00106v",
+                    "status": "success",
+                    "result": 36932798.15
+                }
+            ]
+        }
+    ]
+}

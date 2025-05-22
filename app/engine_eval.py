@@ -474,6 +474,7 @@ def eval_formula(entities_eval, formulas):
                 entity_results["formula_results"].append({
                     "formula_path": id_eval["formula"],
                     "status": "success",
+                    "update": formula["update"],
                     "result": result.tolist() if isinstance(result, np.ndarray) else result
                 })
                 
@@ -482,6 +483,7 @@ def eval_formula(entities_eval, formulas):
                 entity_results["formula_results"].append({
                     "formula_path": id_eval["formula"],
                     "status": "error",
+                    "update": formula["update"],
                     "error": str(e)
                 })
         

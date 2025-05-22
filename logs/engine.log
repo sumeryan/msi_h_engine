@@ -7956,3 +7956,8 @@ else
 2025-05-21 10:44:21 - DEBUG - filters - Log file configuration: /Users/kaue/Desktop/motor_novo/hierarquical_engine/logs/engine.log, max size: 1024.0KB, backups: 3
 2025-05-21 10:44:21 - DEBUG - filters - Logger 'filters' initialized with level DEBUG
 2025-05-21 10:44:21 - INFO - filters.filters - Filters module initialized
+2025-05-22 08:51:27 - DEBUG - filters - Log file configuration: /Users/kaue/Desktop/motor_novo/hierarquical_engine/logs/engine.log, max size: 1024.0KB, backups: 3
+2025-05-22 08:51:27 - DEBUG - filters - Logger 'filters' initialized with level DEBUG
+2025-05-22 08:51:28 - DEBUG - filters - Log file configuration: /Users/kaue/Desktop/motor_novo/hierarquical_engine/logs/engine.log, max size: 1024.0KB, backups: 3
+2025-05-22 08:51:28 - DEBUG - filters - Logger 'filters' initialized with level DEBUG
+2025-05-22 08:51:28 - INFO - filters.filters - Filters module initialized
