@@ -6,11 +6,19 @@
                 {
                     "formula_path": "e00100v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement",
+                        "fieldname": "saldopercentual"
+                    },
                     "result": 82.80288443295218
                 },
                 {
                     "formula_path": "e00097v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement",
+                        "fieldname": "totalvigentemenosftd"
+                    },
                     "result": 34832798.15
                 },
                 {
@@ -21,21 +29,37 @@
                 {
                     "formula_path": "e00090v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement",
+                        "fieldname": "medicaoatualdescontoftd"
+                    },
                     "result": 385893.49
                 },
                 {
                     "formula_path": "e00099v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement",
+                        "fieldname": "saldo"
+                    },
                     "result": 36932798.15
                 },
                 {
                     "formula_path": "e00096v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement",
+                        "fieldname": "ftdacumulado"
+                    },
                     "result": 350000.0
                 },
                 {
                     "formula_path": "e00088v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement",
+                        "fieldname": "medicaoatual"
+                    },
                     "result": 0
                 },
                 {
@@ -51,11 +75,19 @@
                 {
                     "formula_path": "e00100v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement",
+                        "fieldname": "saldopercentual"
+                    },
                     "result": 81.05881920566043
                 },
                 {
                     "formula_path": "e00097v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement",
+                        "fieldname": "totalvigentemenosftd"
+                    },
                     "result": 34832798.15
                 },
                 {
@@ -66,21 +98,37 @@
                 {
                     "formula_path": "e00090v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement",
+                        "fieldname": "medicaoatualdescontoftd"
+                    },
                     "result": 294132.07999999996
                 },
                 {
                     "formula_path": "e00099v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement",
+                        "fieldname": "saldo"
+                    },
                     "result": 36932798.15
                 },
                 {
                     "formula_path": "e00096v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement",
+                        "fieldname": "ftdacumulado"
+                    },
                     "result": 350000.0
                 },
                 {
                     "formula_path": "e00088v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement",
+                        "fieldname": "medicaoatual"
+                    },
                     "result": 0
                 },
                 {
@@ -96,21 +144,37 @@
                 {
                     "formula_path": "e00030v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "acumuladoatual"
+                    },
                     "result": 0
                 },
                 {
                     "formula_path": "e00109v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "acumuladoatual"
+                    },
                     "result": 0
                 },
                 {
                     "formula_path": "e00025v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "acumuladoatual"
+                    },
                     "result": 0
                 },
                 {
                     "formula_path": "e00106v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "valortotalvigente"
+                    },
                     "result": 36932798.15
                 }
             ]
@@ -121,21 +185,37 @@
                 {
                     "formula_path": "e00030v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "acumuladoatual"
+                    },
                     "result": 0
                 },
                 {
                     "formula_path": "e00109v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "acumuladoatual"
+                    },
                     "result": 0
                 },
                 {
                     "formula_path": "e00025v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "acumuladoatual"
+                    },
                     "result": 0
                 },
                 {
                     "formula_path": "e00106v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "valortotalvigente"
+                    },
                     "result": 36932798.15
                 }
             ]
@@ -146,21 +226,37 @@
                 {
                     "formula_path": "e00030v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "acumuladoatual"
+                    },
                     "result": 0
                 },
                 {
                     "formula_path": "e00109v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "acumuladoatual"
+                    },
                     "result": 0
                 },
                 {
                     "formula_path": "e00025v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "acumuladoatual"
+                    },
                     "result": 0
                 },
                 {
                     "formula_path": "e00106v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "valortotalvigente"
+                    },
                     "result": 36932798.15
                 }
             ]
@@ -171,21 +267,37 @@
                 {
                     "formula_path": "e00030v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "acumuladoatual"
+                    },
                     "result": 0
                 },
                 {
                     "formula_path": "e00109v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "acumuladoatual"
+                    },
                     "result": 0
                 },
                 {
                     "formula_path": "e00025v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "acumuladoatual"
+                    },
                     "result": 0
                 },
                 {
                     "formula_path": "e00106v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "valortotalvigente"
+                    },
                     "result": 36932798.15
                 }
             ]
@@ -196,21 +308,37 @@
                 {
                     "formula_path": "e00030v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "acumuladoatual"
+                    },
                     "result": 0
                 },
                 {
                     "formula_path": "e00109v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "acumuladoatual"
+                    },
                     "result": 0
                 },
                 {
                     "formula_path": "e00025v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "acumuladoatual"
+                    },
                     "result": 0
                 },
                 {
                     "formula_path": "e00106v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "valortotalvigente"
+                    },
                     "result": 36932798.15
                 }
             ]
@@ -221,21 +349,37 @@
                 {
                     "formula_path": "e00030v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "acumuladoatual"
+                    },
                     "result": 0
                 },
                 {
                     "formula_path": "e00109v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "acumuladoatual"
+                    },
                     "result": 0
                 },
                 {
                     "formula_path": "e00025v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "acumuladoatual"
+                    },
                     "result": 0
                 },
                 {
                     "formula_path": "e00106v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "valortotalvigente"
+                    },
                     "result": 36932798.15
                 }
             ]
@@ -246,21 +390,37 @@
                 {
                     "formula_path": "e00030v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "acumuladoatual"
+                    },
                     "result": 0
                 },
                 {
                     "formula_path": "e00109v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "acumuladoatual"
+                    },
                     "result": 0
                 },
                 {
                     "formula_path": "e00025v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "acumuladoatual"
+                    },
                     "result": 0
                 },
                 {
                     "formula_path": "e00106v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "valortotalvigente"
+                    },
                     "result": 36932798.15
                 }
             ]
@@ -271,21 +431,37 @@
                 {
                     "formula_path": "e00030v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "acumuladoatual"
+                    },
                     "result": 0
                 },
                 {
                     "formula_path": "e00109v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "acumuladoatual"
+                    },
                     "result": 0
                 },
                 {
                     "formula_path": "e00025v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "acumuladoatual"
+                    },
                     "result": 0
                 },
                 {
                     "formula_path": "e00106v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "valortotalvigente"
+                    },
                     "result": 36932798.15
                 }
             ]
@@ -296,21 +472,37 @@
                 {
                     "formula_path": "e00030v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "acumuladoatual"
+                    },
                     "result": 0
                 },
                 {
                     "formula_path": "e00109v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "acumuladoatual"
+                    },
                     "result": 0
                 },
                 {
                     "formula_path": "e00025v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "acumuladoatual"
+                    },
                     "result": 0
                 },
                 {
                     "formula_path": "e00106v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "valortotalvigente"
+                    },
                     "result": 36932798.15
                 }
             ]
@@ -321,21 +513,37 @@
                 {
                     "formula_path": "e00030v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "acumuladoatual"
+                    },
                     "result": 0
                 },
                 {
                     "formula_path": "e00109v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "acumuladoatual"
+                    },
                     "result": 0
                 },
                 {
                     "formula_path": "e00025v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "acumuladoatual"
+                    },
                     "result": 0
                 },
                 {
                     "formula_path": "e00106v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "valortotalvigente"
+                    },
                     "result": 36932798.15
                 }
             ]
@@ -346,21 +554,37 @@
                 {
                     "formula_path": "e00030v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "acumuladoatual"
+                    },
                     "result": 0
                 },
                 {
                     "formula_path": "e00109v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "acumuladoatual"
+                    },
                     "result": 0
                 },
                 {
                     "formula_path": "e00025v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "acumuladoatual"
+                    },
                     "result": 0
                 },
                 {
                     "formula_path": "e00106v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "valortotalvigente"
+                    },
                     "result": 36932798.15
                 }
             ]
@@ -371,21 +595,37 @@
                 {
                     "formula_path": "e00030v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "acumuladoatual"
+                    },
                     "result": 0
                 },
                 {
                     "formula_path": "e00109v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "acumuladoatual"
+                    },
                     "result": 0
                 },
                 {
                     "formula_path": "e00025v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "acumuladoatual"
+                    },
                     "result": 0
                 },
                 {
                     "formula_path": "e00106v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "valortotalvigente"
+                    },
                     "result": 36932798.15
                 }
             ]
@@ -396,21 +636,37 @@
                 {
                     "formula_path": "e00030v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "acumuladoatual"
+                    },
                     "result": 0
                 },
                 {
                     "formula_path": "e00109v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "acumuladoatual"
+                    },
                     "result": 0
                 },
                 {
                     "formula_path": "e00025v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "acumuladoatual"
+                    },
                     "result": 0
                 },
                 {
                     "formula_path": "e00106v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "valortotalvigente"
+                    },
                     "result": 36932798.15
                 }
             ]
@@ -421,21 +677,37 @@
                 {
                     "formula_path": "e00030v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "acumuladoatual"
+                    },
                     "result": 0
                 },
                 {
                     "formula_path": "e00109v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "acumuladoatual"
+                    },
                     "result": 0
                 },
                 {
                     "formula_path": "e00025v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "acumuladoatual"
+                    },
                     "result": 0
                 },
                 {
                     "formula_path": "e00106v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "valortotalvigente"
+                    },
                     "result": 36932798.15
                 }
             ]
@@ -446,21 +718,37 @@
                 {
                     "formula_path": "e00030v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "acumuladoatual"
+                    },
                     "result": 0
                 },
                 {
                     "formula_path": "e00109v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "acumuladoatual"
+                    },
                     "result": 0
                 },
                 {
                     "formula_path": "e00025v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "acumuladoatual"
+                    },
                     "result": 0
                 },
                 {
                     "formula_path": "e00106v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "valortotalvigente"
+                    },
                     "result": 36932798.15
                 }
             ]
@@ -471,21 +759,37 @@
                 {
                     "formula_path": "e00030v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "acumuladoatual"
+                    },
                     "result": 0
                 },
                 {
                     "formula_path": "e00109v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "acumuladoatual"
+                    },
                     "result": 0
                 },
                 {
                     "formula_path": "e00025v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "acumuladoatual"
+                    },
                     "result": 0
                 },
                 {
                     "formula_path": "e00106v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "valortotalvigente"
+                    },
                     "result": 36932798.15
                 }
             ]
@@ -496,21 +800,37 @@
                 {
                     "formula_path": "e00030v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "acumuladoatual"
+                    },
                     "result": 0
                 },
                 {
                     "formula_path": "e00109v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "acumuladoatual"
+                    },
                     "result": 0
                 },
                 {
                     "formula_path": "e00025v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "acumuladoatual"
+                    },
                     "result": 0
                 },
                 {
                     "formula_path": "e00106v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "valortotalvigente"
+                    },
                     "result": 36932798.15
                 }
             ]
@@ -521,21 +841,37 @@
                 {
                     "formula_path": "e00030v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "acumuladoatual"
+                    },
                     "result": 0
                 },
                 {
                     "formula_path": "e00109v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "acumuladoatual"
+                    },
                     "result": 0
                 },
                 {
                     "formula_path": "e00025v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "acumuladoatual"
+                    },
                     "result": 0
                 },
                 {
                     "formula_path": "e00106v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "valortotalvigente"
+                    },
                     "result": 36932798.15
                 }
             ]
@@ -546,21 +882,37 @@
                 {
                     "formula_path": "e00030v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "acumuladoatual"
+                    },
                     "result": 0
                 },
                 {
                     "formula_path": "e00109v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "acumuladoatual"
+                    },
                     "result": 0
                 },
                 {
                     "formula_path": "e00025v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "acumuladoatual"
+                    },
                     "result": 0
                 },
                 {
                     "formula_path": "e00106v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "valortotalvigente"
+                    },
                     "result": 36932798.15
                 }
             ]
@@ -571,21 +923,37 @@
                 {
                     "formula_path": "e00030v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "acumuladoatual"
+                    },
                     "result": 0
                 },
                 {
                     "formula_path": "e00109v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "acumuladoatual"
+                    },
                     "result": 0
                 },
                 {
                     "formula_path": "e00025v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "acumuladoatual"
+                    },
                     "result": 0
                 },
                 {
                     "formula_path": "e00106v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "valortotalvigente"
+                    },
                     "result": 36932798.15
                 }
             ]
@@ -596,21 +964,37 @@
                 {
                     "formula_path": "e00030v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "acumuladoatual"
+                    },
                     "result": 0
                 },
                 {
                     "formula_path": "e00109v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "acumuladoatual"
+                    },
                     "result": 0
                 },
                 {
                     "formula_path": "e00025v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "acumuladoatual"
+                    },
                     "result": 0
                 },
                 {
                     "formula_path": "e00106v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "valortotalvigente"
+                    },
                     "result": 36932798.15
                 }
             ]
@@ -621,21 +1005,37 @@
                 {
                     "formula_path": "e00030v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "acumuladoatual"
+                    },
                     "result": 0
                 },
                 {
                     "formula_path": "e00109v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "acumuladoatual"
+                    },
                     "result": 0
                 },
                 {
                     "formula_path": "e00025v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "acumuladoatual"
+                    },
                     "result": 0
                 },
                 {
                     "formula_path": "e00106v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "valortotalvigente"
+                    },
                     "result": 36932798.15
                 }
             ]
@@ -646,21 +1046,37 @@
                 {
                     "formula_path": "e00030v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "acumuladoatual"
+                    },
                     "result": 0
                 },
                 {
                     "formula_path": "e00109v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "acumuladoatual"
+                    },
                     "result": 0
                 },
                 {
                     "formula_path": "e00025v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "acumuladoatual"
+                    },
                     "result": 0
                 },
                 {
                     "formula_path": "e00106v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "valortotalvigente"
+                    },
                     "result": 36932798.15
                 }
             ]
@@ -671,21 +1087,37 @@
                 {
                     "formula_path": "e00030v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "acumuladoatual"
+                    },
                     "result": 0
                 },
                 {
                     "formula_path": "e00109v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "acumuladoatual"
+                    },
                     "result": 0
                 },
                 {
                     "formula_path": "e00025v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "acumuladoatual"
+                    },
                     "result": 0
                 },
                 {
                     "formula_path": "e00106v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "valortotalvigente"
+                    },
                     "result": 36932798.15
                 }
             ]
@@ -696,21 +1128,37 @@
                 {
                     "formula_path": "e00030v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "acumuladoatual"
+                    },
                     "result": 0
                 },
                 {
                     "formula_path": "e00109v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "acumuladoatual"
+                    },
                     "result": 0
                 },
                 {
                     "formula_path": "e00025v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "acumuladoatual"
+                    },
                     "result": 0
                 },
                 {
                     "formula_path": "e00106v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "valortotalvigente"
+                    },
                     "result": 36932798.15
                 }
             ]
@@ -721,21 +1169,37 @@
                 {
                     "formula_path": "e00030v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "acumuladoatual"
+                    },
                     "result": 0
                 },
                 {
                     "formula_path": "e00109v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "acumuladoatual"
+                    },
                     "result": 0
                 },
                 {
                     "formula_path": "e00025v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "acumuladoatual"
+                    },
                     "result": 0
                 },
                 {
                     "formula_path": "e00106v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "valortotalvigente"
+                    },
                     "result": 36932798.15
                 }
             ]
@@ -746,21 +1210,37 @@
                 {
                     "formula_path": "e00030v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "acumuladoatual"
+                    },
                     "result": 0
                 },
                 {
                     "formula_path": "e00109v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "acumuladoatual"
+                    },
                     "result": 0
                 },
                 {
                     "formula_path": "e00025v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "acumuladoatual"
+                    },
                     "result": 0
                 },
                 {
                     "formula_path": "e00106v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "valortotalvigente"
+                    },
                     "result": 36932798.15
                 }
             ]
@@ -771,21 +1251,37 @@
                 {
                     "formula_path": "e00030v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "acumuladoatual"
+                    },
                     "result": 0
                 },
                 {
                     "formula_path": "e00109v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "acumuladoatual"
+                    },
                     "result": 0
                 },
                 {
                     "formula_path": "e00025v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "acumuladoatual"
+                    },
                     "result": 0
                 },
                 {
                     "formula_path": "e00106v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "valortotalvigente"
+                    },
                     "result": 36932798.15
                 }
             ]
@@ -796,21 +1292,37 @@
                 {
                     "formula_path": "e00030v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "acumuladoatual"
+                    },
                     "result": 0
                 },
                 {
                     "formula_path": "e00109v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "acumuladoatual"
+                    },
                     "result": 0
                 },
                 {
                     "formula_path": "e00025v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "acumuladoatual"
+                    },
                     "result": 0
                 },
                 {
                     "formula_path": "e00106v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "valortotalvigente"
+                    },
                     "result": 36932798.15
                 }
             ]
@@ -821,21 +1333,37 @@
                 {
                     "formula_path": "e00030v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "acumuladoatual"
+                    },
                     "result": 0
                 },
                 {
                     "formula_path": "e00109v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "acumuladoatual"
+                    },
                     "result": 0
                 },
                 {
                     "formula_path": "e00025v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "acumuladoatual"
+                    },
                     "result": 0
                 },
                 {
                     "formula_path": "e00106v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "valortotalvigente"
+                    },
                     "result": 36932798.15
                 }
             ]
@@ -846,21 +1374,37 @@
                 {
                     "formula_path": "e00030v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "acumuladoatual"
+                    },
                     "result": 0
                 },
                 {
                     "formula_path": "e00109v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "acumuladoatual"
+                    },
                     "result": 0
                 },
                 {
                     "formula_path": "e00025v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "acumuladoatual"
+                    },
                     "result": 0
                 },
                 {
                     "formula_path": "e00106v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "valortotalvigente"
+                    },
                     "result": 36932798.15
                 }
             ]
@@ -871,21 +1415,37 @@
                 {
                     "formula_path": "e00030v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "acumuladoatual"
+                    },
                     "result": 0
                 },
                 {
                     "formula_path": "e00109v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "acumuladoatual"
+                    },
                     "result": 0
                 },
                 {
                     "formula_path": "e00025v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "acumuladoatual"
+                    },
                     "result": 0
                 },
                 {
                     "formula_path": "e00106v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "valortotalvigente"
+                    },
                     "result": 36932798.15
                 }
             ]
@@ -896,21 +1456,37 @@
                 {
                     "formula_path": "e00030v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "acumuladoatual"
+                    },
                     "result": 0
                 },
                 {
                     "formula_path": "e00109v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "acumuladoatual"
+                    },
                     "result": 0
                 },
                 {
                     "formula_path": "e00025v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "acumuladoatual"
+                    },
                     "result": 0
                 },
                 {
                     "formula_path": "e00106v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "valortotalvigente"
+                    },
                     "result": 36932798.15
                 }
             ]
@@ -921,21 +1497,37 @@
                 {
                     "formula_path": "e00030v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "acumuladoatual"
+                    },
                     "result": 0
                 },
                 {
                     "formula_path": "e00109v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "acumuladoatual"
+                    },
                     "result": 0
                 },
                 {
                     "formula_path": "e00025v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "acumuladoatual"
+                    },
                     "result": 0
                 },
                 {
                     "formula_path": "e00106v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "valortotalvigente"
+                    },
                     "result": 36932798.15
                 }
             ]
@@ -946,21 +1538,37 @@
                 {
                     "formula_path": "e00030v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "acumuladoatual"
+                    },
                     "result": 0
                 },
                 {
                     "formula_path": "e00109v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "acumuladoatual"
+                    },
                     "result": 0
                 },
                 {
                     "formula_path": "e00025v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "acumuladoatual"
+                    },
                     "result": 0
                 },
                 {
                     "formula_path": "e00106v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "valortotalvigente"
+                    },
                     "result": 36932798.15
                 }
             ]
@@ -971,21 +1579,37 @@
                 {
                     "formula_path": "e00030v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "acumuladoatual"
+                    },
                     "result": 0
                 },
                 {
                     "formula_path": "e00109v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "acumuladoatual"
+                    },
                     "result": 0
                 },
                 {
                     "formula_path": "e00025v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "acumuladoatual"
+                    },
                     "result": 0
                 },
                 {
                     "formula_path": "e00106v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "valortotalvigente"
+                    },
                     "result": 36932798.15
                 }
             ]
@@ -996,21 +1620,37 @@
                 {
                     "formula_path": "e00030v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "acumuladoatual"
+                    },
                     "result": 0
                 },
                 {
                     "formula_path": "e00109v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "acumuladoatual"
+                    },
                     "result": 0
                 },
                 {
                     "formula_path": "e00025v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "acumuladoatual"
+                    },
                     "result": 0
                 },
                 {
                     "formula_path": "e00106v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "valortotalvigente"
+                    },
                     "result": 36932798.15
                 }
             ]
@@ -1021,21 +1661,37 @@
                 {
                     "formula_path": "e00030v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "acumuladoatual"
+                    },
                     "result": 0
                 },
                 {
                     "formula_path": "e00109v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "acumuladoatual"
+                    },
                     "result": 0
                 },
                 {
                     "formula_path": "e00025v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "acumuladoatual"
+                    },
                     "result": 0
                 },
                 {
                     "formula_path": "e00106v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "valortotalvigente"
+                    },
                     "result": 36932798.15
                 }
             ]
@@ -1046,21 +1702,37 @@
                 {
                     "formula_path": "e00030v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "acumuladoatual"
+                    },
                     "result": 0
                 },
                 {
                     "formula_path": "e00109v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "acumuladoatual"
+                    },
                     "result": 0
                 },
                 {
                     "formula_path": "e00025v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "acumuladoatual"
+                    },
                     "result": 0
                 },
                 {
                     "formula_path": "e00106v",
                     "status": "success",
+                    "update": {
+                        "doctype": "Contract Measurement SAP Order",
+                        "fieldname": "valortotalvigente"
+                    },
                     "result": 36932798.15
                 }
             ]
