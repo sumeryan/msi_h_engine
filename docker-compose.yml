@@ -10,8 +10,8 @@ services:
       - rabbitmq
       - db
     ports:
-      - "8000:8000"
-    command: uvicorn main:app --host 0.0.0.0 --port 8000
+      - "8081:8081"
+    command: uvicorn main:app  --reload --host 0.0.0.0 --port 8081
 
   worker:
     build: .
@@ -22,6 +22,17 @@ services:
       - rabbitmq
       - db
     command: python consumer.py
+    restart: on-failure
+
+  carga:
+    build: .
+    container_name: engine_carga
+    env_file:
+      - .env
+    depends_on:
+      - rabbitmq
+    command: python consumer_carga.py
+    restart: on-failure
 
   rabbitmq:
     image: rabbitmq:3-management

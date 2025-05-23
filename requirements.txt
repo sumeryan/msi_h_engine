@@ -9,4 +9,6 @@ numpy
 networkx
 jmespath
 ply
+requests
+pandas
 asteval

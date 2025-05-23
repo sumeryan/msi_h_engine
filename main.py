@@ -12,17 +12,17 @@ from app.engine_parser import parse_formulas
 from app.engine_pre_processor import process_formula_variables
 from app.engine_eval import eval_formula
 
-# Configurações de ambiente
-env_rabbit = os.getenv("RABBIT_URL", "amqp://guest:guest@rabbitmq:5672/")
-env_db     = os.getenv("POSTGRES_URL", None)
-
 app = FastAPI(title="Motor de Cálculo")
 
-# Inicializa DB se presente
+# Ambiente
+RABBIT_URL = os.getenv("RABBIT_URL", "amqp://guest:guest@rabbitmq:5672/")
+DB_URL     = os.getenv("POSTGRES_URL", None)
+
+# Configura DB opcional
 db = None
-if env_db:
-    db = Database(env_db)
-    engine = create_engine(env_db)
+if DB_URL:
+    db = Database(DB_URL)
+    engine = create_engine(DB_URL)
 
     @app.on_event("startup")
     async def startup():
@@ -44,20 +44,20 @@ def convert_numpy(obj: Any) -> Any:
         return {k: convert_numpy(v) for k, v in obj.items()}
     return obj
 
+
 @app.post("/evaluate")
 async def evaluate_endpoint(raw_data: Any = Body(...)):
     try:
-        # Normaliza payload para motor
+        # 1) normaliza payload
         if isinstance(raw_data, list):
             tree_data = {"data": raw_data}
         elif isinstance(raw_data, dict):
             tree_data = raw_data
         else:
-            raise ValueError("Envie um objeto JSON ou uma lista de objetos.")
+            raise ValueError("Envie um JSON ou lista")
 
-        # Define request_id
+        # 2) salva request_id
         if db:
-            # usa fetch_val para retornar escalar
             request_id = await db.fetch_val(
                 "INSERT INTO requests(payload) VALUES(CAST(:p AS JSONB)) RETURNING id",
                 {"p": json.dumps(raw_data)}
@@ -65,20 +65,38 @@ async def evaluate_endpoint(raw_data: Any = Body(...)):
         else:
             request_id = str(uuid.uuid4())
 
-        # Executa motor de cálculo
-        extracted = parse_formulas(tree_data)
-        processed = process_formula_variables(extracted, tree_data)
+        # 3) executa o motor
+        extracted   = parse_formulas(tree_data)
+        processed   = process_formula_variables(extracted, tree_data)
         raw_results = eval_formula(processed, extracted)
-        clean = convert_numpy(raw_results)
+        clean       = convert_numpy(raw_results)
 
-        # Publica no RabbitMQ
+        # opcional: atualiza tree_data com resultados
+        for idx, node in enumerate(tree_data.get("data", [])):
+            node["result"] = clean[idx]
+
+        # 4) publica na fila do motor
         publish_to_queue(
-            rabbit_url=env_rabbit,
-            queue_name="engine_queue",
-            message={"request_id": request_id, "payload": raw_data, "results": clean}
+            rabbit_url = RABBIT_URL,
+            queue_name = "engine_queue",
+            message    = {
+                "request_id": request_id,
+                "payload":    tree_data,
+                "results":    clean
+            }
         )
 
-        # Retorna resultados
+        # 5) publica na fila de carga
+        publish_to_queue(
+            rabbit_url = RABBIT_URL,
+            queue_name = "carga_queue",
+            message    = {
+                "request_id": request_id,
+                "results":    clean
+            }
+        )
+
+        # 6) retorna imediatamente
         return {"results": clean}
 
     except Exception as e:
