@@ -242,9 +242,9 @@ def main():
     current_dir = os.path.dirname(os.path.abspath(__file__))
     
     # Paths for input and output files
-    tree_data_path = os.path.join(current_dir, "tree_data.json")
-    extracted_formulas_path = os.path.join(current_dir, "extracted_formulas.json")
-    output_path = os.path.join(current_dir, "processed_formulas_with_variables.json")
+    tree_data_path = "/Users/igordanielgabardogoncalves/Library/CloudStorage/OneDrive-Pessoal/GitHub/engine_entities/data/tree_data.json"
+    extracted_formulas_path = "/Users/igordanielgabardogoncalves/Library/CloudStorage/OneDrive-Pessoal/GitHub/engine_entities/data/extracted_formulas.json"
+    output_path = "/Users/igordanielgabardogoncalves/Library/CloudStorage/OneDrive-Pessoal/GitHub/engine_entities/data/processed_formulas_with_variables.json"
     
     logger.info(f"Using tree data path: {tree_data_path}")
     logger.info(f"Using output path: {output_path}")

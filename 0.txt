@@ -1,23 +1,40 @@
-[
-    7.95, ok
-    139870.82, ok
-    5.55, 
-    24596.5, 
-    5.46, 
-    11019.28, 
-    10.5, 
-    71139.91, 
-    2.31, 
-    3367.0, 
-    7.08, 
-    44138.56, 
-    7.08, 
-    44138.56, 
-    8.33, 
-    86978.69, 
-    16.67, 
-    6663.9, 
-    8.22, 
-    241805.1, 
-    8.33, 
-    14552.31]
+# import frappe
+
+# @frappe.whitelist(allow_guest=True)
+# def get_ping():
+#     return "pong"
+
+
+# @frappe.whitelist(allow_guest=True)
+# def get_kartado_maps():
+#     """
+#     Function to get the kartado maps.
+#     """
+
+#     asset_data = fappre.db.sql("""
+#         SELECT
+#             a.`name` AS `assett`,
+#             a.`ativo` AS `ativo`,
+#             k.`descricao` AS `ativo_kartado`
+#         FROM
+#             `tabAsset` as a
+#             INNER JOIN `tabAsset Config Kartado`.`parent` as k ON k.`name` = a.`parent`  
+#         """)
+
+#     work_map = fappre.db.sql("""
+#         SELECT
+#             w.`name` AS `assett`,
+#             w.`funcao` AS `funcao`,
+#             k.`descricaokartado` AS `funcao_kartado`
+#         FROM
+#             `tabWork Role` as w
+#             INNER JOIN `tabWork Role Config Kartado`.`parent` as k ON k.`name` = a.`parent`  
+#         """)
+
+#     data = {
+#         "asset_data": asset_data,
+#         "work_map": work_map
+#     }
+   
+#     # Return the kartado maps
+#     return data

@@ -486,7 +486,7 @@ def eval_formula(entities_eval, formulas):
                 })
         
         results.append(entity_results)
-        
+
     logger.info(f"Completed batch formula evaluation. Processed {len(results)} entities.")
     return results
 
@@ -503,8 +503,9 @@ if __name__ == "__main__":
     logger.debug(f"Current directory: {current_dir}")
 
     # Paths for input and output files
-    formulas_json = os.path.join(current_dir, "extracted_formulas.json")
-    entities_eval_json = os.path.join(current_dir, "processed_formulas_with_variables.json")
+    formulas_json = "/Users/igordanielgabardogoncalves/Library/CloudStorage/OneDrive-Pessoal/GitHub/engine_entities/data/extracted_formulas.json"
+    entities_eval_json = "/Users/igordanielgabardogoncalves/Library/CloudStorage/OneDrive-Pessoal/GitHub/engine_entities/data/processed_formulas_with_variables.json"
+    engine_result_json = "/Users/igordanielgabardogoncalves/Library/CloudStorage/OneDrive-Pessoal/GitHub/engine_entities/data/engine_result.json"
     
     logger.info(f"Loading formula definitions from: {formulas_json}")
     logger.info(f"Loading entity data from: {entities_eval_json}")
@@ -539,3 +540,6 @@ if __name__ == "__main__":
         logger.info(f"Formula evaluation complete. Successful: {success_count}, Errors: {error_count}")
     else:
         logger.error("Cannot perform evaluation: missing formula definitions or entity data")
+
+    with open(engine_result_json, 'w', encoding='utf-8') as f:
+        json.dump(results, f, indent=4, ensure_ascii=False)

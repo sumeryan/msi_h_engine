@@ -687,14 +687,14 @@ if __name__ == "__main__":
     logger = get_logger("Formula Parser")
     logger.info("Starting formula parser module test")
     
-    input_path = os.path.join(os.path.dirname(__file__), "tree_data.json")
-    output_path = os.path.join(os.path.dirname(__file__), "extracted_formulas.json")
+    input_path = "/Users/igordanielgabardogoncalves/Library/CloudStorage/OneDrive-Pessoal/GitHub/engine_entities/data/tree_data.json"
+    output_path = "/Users/igordanielgabardogoncalves/Library/CloudStorage/OneDrive-Pessoal/GitHub/engine_entities/data/extracted_formulas.json"
 
     logger.info(f"Loading data from {input_path}")
     try:
         with open(input_path, 'r', encoding='utf-8') as f:
             logger.debug("Reading input file")
-            data = json.load(f)    
+            data = json.load(f)
         logger.info(f"Successfully loaded data from {input_path}")
         
         logger.info("Parsing and ordering formulas")
