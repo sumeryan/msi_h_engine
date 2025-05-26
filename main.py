@@ -67,15 +67,31 @@ async def evaluate_endpoint(raw_data: Any = Body(...)):
 
         # 3) executa o motor
         extracted   = parse_formulas(tree_data)
+
+        # 4) DEBUG: injetando fórmulas extraídas em cada nó antes da avaliação
+        for group in extracted:
+            group_id = group.get("id")
+            formulas = group.get("formulas")
+            print(f"[DEBUG] Injetando fórmulas em node id={group_id}: {formulas}")
+            for node in tree_data.get("data", []):
+                if node.get("id") == group_id:
+                    node["extracted_formulas"] = formulas
+                    break
+
         processed   = process_formula_variables(extracted, tree_data)
         raw_results = eval_formula(processed, extracted)
         clean       = convert_numpy(raw_results)
 
-        # opcional: atualiza tree_data com resultados
-        for idx, node in enumerate(tree_data.get("data", [])):
-            node["result"] = clean[idx]
+        # 5) DEBUG: atribuindo resultados em cada nó após avaliação
+        for group, result in zip(extracted, clean):
+            group_id = group.get("id")
+            print(f"[DEBUG] Atribuindo result={result} ao node id={group_id}")
+            for node in tree_data.get("data", []):
+                if node.get("id") == group_id:
+                    node["result"] = result
+                    break
 
-        # 4) publica na fila do motor
+        # 6) publica na fila do motor
         publish_to_queue(
             rabbit_url = RABBIT_URL,
             queue_name = "engine_queue",
@@ -86,7 +102,7 @@ async def evaluate_endpoint(raw_data: Any = Body(...)):
             }
         )
 
-        # 5) publica na fila de carga
+        # 7) publica na fila de carga
         publish_to_queue(
             rabbit_url = RABBIT_URL,
             queue_name = "carga_queue",
@@ -96,7 +112,7 @@ async def evaluate_endpoint(raw_data: Any = Body(...)):
             }
         )
 
-        # 6) retorna imediatamente
+        # 8) retorna resultados ao cliente
         return {"results": clean}
 
     except Exception as e:
