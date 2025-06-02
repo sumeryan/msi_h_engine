@@ -1,10 +1,74 @@
 [
     {
-        "path": "e00078v",
+        "path": "e00007v",
         "formulas": [
             {
-                "path": "e00100v",
-                "value": "(e00099v * 100)/ e00019v",
+                "path": "e00015v",
+                "value": "caucao_atual =  (e00003v/100) * last(e00014v)\n\nacumulado_caucao = sum(e00015v, e00009v == 'Não')+caucao_atual\n\nporcentagem_total = 0.03 * e00008v\n\nif acumulado_caucao > porcentagem_total:\n    return 0\nelse:\n    return caucao_atual",
+                "update": {
+                    "doctype": "Contract Measurement",
+                    "fieldname": "caucaocontratual"
+                },
+                "parsed": {
+                    "aggr": [
+                        {
+                            "base": "last(e00014v)",
+                            "eval": "e00014v",
+                            "vars": [
+                                "e00014v"
+                            ],
+                            "global": true,
+                            "filter": "",
+                            "filter_vars": []
+                        },
+                        {
+                            "base": "sum(e00015v, e00009v == 'Não')",
+                            "eval": "sum(e00015v)",
+                            "vars": [
+                                "e00015v"
+                            ],
+                            "global": true,
+                            "filter": "e00009v == 'Não'",
+                            "filter_vars": [
+                                "e00009v"
+                            ]
+                        }
+                    ],
+                    "vars": [
+                        "e00008v",
+                        "e00003v"
+                    ],
+                    "dag_paths": [
+                        "e00014v",
+                        "e00015v",
+                        "e00009v",
+                        "e00008v",
+                        "e00003v"
+                    ]
+                }
+            },
+            {
+                "path": "e00014v",
+                "value": "e00012v - e00013v",
+                "update": {
+                    "doctype": "Contract Measurement",
+                    "fieldname": "medicaoequivalente"
+                },
+                "parsed": {
+                    "aggr": [],
+                    "vars": [
+                        "e00012v",
+                        "e00013v"
+                    ],
+                    "dag_paths": [
+                        "e00012v",
+                        "e00013v"
+                    ]
+                }
+            },
+            {
+                "path": "e00020v",
+                "value": "(e00019v * 100)/ e00001v",
                 "update": {
                     "doctype": "Contract Measurement",
                     "fieldname": "saldopercentual"
@@ -12,18 +76,18 @@
                 "parsed": {
                     "aggr": [],
                     "vars": [
-                        "e00099v",
-                        "e00019v"
+                        "e00019v",
+                        "e00001v"
                     ],
                     "dag_paths": [
-                        "e00099v",
-                        "e00019v"
+                        "e00019v",
+                        "e00001v"
                     ]
                 }
             },
             {
-                "path": "e00097v",
-                "value": "e00095v - e00096v",
+                "path": "e00018v",
+                "value": "e00016v - e00017v",
                 "update": {
                     "doctype": "Contract Measurement",
                     "fieldname": "totalvigentemenosftd"
@@ -31,54 +95,37 @@
                 "parsed": {
                     "aggr": [],
                     "vars": [
-                        "e00095v",
-                        "e00096v"
+                        "e00016v",
+                        "e00017v"
                     ],
                     "dag_paths": [
-                        "e00095v",
-                        "e00096v"
+                        "e00016v",
+                        "e00017v"
                     ]
                 }
             },
             {
-                "path": "e00091v",
-                "value": "valor_percentual = (e00026v * e00088v)/100\nreid_acumulado = sum(e00091v, e00083v == 'Não') + valor_percentual\nvalor_maximo = (e00019v * 3,65)/100\n\nif reid_acumulado > valor_maximo:\n    return e00088v\nelse\n\treturn e00088v - valor_percentual",
+                "path": "e00013v",
+                "value": "(e00002v/100) * e00010v",
                 "update": {
                     "doctype": "Contract Measurement",
                     "fieldname": "descontoreidi"
                 },
                 "parsed": {
-                    "aggr": [
-                        {
-                            "base": "sum(e00091v, e00083v == 'Não')",
-                            "eval": "sum(e00091v)",
-                            "vars": [
-                                "e00091v"
-                            ],
-                            "global": true,
-                            "filter": "e00083v == 'Não'",
-                            "filter_vars": [
-                                "e00083v"
-                            ]
-                        }
-                    ],
+                    "aggr": [],
                     "vars": [
-                        "e00019v",
-                        "e00088v",
-                        "e00026v"
+                        "e00002v",
+                        "e00010v"
                     ],
                     "dag_paths": [
-                        "e00091v",
-                        "e00083v",
-                        "e00019v",
-                        "e00088v",
-                        "e00026v"
+                        "e00002v",
+                        "e00010v"
                     ]
                 }
             },
             {
-                "path": "e00090v",
-                "value": "e00088v - e00089v",
+                "path": "e00012v",
+                "value": "e00010v - e00011v",
                 "update": {
                     "doctype": "Contract Measurement",
                     "fieldname": "medicaoatualdescontoftd"
@@ -86,18 +133,18 @@
                 "parsed": {
                     "aggr": [],
                     "vars": [
-                        "e00089v",
-                        "e00088v"
+                        "e00011v",
+                        "e00010v"
                     ],
                     "dag_paths": [
-                        "e00089v",
-                        "e00088v"
+                        "e00011v",
+                        "e00010v"
                     ]
                 }
             },
             {
-                "path": "e00099v",
-                "value": "e00019v - sum(e00088v, e00083v == 'Não')",
+                "path": "e00019v",
+                "value": "e00001v - sum(e00010v, e00009v == 'Não')",
                 "update": {
                     "doctype": "Contract Measurement",
                     "fieldname": "saldo"
@@ -105,31 +152,31 @@
                 "parsed": {
                     "aggr": [
                         {
-                            "base": "sum(e00088v, e00083v == 'Não')",
-                            "eval": "sum(e00088v)",
+                            "base": "sum(e00010v, e00009v == 'Não')",
+                            "eval": "sum(e00010v)",
                             "vars": [
-                                "e00088v"
+                                "e00010v"
                             ],
                             "global": true,
-                            "filter": "e00083v == 'Não'",
+                            "filter": "e00009v == 'Não'",
                             "filter_vars": [
-                                "e00083v"
+                                "e00009v"
                             ]
                         }
                     ],
                     "vars": [
-                        "e00019v"
+                        "e00001v"
                     ],
                     "dag_paths": [
-                        "e00088v",
-                        "e00083v",
-                        "e00019v"
+                        "e00010v",
+                        "e00009v",
+                        "e00001v"
                     ]
                 }
             },
             {
-                "path": "e00096v",
-                "value": "sum(e00120v, e00083v == 'Não')+e00089v",
+                "path": "e00017v",
+                "value": "sum(e00026v, e00009v == 'Não')+e00011v",
                 "update": {
                     "doctype": "Contract Measurement",
                     "fieldname": "ftdacumulado"
@@ -137,31 +184,31 @@
                 "parsed": {
                     "aggr": [
                         {
-                            "base": "sum(e00120v, e00083v == 'Não')",
-                            "eval": "sum(e00120v)",
+                            "base": "sum(e00026v, e00009v == 'Não')",
+                            "eval": "sum(e00026v)",
                             "vars": [
-                                "e00120v"
+                                "e00026v"
                             ],
                             "global": true,
-                            "filter": "e00083v == 'Não'",
+                            "filter": "e00009v == 'Não'",
                             "filter_vars": [
-                                "e00083v"
+                                "e00009v"
                             ]
                         }
                     ],
                     "vars": [
-                        "e00089v"
+                        "e00011v"
                     ],
                     "dag_paths": [
-                        "e00120v",
-                        "e00083v",
-                        "e00089v"
+                        "e00026v",
+                        "e00009v",
+                        "e00011v"
                     ]
                 }
             },
             {
-                "path": "e00088v",
-                "value": "sum(e00088v, e00083v == 'Sim')",
+                "path": "e00010v",
+                "value": "last(e00023v)",
                 "update": {
                     "doctype": "Contract Measurement",
                     "fieldname": "medicaoatual"
@@ -169,28 +216,25 @@
                 "parsed": {
                     "aggr": [
                         {
-                            "base": "sum(e00088v, e00083v == 'Sim')",
-                            "eval": "sum(e00088v)",
+                            "base": "last(e00023v)",
+                            "eval": "e00023v",
                             "vars": [
-                                "e00088v"
+                                "e00023v"
                             ],
                             "global": true,
-                            "filter": "e00083v == 'Sim'",
-                            "filter_vars": [
-                                "e00083v"
-                            ]
+                            "filter": "",
+                            "filter_vars": []
                         }
                     ],
                     "vars": [],
                     "dag_paths": [
-                        "e00088v",
-                        "e00083v"
+                        "e00023v"
                     ]
                 }
             },
             {
-                "path": "e00089v",
-                "value": "valor_ativo = sum(e00108v, e00083v = 'Sim')",
+                "path": "e00011v",
+                "value": "valor_ativo = sum(e00023v, e00009v = 'Sim')",
                 "update": {
                     "doctype": "Contract Measurement",
                     "fieldname": "faturamentodireto"
@@ -198,41 +242,38 @@
                 "parsed": {
                     "aggr": [
                         {
-                            "base": "sum(e00108v, e00083v = 'Sim')",
-                            "eval": "sum(e00108v)",
+                            "base": "sum(e00023v, e00009v = 'Sim')",
+                            "eval": "sum(e00023v)",
                             "vars": [
-                                "e00108v"
+                                "e00023v"
                             ],
                             "global": true,
-                            "filter": "e00083v == 'Sim'",
+                            "filter": "e00009v == 'Sim'",
                             "filter_vars": [
-                                "e00083v"
+                                "e00009v"
                             ]
                         }
                     ],
                     "vars": [],
                     "dag_paths": [
-                        "e00108v",
-                        "e00083v"
+                        "e00023v",
+                        "e00009v"
                     ]
                 }
             }
         ],
         "ids": [
             {
-                "id": "0196c4d0-b7ad-7b23-ad96-b316ce979d6f"
-            },
-            {
-                "id": "0196c6ad-c158-7883-9b7a-351ef0cf0772"
+                "id": "019727d9-2f15-7bb2-a7a3-c5d25fc47647"
             }
         ]
     },
     {
-        "path": "e00103v",
+        "path": "e00021v",
         "formulas": [
             {
-                "path": "e00030v",
-                "value": "sum_node(e00088v) + sum_node(e00108v)",
+                "path": "e00024v",
+                "value": "sum(e00010v)",
                 "update": {
                     "doctype": "Contract Measurement SAP Order",
                     "fieldname": "acumuladoatual"
@@ -240,20 +281,10 @@
                 "parsed": {
                     "aggr": [
                         {
-                            "base": "sum_node(e00088v)",
-                            "eval": "sum(e00088v)",
+                            "base": "sum(e00010v)",
+                            "eval": "sum(e00010v)",
                             "vars": [
-                                "e00088v"
-                            ],
-                            "global": true,
-                            "filter": "",
-                            "filter_vars": []
-                        },
-                        {
-                            "base": "sum_node(e00108v)",
-                            "eval": "sum(e00108v)",
-                            "vars": [
-                                "e00108v"
+                                "e00010v"
                             ],
                             "global": true,
                             "filter": "",
@@ -262,76 +293,13 @@
                     ],
                     "vars": [],
                     "dag_paths": [
-                        "e00088v",
-                        "e00108v"
+                        "e00010v"
                     ]
                 }
             },
             {
-                "path": "e00109v",
-                "value": "sum(e00088v)",
-                "update": {
-                    "doctype": "Contract Measurement SAP Order",
-                    "fieldname": "acumuladoatual"
-                },
-                "parsed": {
-                    "aggr": [
-                        {
-                            "base": "sum(e00088v)",
-                            "eval": "sum(e00088v)",
-                            "vars": [
-                                "e00088v"
-                            ],
-                            "global": true,
-                            "filter": "",
-                            "filter_vars": []
-                        }
-                    ],
-                    "vars": [],
-                    "dag_paths": [
-                        "e00088v"
-                    ]
-                }
-            },
-            {
-                "path": "e00025v",
-                "value": "sum(e00108v) + sum_node(e00108v)",
-                "update": {
-                    "doctype": "Contract Measurement SAP Order",
-                    "fieldname": "acumuladoatual"
-                },
-                "parsed": {
-                    "aggr": [
-                        {
-                            "base": "sum(e00108v)",
-                            "eval": "sum(e00108v)",
-                            "vars": [
-                                "e00108v"
-                            ],
-                            "global": true,
-                            "filter": "",
-                            "filter_vars": []
-                        },
-                        {
-                            "base": "sum_node(e00108v)",
-                            "eval": "sum(e00108v)",
-                            "vars": [
-                                "e00108v"
-                            ],
-                            "global": true,
-                            "filter": "",
-                            "filter_vars": []
-                        }
-                    ],
-                    "vars": [],
-                    "dag_paths": [
-                        "e00108v"
-                    ]
-                }
-            },
-            {
-                "path": "e00106v",
-                "value": "e00019v",
+                "path": "e00022v",
+                "value": "e00001v+100*2+200",
                 "update": {
                     "doctype": "Contract Measurement SAP Order",
                     "fieldname": "valortotalvigente"
@@ -339,131 +307,456 @@
                 "parsed": {
                     "aggr": [],
                     "vars": [
-                        "e00019v"
+                        "e00001v"
                     ],
                     "dag_paths": [
-                        "e00019v"
+                        "e00001v"
                     ]
                 }
             }
         ],
         "ids": [
             {
-                "id": "0196c4ed-90aa-75a1-8ffa-b453675ab422"
+                "id": "019727d9-2f15-7bb2-a7a3-c5edc19463f9"
             },
             {
-                "id": "0196c8d0-74b8-7832-9049-d3f62e3dee90"
+                "id": "019727d9-2f15-7bb2-a7a3-c5f0eeeff71b"
             },
             {
-                "id": "0196c4ed-90aa-75a1-8ffa-b4640699dc42"
+                "id": "019727d9-2f15-7bb2-a7a3-c60176d41e50"
             },
             {
-                "id": "0196c4ed-90aa-75a1-8ffa-b478128dc114"
+                "id": "019727d9-2f15-7bb2-a7a3-c61e102374ce"
             },
             {
-                "id": "0196c4ed-90aa-75a1-8ffa-b48679b401d2"
+                "id": "019727d9-2f16-78f2-9152-da92f414022a"
             },
             {
-                "id": "0196c4ed-90aa-75a1-8ffa-b49e965b973f"
+                "id": "019727d9-2f16-78f2-9152-daad5ccb291c"
             },
             {
-                "id": "0196c4ed-90aa-75a1-8ffa-b4a36e2a581c"
+                "id": "019727d9-2f16-78f2-9152-dabd097302c1"
             },
             {
-                "id": "0196c4ed-90aa-75a1-8ffa-b4b81f0272df"
+                "id": "019727d9-2f16-78f2-9152-dac3ed83f726"
             },
             {
-                "id": "0196c4ed-90aa-75a1-8ffa-b4caeb9a5571"
+                "id": "019727d9-2f16-78f2-9152-dadc9ad361fe"
             },
             {
-                "id": "0196c4ed-90aa-75a1-8ffa-b4d71c3a8818"
+                "id": "019727d9-2f16-78f2-9152-dae8ba06bd98"
             },
             {
-                "id": "0196c4ed-90aa-75a1-8ffa-b4eacdb157be"
+                "id": "019727d9-2f16-78f2-9152-daf9c0f20508"
             },
             {
-                "id": "0196c4ed-90aa-75a1-8ffa-b4fde20c938a"
+                "id": "019727d9-2f16-78f2-9152-db03c6d820ee"
             },
             {
-                "id": "0196c4ed-90aa-75a1-8ffa-b5089c1c6208"
+                "id": "019727d9-2f16-78f2-9152-db1e8f6ca4c2"
             },
             {
-                "id": "0196c4ed-90aa-75a1-8ffa-b5145b1be9f0"
+                "id": "019727d9-2f16-78f2-9152-db2573160641"
             },
             {
-                "id": "0196c4ed-90aa-75a1-8ffa-b52883c5ad3e"
+                "id": "019727d9-2f16-78f2-9152-db3c7c9c819b"
             },
             {
-                "id": "0196c4ed-90aa-75a1-8ffa-b53107cf2522"
+                "id": "019727d9-2f16-78f2-9152-db4c693d951d"
             },
             {
-                "id": "0196c4ed-90aa-75a1-8ffa-b54d9bfd13f1"
+                "id": "019727d9-2f16-78f2-9152-db5298c8c56d"
             },
             {
-                "id": "0196c4ed-90aa-75a1-8ffa-b553dd4f1520"
+                "id": "019727d9-2f16-78f2-9152-db65683648e9"
             },
             {
-                "id": "0196c4ed-90aa-75a1-8ffa-b56f81abdc06"
+                "id": "019727d9-2f16-78f2-9152-db73cd8ae63e"
             },
             {
-                "id": "0196c4ed-90aa-75a1-8ffa-b571949b72a3"
+                "id": "019727d9-2f16-78f2-9152-db8f08cc5a83"
             },
             {
-                "id": "0196c4ed-90aa-75a1-8ffa-b58e01a66c75"
+                "id": "019727d9-2f16-78f2-9152-db9573c9a345"
             },
             {
-                "id": "0196c4ed-90aa-75a1-8ffa-b59779b59a9b"
+                "id": "019727d9-2f16-78f2-9152-dba37888537a"
             },
             {
-                "id": "0196c4ed-90aa-75a1-8ffa-b5ae62c4f633"
+                "id": "019727d9-2f16-78f2-9152-dbb154a516d3"
             },
             {
-                "id": "0196c4ed-90aa-75a1-8ffa-b5b740ba5545"
+                "id": "019727d9-2f17-7361-8688-1fdb89323c82"
             },
             {
-                "id": "0196c4ed-90ab-7bc1-9e25-2b5ab29318d9"
+                "id": "019727d9-2f17-7361-8688-1fe99a14a10d"
             },
             {
-                "id": "0196c4ed-90ab-7bc1-9e25-2b695493e277"
+                "id": "019727d9-2f17-7361-8688-1ff0cc997c3f"
             },
             {
-                "id": "0196c4ed-90ab-7bc1-9e25-2b72f1f511c7"
+                "id": "019727d9-2f17-7361-8688-200cdcdbee6b"
             },
             {
-                "id": "0196c4ed-90ab-7bc1-9e25-2b8b8ab04908"
+                "id": "019727d9-2f17-7361-8688-2016728c13b5"
             },
             {
-                "id": "0196c916-96e9-7fc0-90e8-d4396368e7b8"
+                "id": "019727d9-2f17-7361-8688-2028373aad4e"
             },
             {
-                "id": "0196c916-96ea-72e3-9e21-a3a33734dac2"
+                "id": "019727d9-2f17-7361-8688-2034cb2f14ee"
             },
             {
-                "id": "0196c916-96ea-72e3-9e21-a3b873dadfcf"
+                "id": "019727d9-2f17-7361-8688-20448f01d54c"
             },
             {
-                "id": "0196c916-96ea-72e3-9e21-a3c312f89032"
+                "id": "019727d9-2f17-7361-8688-205ca8f45759"
             },
             {
-                "id": "0196c916-96ea-72e3-9e21-a3dae0140333"
+                "id": "019727d9-2f17-7361-8688-206782e2d221"
             },
             {
-                "id": "0196c916-96ea-72e3-9e21-a3e40c7259a6"
+                "id": "019727d9-2f17-7361-8688-2073b19b4571"
             },
             {
-                "id": "0196c916-96ea-72e3-9e21-a3f0a48aa740"
+                "id": "019727d9-2f17-7361-8688-208eb71842c7"
             },
             {
-                "id": "0196c916-96ea-72e3-9e21-a404430eb424"
+                "id": "019727d9-2f17-7361-8688-20959c143d3c"
             },
             {
-                "id": "0196c916-96ea-72e3-9e21-a4121329a286"
+                "id": "019727d9-2f17-7361-8688-20ae63d445e5"
             },
             {
-                "id": "0196c916-96ea-72e3-9e21-a42867d5cabf"
+                "id": "019727d9-2f17-7361-8688-20bab687055a"
             },
             {
-                "id": "0196c916-96ea-72e3-9e21-a4339621f068"
+                "id": "019727d9-2f17-7361-8688-20cb7f2e716e"
+            },
+            {
+                "id": "019727d9-2f17-7361-8688-20d1a8ba2068"
+            },
+            {
+                "id": "019727d9-2f17-7361-8688-20eba20bd142"
+            },
+            {
+                "id": "019727d9-2f17-7361-8688-20f04767ab15"
+            },
+            {
+                "id": "019727d9-2f17-7361-8688-210dfd5aff89"
+            },
+            {
+                "id": "019727d9-2f18-7422-a19d-10d950e9a66f"
+            },
+            {
+                "id": "019727d9-2f18-7422-a19d-10eb95b53dd3"
+            },
+            {
+                "id": "019727d9-2f18-7422-a19d-10f33303d90e"
+            },
+            {
+                "id": "019727d9-2f18-7422-a19d-110c575e0c18"
+            },
+            {
+                "id": "019727d9-2f18-7422-a19d-1116f6992e8a"
+            },
+            {
+                "id": "019727d9-2f18-7422-a19d-1124f3bfbce7"
+            },
+            {
+                "id": "019727d9-2f18-7422-a19d-113cbc8b82a4"
+            },
+            {
+                "id": "019727d9-2f18-7422-a19d-1141af7ba959"
+            },
+            {
+                "id": "019727d9-2f18-7422-a19d-11516e78a727"
+            },
+            {
+                "id": "019727d9-2f18-7422-a19d-1166d399226c"
+            },
+            {
+                "id": "019727d9-2f18-7422-a19d-117425a64795"
+            },
+            {
+                "id": "019727d9-2f18-7422-a19d-118822176dad"
+            },
+            {
+                "id": "019727d9-2f18-7422-a19d-1194daa78b83"
+            },
+            {
+                "id": "019727d9-2f18-7422-a19d-11ad795f7c65"
+            },
+            {
+                "id": "019727d9-2f18-7422-a19d-11b9331efdc7"
+            },
+            {
+                "id": "019727d9-2f18-7422-a19d-11caf8065537"
+            },
+            {
+                "id": "019727d9-2f18-7422-a19d-11d93a9c8ddd"
+            },
+            {
+                "id": "019727d9-2f18-7422-a19d-11e263c087e6"
+            },
+            {
+                "id": "019727d9-2f18-7422-a19d-11f9fb7f3a5a"
+            },
+            {
+                "id": "019727d9-2f19-7820-b33a-cd8deabed018"
+            },
+            {
+                "id": "019727d9-2f19-7820-b33a-cd9de3121184"
+            },
+            {
+                "id": "019727d9-2f19-7820-b33a-cda072b0adea"
+            },
+            {
+                "id": "019727d9-2f19-7820-b33a-cdbc7efd71e7"
+            },
+            {
+                "id": "019727d9-2f19-7820-b33a-cdcfa92e0ff4"
+            },
+            {
+                "id": "019727d9-2f19-7820-b33a-cdda876e3e94"
+            },
+            {
+                "id": "019727d9-2f19-7820-b33a-cdef1df5c969"
+            },
+            {
+                "id": "019727d9-2f19-7820-b33a-cdf629a0d63e"
+            },
+            {
+                "id": "019727d9-2f19-7820-b33a-ce010b81ec83"
+            },
+            {
+                "id": "019727d9-2f19-7820-b33a-ce16b2c2da58"
+            },
+            {
+                "id": "019727d9-2f19-7820-b33a-ce2d4353fdff"
+            },
+            {
+                "id": "019727d9-2f19-7820-b33a-ce3c7bd4e6f0"
+            },
+            {
+                "id": "019727d9-2f19-7820-b33a-ce4d74e715ad"
+            },
+            {
+                "id": "019727d9-2f19-7820-b33a-ce5050640761"
+            },
+            {
+                "id": "019727d9-2f19-7820-b33a-ce60551ccc02"
+            }
+        ]
+    },
+    {
+        "path": "e00027v",
+        "formulas": [
+            {
+                "path": "e00035v",
+                "value": "e00034v + e00029v",
+                "update": {
+                    "doctype": "Contract Measurement Item",
+                    "fieldname": "quantidadeacumulada"
+                },
+                "parsed": {
+                    "aggr": [],
+                    "vars": [
+                        "e00034v",
+                        "e00029v"
+                    ],
+                    "dag_paths": [
+                        "e00034v",
+                        "e00029v"
+                    ]
+                }
+            },
+            {
+                "path": "e00036v",
+                "value": "e00030v + e00033v",
+                "update": {
+                    "doctype": "Contract Measurement Item",
+                    "fieldname": "valortotalacumulado"
+                },
+                "parsed": {
+                    "aggr": [],
+                    "vars": [
+                        "e00033v",
+                        "e00030v"
+                    ],
+                    "dag_paths": [
+                        "e00033v",
+                        "e00030v"
+                    ]
+                }
+            },
+            {
+                "path": "e00031v",
+                "value": "e00030v - e00032v",
+                "update": {
+                    "doctype": "Contract Measurement Item",
+                    "fieldname": "saldoatual"
+                },
+                "parsed": {
+                    "aggr": [],
+                    "vars": [
+                        "e00032v",
+                        "e00030v"
+                    ],
+                    "dag_paths": [
+                        "e00032v",
+                        "e00030v"
+                    ]
+                }
+            },
+            {
+                "path": "e00037v",
+                "value": "2*2",
+                "update": {
+                    "doctype": "Contract Measurement Item",
+                    "fieldname": "valorfatorpagamento"
+                },
+                "parsed": {
+                    "aggr": [],
+                    "vars": [],
+                    "dag_paths": []
+                }
+            },
+            {
+                "path": "e00029v",
+                "value": "sum(e00041v, e00040v == e00028v)",
+                "update": {
+                    "doctype": "Contract Measurement Item",
+                    "fieldname": "quantidademedida"
+                },
+                "parsed": {
+                    "aggr": [
+                        {
+                            "base": "sum(e00041v, e00040v == e00028v)",
+                            "eval": "sum(e00041v)",
+                            "vars": [
+                                "e00041v"
+                            ],
+                            "global": true,
+                            "filter": "e00040v == e00028v",
+                            "filter_vars": [
+                                "e00040v",
+                                "e00028v"
+                            ]
+                        }
+                    ],
+                    "vars": [],
+                    "dag_paths": [
+                        "e00041v",
+                        "e00040v",
+                        "e00028v"
+                    ]
+                }
+            },
+            {
+                "path": "e00030v",
+                "value": "valor_unitario = max(e00006v, e00005v == e00028v)\n\nsum(e00041v * valor_unitario, e00040v == e00028v)",
+                "update": {
+                    "doctype": "Contract Measurement Item",
+                    "fieldname": "valortotalmedido"
+                },
+                "parsed": {
+                    "aggr": [
+                        {
+                            "base": "max(e00006v, e00005v == e00028v)",
+                            "eval": "max(e00006v)",
+                            "vars": [
+                                "e00006v"
+                            ],
+                            "global": true,
+                            "filter": "e00005v == e00028v",
+                            "filter_vars": [
+                                "e00005v",
+                                "e00028v"
+                            ]
+                        },
+                        {
+                            "base": "sum(e00041v * valor_unitario, e00040v == e00028v)",
+                            "eval": "sum(e00041v * valor_unitario)",
+                            "vars": [
+                                "e00041v"
+                            ],
+                            "global": true,
+                            "filter": "e00040v == e00028v",
+                            "filter_vars": [
+                                "e00040v",
+                                "e00028v"
+                            ]
+                        }
+                    ],
+                    "vars": [],
+                    "dag_paths": [
+                        "e00006v",
+                        "e00005v",
+                        "e00028v",
+                        "e00041v",
+                        "e00040v"
+                    ]
+                }
+            }
+        ],
+        "ids": [
+            {
+                "id": "019727d9-2f1a-7621-914e-3ecfde1ea447"
+            },
+            {
+                "id": "019727d9-2f1a-7621-914e-3ed8a174bf98"
+            },
+            {
+                "id": "019727d9-2f1a-7621-914e-3ee5771ba968"
+            },
+            {
+                "id": "019727d9-2f1b-74a0-8e16-46a95a3b3de3"
+            },
+            {
+                "id": "019727d9-2f1b-74a0-8e16-46b5de90294e"
+            },
+            {
+                "id": "019727d9-2f1b-74a0-8e16-46c4532cee81"
+            },
+            {
+                "id": "019727d9-2f1b-74a0-8e16-46d026eab743"
+            },
+            {
+                "id": "019727d9-2f1b-74a0-8e16-46e2df5385c9"
+            },
+            {
+                "id": "019727d9-2f1b-74a0-8e16-46f642444da3"
+            },
+            {
+                "id": "019727d9-2f1b-74a0-8e16-4701d4b392c4"
+            },
+            {
+                "id": "019727d9-2f1b-74a0-8e16-471a18d3afdc"
+            },
+            {
+                "id": "019727d9-2f1b-74a0-8e16-472782b6106f"
+            },
+            {
+                "id": "019727d9-2f1b-74a0-8e16-4734541181a3"
+            },
+            {
+                "id": "019727d9-2f1b-74a0-8e16-474fdbd95567"
+            },
+            {
+                "id": "019727d9-2f1b-74a0-8e16-475127ad3793"
+            },
+            {
+                "id": "019727d9-2f1b-74a0-8e16-476962668358"
+            },
+            {
+                "id": "019727d9-2f1b-74a0-8e16-4772f8d34b52"
+            },
+            {
+                "id": "019727d9-2f1b-74a0-8e16-47843c1b297c"
+            },
+            {
+                "id": "019727d9-2f1b-74a0-8e16-479b016b2b54"
             }
         ]
     }

@@ -45,6 +45,47 @@ from dotenv import load_dotenv
 # Load environment variables from .env file
 load_dotenv()
 
+class AlignedFormatter(logging.Formatter):
+    """Custom formatter that handles message alignment."""
+    
+    # Column width for aligning colons
+    COLON_COLUMN = 25
+    
+    def format(self, record):
+        # Get the original formatted message
+        original = super().format(record)
+        
+        # Split into timestamp/level and message parts
+        parts = original.split(" - ", 2)
+        if len(parts) == 3:
+            timestamp_level = " - ".join(parts[:2])
+            message = parts[2]
+            
+            # Remove original indentation
+            clean_message = message.lstrip()
+            
+            # Check if the message contains a colon for alignment
+            if ':' in clean_message and not clean_message.startswith(('=', '-', '.', '>', '<', '✓', '✗', '⚠')):
+                # Split on the first colon
+                colon_pos = clean_message.find(':')
+                before_colon = clean_message[:colon_pos].strip()
+                after_colon = clean_message[colon_pos + 1:].strip()
+                
+                # Calculate padding to align the colon
+                padding = max(0, self.COLON_COLUMN - len(before_colon))
+                aligned_message = f"{before_colon}{' ' * padding}: {after_colon}"
+                
+                return f"{timestamp_level} - {aligned_message}"
+            else:
+                # For messages without colons or special headers, keep original formatting
+                # but still apply some indentation based on content
+                indent_count = len(message) - len(message.lstrip())
+                indent = " " * (indent_count * 2)
+                
+                return f"{timestamp_level} - {indent}{clean_message}"
+        
+        return original
+
 # Mapping of string log levels to their numeric values
 LOG_LEVEL_MAP = {
     "DEBUG": logging.DEBUG,
@@ -94,7 +135,7 @@ def get_env_bool(name, default=False):
 
 # Constants with environment variable fallbacks
 DEFAULT_LOG_LEVEL = get_env_var("LOG_LEVEL", "DEBUG", lambda x: LOG_LEVEL_MAP.get(x.upper(), logging.DEBUG))
-DEFAULT_LOG_FORMAT = "%(asctime)s - %(levelname)s - %(name)s - %(message)s"
+DEFAULT_LOG_FORMAT = "%(asctime)s - %(levelname)-8s - %(message)s"
 DEFAULT_DATE_FORMAT = "%Y-%m-%d %H:%M:%S"
 DEFAULT_LOG_DIR = get_env_var("LOG_DIR", "logs")
 DEFAULT_LOG_FILE = get_env_var("LOG_FILE", "filter_engine.log")
@@ -153,8 +194,8 @@ def setup_logger(
     for handler in logger.handlers[:]:
         logger.removeHandler(handler)
     
-    # Create formatter
-    formatter = logging.Formatter(log_format, DEFAULT_DATE_FORMAT)
+    # Create formatter using our custom AlignedFormatter
+    formatter = AlignedFormatter(log_format, DEFAULT_DATE_FORMAT)
     
     # Add console handler if requested
     if log_to_console:

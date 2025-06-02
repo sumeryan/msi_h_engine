@@ -27,6 +27,52 @@ from asteval import Interpreter
 # Setup logging
 logger = log.get_logger("Engine Eval")
 
+# Helper function for aligned logging
+def log_info(message, indent=0):
+    """Log info message with proper indentation."""
+    prefix = "  " * indent
+    logger.info(f"{prefix}{message}")
+
+def log_debug(message, indent=0):
+    """Log debug message with proper indentation."""
+    prefix = "  " * indent
+    logger.debug(f"{prefix}{message}")
+
+def log_error(message, indent=0):
+    """Log error message with proper indentation."""
+    prefix = "  " * indent
+    logger.error(f"{prefix}{message}")
+
+def log_warning(message, indent=0):
+    """Log warning message with proper indentation."""
+    prefix = "  " * indent
+    logger.warning(f"{prefix}{message}")
+
+def convert_numpy_types(obj):
+    """
+    Convert numpy data types to Python native types for JSON serialization.
+    
+    This function recursively converts numpy integers, floats, and arrays
+    to their Python equivalents to ensure JSON serialization compatibility.
+    
+    Args:
+        obj: The object to convert (can be dict, list, numpy type, etc.)
+        
+    Returns:
+        The converted object with all numpy types replaced by Python native types
+    """
+    if isinstance(obj, np.integer):
+        return int(obj)
+    elif isinstance(obj, np.floating):
+        return float(obj)
+    elif isinstance(obj, np.ndarray):
+        return obj.tolist()
+    elif isinstance(obj, dict):
+        return {key: convert_numpy_types(value) for key, value in obj.items()}
+    elif isinstance(obj, list):
+        return [convert_numpy_types(item) for item in obj]
+    return obj
+
 def create_interpreter(use_numpy=True, max_time=5.0, readonly=False):
     """
     Create an asteval Interpreter with optional NumPy support and safety features.
@@ -222,22 +268,8 @@ def evaluate_formula(formula, variables=None, use_numpy=True, max_time=5.0):
 
     # Add variables to interpreter's symbol table
     if variables:
-        logger.debug(f"Adding {len(variables)} variables to interpreter")
         for name, value in variables.items():
             interpreter.symtable[name] = value
-            if isinstance(value, list) and len(value) < 10:
-                logger.debug(f"Variable {name} = {value}")
-            elif isinstance(value, list):
-                logger.debug(f"Variable {name} = list with {len(value)} items")
-            elif isinstance(value, np.ndarray):
-                logger.debug(f"Variable {name} = numpy.ndarray with shape {value.shape}")
-            else:
-                logger.debug(f"Variable {name} = {value} (type: {type(value).__name__})")
-
-    # Print variable types for debugging
-    if variables:
-        var_types = {name: type(value).__name__ for name, value in variables.items() if name in formula}
-        logger.debug(f"Variable types in formula: {var_types}")
 
     # Evaluate the formula
     try:
@@ -345,57 +377,58 @@ def eval_formula(entities_eval, formulas):
     Returns:
         list: Results of formula evaluations for each entity
     """
-    logger.info(f"Starting batch formula evaluation for {len(entities_eval)} entities")
+    log_info("=" * 80)
+    log_info(f"STARTING BATCH FORMULA EVALUATION")
+    log_info("=" * 80)
     results = []
     counter = 0
 
     for entity_idx, entity in enumerate(entities_eval):
-        logger.info(f"Processing entity {entity_idx+1}/{len(entities_eval)}")
+        log_info(f"ENTITY [{entity_idx+1}/{len(entities_eval)}] - ID: {entity.get('id', f'entity_{entity_idx}')}")
+        log_info("-" * 60)
         entity_results = {"entity_id": entity.get("id", f"entity_{entity_idx}"), "formula_results": []}
         
         if "formula_data" not in entity or "formulas" not in entity["formula_data"]:
-            logger.warning(f"Entity {entity_idx} has no formula data, skipping")
+            log_warning(f"⚠ Entity {entity_idx} has no formula data - SKIPPING", indent=1)
             continue
             
         for id_eval in entity["formula_data"]["formulas"]:
-            logger.debug(f"Processing formula path: {id_eval['formula']}")
+            log_info(f"FORMULA: {id_eval['formula']}", indent=0)
+            log_info("." * 40, indent=0)
             
             # Create a fresh interpreter for each formula evaluation
             aeval = create_interpreter(use_numpy=True, max_time=5.0, readonly=False)
-            logger.debug("Created interpreter for formula evaluation")
             
             # Get the formula
             formula = get_formula(formulas, id_eval["formula"])
             if not formula:
-                logger.error(f"Formula not found: {id_eval['formula']}")
+                log_error(f"✗ FORMULA NOT FOUND: {id_eval['formula']}", indent=1)
                 continue
                 
             formula_str = formula["value"]
-            logger.info(f"Evaluating formula: '{formula_str}'")
+            log_info(f"Id:{entity.get("id")}")
+            log_info(f"Expression: '{formula_str}'", indent=1)
             
             # Track variable replacements for debugging
             var_replacements = {}
             
             # First process aggregation functions
             if "data" not in id_eval:
-                logger.warning(f"No data found for formula: {id_eval['formula']}")
+                log_warning(f"⚠ NO DATA for formula: {id_eval['formula']}", indent=1)
                 continue
-                
-            logger.debug(f"Processing {len(id_eval['data'])} data items")
             
             # Process aggregation variables first
             for i, value in enumerate(id_eval["data"]):
                 if "aggr" in value:
-                    logger.debug(f"Processing aggregation: {value['aggr']}")
+                    log_info(f"→ Processing AGGREGATION variable", indent=2)
+                    log_debug(f"Base: {value['aggr']['base'] if 'base' in value['aggr'] else 'N/A'}", indent=3)
                     
                     # Get the aggregation function
                     aggr = get_aggr(formula, value["aggr"]["base"])
                     if not aggr:
-                        logger.warning(f"Aggregation not found for base: {value['aggr']['base']}")
+                        log_warning(f"Aggregation not found for base: {value['aggr']['base']}", indent=3)
                         continue
                         
-                    logger.debug(f"Found aggregation definition: {aggr}")
-                    
                     # Process each variable in the aggregation
                     for v in aggr["vars"]:
                         counter += 1
@@ -404,28 +437,31 @@ def eval_formula(entities_eval, formulas):
                         formula_str = formula_str.replace(aggr["base"], aggr["eval"].replace(v, new_var))
                         
                         if old_formula != formula_str:
-                            logger.debug(f"Replaced aggregation base '{aggr['base']}' with expression containing '{new_var}'")
+                            log_info(f"Replaced: {aggr['base']} → {new_var}", indent=3)
                             var_replacements[aggr["base"]] = aggr["eval"].replace(v, new_var)
                         
                         # Add the variable to the interpreter
-                        if "values" in value and len(value["values"]) > 0:
-                            aeval.symtable[new_var] = np.array(value["values"])
-                            logger.debug(f"Added variable {new_var} = {value['values'][0]}")
+                        aggregation_var = value["aggr"]["vars"]
+                        if "values" in aggregation_var and len(aggregation_var["values"]) > 0:
+                            aeval.symtable[new_var] = np.array(aggregation_var["values"])
+                            log_info(f"Added: {new_var} = array[{len(aggregation_var['values'])} values]", indent=3)
+                            log_debug(f"Values: {aggregation_var['values']}")
                         else:
-                            logger.warning(f"No values found for aggregation variable {v}")
+                            log_warning(f"No values found for aggregation variable {v}", indent=3)
                             aeval.symtable[new_var] = np.array([0])  # Default value
 
             # Process other (non-aggregation) variables
             for i, value in enumerate(id_eval["data"]):
                 if "non_aggr" in value:
-                    logger.debug(f"Processing non-aggregation variable: {value['non_aggr']}")
+                    log_info(f"→ Processing REGULAR variable", indent=2)
+                    log_debug(f"Path: {value['non_aggr']['path']}", indent=3)
                     
                     counter += 1
                     pattern = r'e\d{5}v'
                     matches = re.search(pattern, value["non_aggr"]["path"])
                     
                     if not matches:
-                        logger.warning(f"No variable pattern found in path: {value['non_aggr']['path']}")
+                        log_warning(f"No variable pattern found in path: {value['non_aggr']['path']}", indent=3)
                         continue
                         
                     var = matches.group()
@@ -434,30 +470,49 @@ def eval_formula(entities_eval, formulas):
                     formula_str = formula_str.replace(var, new_var)
                     
                     if old_formula != formula_str:
-                        logger.debug(f"Replaced variable '{var}' with '{new_var}'")
                         var_replacements[var] = new_var
                     
                     # Add the variable to the interpreter
                     if "values" in value["non_aggr"]:
                         aeval.symtable[new_var] = value["non_aggr"]["values"][0]
-                        logger.debug(f"Added variable {new_var} = numpy.array with {len(value['non_aggr']['values'])} values")
+                        log_info(f"Added: {new_var}", indent=3)
+                        log_debug(f"Value: {value["non_aggr"]["values"][0]}")                        
                     else:
-                        logger.warning(f"No values found for non-aggregation variable {var}")
+                        log_warning(f"No values found for non-aggregation variable {var}", indent=3)
                         aeval.symtable[new_var] = 0  # Empty array
 
             # Log all variable replacements
-            logger.debug(f"Formula after variable substitution: '{formula_str}'")
-            logger.debug(f"Variable replacements: {var_replacements}")
+            log_info(f"Final expression: '{formula_str}'", indent=2)
+            if var_replacements:
+                for old, new in var_replacements.items():
+                    log_info(f"{old} → {new}", indent=3)
             
             # Execute the formula
             try:
-                logger.info(f"Executing formula: '{formula_str}'")
+                log_info(">>> EXECUTING FORMULA <<<", indent=1)
+                log_info(f"Path: {id_eval['formula']}", indent=2)
+                log_info(f"Expression: '{formula_str}'", indent=2)
+                
+                # Regular expression without assignment
                 result = aeval(formula_str)
                 
                 # Check for errors
                 if result is None or (hasattr(aeval, 'error') and aeval.error):
-                    error_msg = str(aeval.error[0]) if hasattr(aeval, 'error') and aeval.error else "Unknown error"
-                    logger.error(f"Error evaluating formula '{formula_str}': {error_msg}")
+                    if hasattr(aeval, 'error') and aeval.error:
+                        error_msg = str(aeval.error[0])
+                        error_details = str(aeval.error[1]) if len(aeval.error) > 1 else ""
+                    else:
+                        error_msg = "Unknown error"
+                        error_details = ""
+                    
+                    log_error(f"✗ ERROR - Formula: {id_eval['formula']}", indent=1)
+                    log_error(f"Expression: '{formula_str}'", indent=2)
+                    log_error(f"Error: {error_msg}", indent=2)
+                    if error_details:
+                        log_error(f"Details: {error_details}", indent=2)
+                    
+                    # Debug: print available symbols
+                    log_debug(f"Available symbols: {list(aeval.symtable.keys())}", indent=2)
                     entity_results["formula_results"].append({
                         "formula_path": id_eval["formula"],
                         "status": "error",
@@ -467,18 +522,24 @@ def eval_formula(entities_eval, formulas):
                 
                 # Log and store successful result
                 if isinstance(result, np.ndarray):
-                    logger.info(f"Formula result: numpy.ndarray with shape {result.shape}")
+                    log_info(f"✓ SUCCESS - Formula: {id_eval['formula']}", indent=1)
+                    log_info(f"Result type: numpy.ndarray", indent=2)
+                    log_info(f"Shape: {result.shape}", indent=2)
+                    log_info(f"Sample values (first 5): {result.flatten()[:5].tolist() if result.size > 0 else []}", indent=2)
                 else:
-                    logger.info(f"Formula result: {result}")
-                    
+                    log_info(f"✓ SUCCESS - Formula: {id_eval['formula']}", indent=1)
+                    log_info(f"Result: {result}", indent=2)
+
                 entity_results["formula_results"].append({
                     "formula_path": id_eval["formula"],
                     "status": "success",
-                    "result": result.tolist() if isinstance(result, np.ndarray) else result
+                    "result": result.tolist() if isinstance(result, np.ndarray) else result,
                 })
                 
             except Exception as e:
-                logger.error(f"Exception evaluating formula '{formula_str}': {str(e)}", exc_info=True)
+                log_error(f"✗ EXCEPTION - Formula: {id_eval['formula']}", indent=1)
+                log_error(f"Expression: '{formula_str}'", indent=2)
+                log_error(f"Exception: {str(e)}", indent=2)
                 entity_results["formula_results"].append({
                     "formula_path": id_eval["formula"],
                     "status": "error",
@@ -487,7 +548,10 @@ def eval_formula(entities_eval, formulas):
         
         results.append(entity_results)
 
-    logger.info(f"Completed batch formula evaluation. Processed {len(results)} entities.")
+    log_info("=" * 80)
+    log_info(f"BATCH EVALUATION COMPLETED")
+    log_info(f"Total entities processed: {len(results)}")
+    log_info("=" * 80)
     return results
 
 if __name__ == "__main__":
@@ -503,9 +567,9 @@ if __name__ == "__main__":
     logger.debug(f"Current directory: {current_dir}")
 
     # Paths for input and output files
-    formulas_json = "/Users/igordanielgabardogoncalves/Library/CloudStorage/OneDrive-Pessoal/GitHub/engine_entities/data/extracted_formulas.json"
-    entities_eval_json = "/Users/igordanielgabardogoncalves/Library/CloudStorage/OneDrive-Pessoal/GitHub/engine_entities/data/processed_formulas_with_variables.json"
-    engine_result_json = "/Users/igordanielgabardogoncalves/Library/CloudStorage/OneDrive-Pessoal/GitHub/engine_entities/data/engine_result.json"
+    formulas_json = "extracted_formulas.json"
+    entities_eval_json = "processed_formulas_with_variables.json"
+    engine_result_json = "engine_result.json"
     
     logger.info(f"Loading formula definitions from: {formulas_json}")
     logger.info(f"Loading entity data from: {entities_eval_json}")
@@ -541,5 +605,8 @@ if __name__ == "__main__":
     else:
         logger.error("Cannot perform evaluation: missing formula definitions or entity data")
 
+    # Convert numpy types to native Python types before saving
+    results_converted = convert_numpy_types(results)
+    
     with open(engine_result_json, 'w', encoding='utf-8') as f:
-        json.dump(results, f, indent=4, ensure_ascii=False)
+        json.dump(results_converted, f, indent=4, ensure_ascii=False)

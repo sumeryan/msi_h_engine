@@ -954,13 +954,16 @@ def filter_tree_data(tree_data: Dict, return_paths: List[str], record_id: str = 
         # Apply the filter function to each record
         for record in records:
             
-            if 'id' in record and isinstance(record, dict) and filter_function(record, tree_data):
-                return record
+            if 'id' in record and isinstance(record, dict):
+                # logger.debug(f"Evaluating record with ID: {record.get('id')} path {record.get('fields')[0]['path']}")
+                if filter_function(record, tree_data):
+                    #return record
+                    g_filtered_records.append(record)
             
             if isinstance(record, dict) and 'data' in record and record['data']:
                 f_record = filter_global(record["data"])
                 if f_record:
-                    g_filtered_records.append(f_record)
+                    g_filtered_records.extend(f_record)
 
         return g_filtered_records
 

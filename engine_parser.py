@@ -687,8 +687,8 @@ if __name__ == "__main__":
     logger = get_logger("Formula Parser")
     logger.info("Starting formula parser module test")
     
-    input_path = "/Users/igordanielgabardogoncalves/Library/CloudStorage/OneDrive-Pessoal/GitHub/engine_entities/data/tree_data.json"
-    output_path = "/Users/igordanielgabardogoncalves/Library/CloudStorage/OneDrive-Pessoal/GitHub/engine_entities/data/extracted_formulas.json"
+    input_path = "tree_data.json"
+    output_path = "extracted_formulas.json"
 
     logger.info(f"Loading data from {input_path}")
     try:
