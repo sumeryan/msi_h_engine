@@ -922,7 +922,7 @@ class tree_data_filter:
         # Return the value of the node with the oldest creation date
         return sorted_nodes[0]['value'] if sorted_nodes else None
     
-def filter_tree_data(tree_data: Dict, return_paths: List[str], record_id: str = None, filter_expr: str = None, lock_node: bool = False) -> Union[List[Dict], Dict[str, Any]]:
+def xfilter_tree_data(tree_data: Dict, return_paths: List[str], record_id: str = None, filter_expr: str = None, lock_node: bool = False) -> Union[List[Dict], Dict[str, Any]]:
     logger.info(f"===== Starting filter operation =====")
     """
     Filters tree data using a custom conditional expression.

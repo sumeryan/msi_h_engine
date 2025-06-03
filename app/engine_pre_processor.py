@@ -38,8 +38,9 @@ import json
 import copy
 from typing import Dict, List, Any, Optional
 from app.filters.filters_paths import filter_tree_data
-from app.engine_parser import parse_formulas
-from app.log.logger import get_logger
+from engine_parser import parse_formulas
+from log.logger import get_logger
+from variable_filter import FilterVariableExtractor
 
 # Get a logger instance for this module
 logger = get_logger("engine_pre_processor")
@@ -149,9 +150,39 @@ def process_formula_variables(extracted_formulas: List[Dict[str, Any]], tree_dat
                 logger.debug(f"Processing {len(aggr_funcs)} aggregation functions")
                 
                 for aggr in aggr_funcs:
+
                     vars = aggr["vars"]
                     filter_expr = aggr["filter"]
                     is_global = aggr["global"]
+
+                    # Check if exits var fields in right side of filter expression
+                    if filter_expr:
+                        filter_vars = FilterVariableExtractor().extract_unique_variables(filter_expr)
+                        if filter_vars:
+                            logger.debug(f"Filter expression found: {filter_expr}")
+
+                            new_filter_expr = FilterVariableExtractor().highlight_variables(filter_expr)
+
+                            logger.debug(f"Get values for right variables: {filter_vars}")
+                            try:
+                                # Apply "first" transformation to get only the first match for each variable
+                                for v in filter_vars:
+                                    var_list = [f"first({v})"]
+                                    node = filter_tree_data(tree_data, return_paths=var_list, record_id=id_value, lock_node=True)
+                                    if node:
+                                        n_value = node[0]["values"][0]
+                                        # Check if the value is a number
+                                        try:
+                                            float(value)
+                                        except (ValueError, TypeError):
+                                            n_value = f"'{n_value}'"  # Enclose in quotes if not a number
+                                        logger.debug(f"Found variable value {n_value}")
+                                        new_filter_expr = new_filter_expr.replace(f"__{v}__", n_value)
+                            except Exception as e:
+                                logger.error(f"Error processing non-aggregated variables: {e}")
+                                raise                
+                            logger.debug(f"Updated filter expression: {new_filter_expr}")
+                            filter_expr = new_filter_expr
                     
                     logger.debug(f"Processing aggregation function - vars: {vars}, filter: {filter_expr}, global: {is_global}")
 
@@ -242,9 +273,9 @@ def main():
     current_dir = os.path.dirname(os.path.abspath(__file__))
     
     # Paths for input and output files
-    tree_data_path = os.path.join(current_dir, "tree_data.json")
-    extracted_formulas_path = os.path.join(current_dir, "extracted_formulas.json")
-    output_path = os.path.join(current_dir, "processed_formulas_with_variables.json")
+    tree_data_path = "tree_data.json"
+    extracted_formulas_path = "extracted_formulas.json"
+    output_path = "processed_formulas_with_variables.json"
     
     logger.info(f"Using tree data path: {tree_data_path}")
     logger.info(f"Using output path: {output_path}")
@@ -295,6 +326,6 @@ def main():
         return
     
     logger.info("Formula processing complete!")
-
+    
 if __name__ == "__main__":
     main()
