@@ -3,7 +3,7 @@ version: '3.8'
 services:
   api:
     build: .
-    container_name: engine_api
+    container_name: engine_api_debug
     env_file:
       - .env
     depends_on:
@@ -11,48 +11,54 @@ services:
       - db
     ports:
       - "8081:8081"
-      - "5678:5678"  # Porta para debug da API
+      - "5678:5678"  # Porta para debugpy
     volumes:
-      - .:/app  # Para hot reload e debug
-    command: uvicorn main:app --reload --host 0.0.0.0 --port 8081
+      - .:/app
+      - /app/__pycache__
+    command: python debug_entrypoint.py
     environment:
       - PYTHONDONTWRITEBYTECODE=1
       - PYTHONUNBUFFERED=1
+      - PYTHONPATH=/app
 
   worker:
     build: .
-    container_name: engine_worker
+    container_name: engine_worker_debug
     env_file:
       - .env
     depends_on:
       - rabbitmq
       - db
     ports:
-      - "5679:5678"  # Porta para debug do worker
+      - "5679:5678"  # Porta para debugpy do worker
     volumes:
       - .:/app
-    command: python consumer.py
+      - /app/__pycache__
+    command: python -m debugpy --listen 0.0.0.0:5678 --wait-for-client consumer.py
     restart: on-failure
     environment:
       - PYTHONDONTWRITEBYTECODE=1
       - PYTHONUNBUFFERED=1
+      - PYTHONPATH=/app
 
   carga:
     build: .
-    container_name: engine_carga
+    container_name: engine_carga_debug
     env_file:
       - .env
     depends_on:
       - rabbitmq
     ports:
-      - "5680:5678"  # Porta para debug do carga
+      - "5680:5678"  # Porta para debugpy do carga
     volumes:
       - .:/app
-    command: python consumer_carga.py
+      - /app/__pycache__
+    command: python -m debugpy --listen 0.0.0.0:5678 --wait-for-client consumer_carga.py
     restart: on-failure
     environment:
       - PYTHONDONTWRITEBYTECODE=1
       - PYTHONUNBUFFERED=1
+      - PYTHONPATH=/app
 
   rabbitmq:
     image: rabbitmq:3-management
@@ -60,6 +66,9 @@ services:
     ports:
       - "5672:5672"      # AMQP
       - "15672:15672"    # Management UI
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
 
   db:
     image: postgres:15

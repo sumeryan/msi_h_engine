@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  api:
+    # Sobrescreve o comando para manter o container rodando
+    command: /bin/sh -c "while sleep 1000; do :; done"
+    
+    # Adiciona capacidades necessárias para debug
+    cap_add:
+      - SYS_PTRACE
+    security_opt:
+      - seccomp:unconfined
+    
+    # Monta o workspace
+    volumes:
+      - .:/app:cached
+      - /app/__pycache__
+      - /app/.mypy_cache
+      - /app/.pytest_cache
+      
+    # Variáveis de ambiente adicionais para desenvolvimento
+    environment:
+      - PYTHONDONTWRITEBYTECODE=1
+      - PYTHONUNBUFFERED=1
+      - PYTHONPATH=/app
+      - DEVELOPMENT=true
+    
+    # Garante que o container não reinicie automaticamente
+    restart: "no"
