@@ -1,551 +1,520 @@
 """
 Powered by Renoir
 Author: Igor Daniel G Goncalves - igor.goncalves@renoirgroup.com
-
-ASTEval module for safe formula evaluation with NumPy support.
-
-This module provides a standardized way to initialize and configure an asteval
-Interpreter instance with numpy support for safe formula evaluation. It handles
-secure parsing and evaluation of mathematical formulas with variable substitution
-while preventing malicious code execution.
-
-The module includes:
-- Configuration of a restricted execution environment
-- Safe mathematical and statistical functions
-- Support for NumPy array operations
-- Custom aggregation functions for data analysis
-- Comprehensive formula evaluation with error handling
-
 """
 import numpy as np
 import re
 import log
 import os
 import json
+from engine_logger import EngineLogger
 from asteval import Interpreter
 from update_tree import UpdateTreeData
 from update_frappe import UpdateFrappe
 
-# Setup logging
-logger = log.get_logger("Engine Eval")
-
-# Helper function for aligned logging
-def log_info(message, indent=0):
-    """Log info message with proper indentation."""
-    prefix = "  " * indent
-    logger.info(f"{prefix}{message}")
-
-def log_debug(message, indent=0):
-    """Log debug message with proper indentation."""
-    prefix = "  " * indent
-    logger.debug(f"{prefix}{message}")
-
-def log_error(message, indent=0):
-    """Log error message with proper indentation."""
-    prefix = "  " * indent
-    logger.error(f"{prefix}{message}")
-
-def log_warning(message, indent=0):
-    """Log warning message with proper indentation."""
-    prefix = "  " * indent
-    logger.warning(f"{prefix}{message}")
-
-def convert_numpy_types(obj):
+class EngineEval(EngineLogger):
     """
-    Convert numpy data types to Python native types for JSON serialization.
+    EngineEval class for managing formula evaluation with asteval.
     
-    This function recursively converts numpy integers, floats, and arrays
-    to their Python equivalents to ensure JSON serialization compatibility.
+    This class provides methods to create an interpreter, evaluate formulas,
+    and handle variable substitutions in a secure manner.
     
-    Args:
-        obj: The object to convert (can be dict, list, numpy type, etc.)
-        
-    Returns:
-        The converted object with all numpy types replaced by Python native types
+    Attributes:
+        use_numpy (bool): Whether to include NumPy functions in the interpreter.
+        max_time (float): Maximum execution time for formula evaluation.
+        readonly (bool): Whether to run in readonly mode (blocks assignment operations).
     """
-    if isinstance(obj, np.integer):
-        return int(obj)
-    elif isinstance(obj, np.floating):
-        return float(obj)
-    elif isinstance(obj, np.ndarray):
-        return obj.tolist()
-    elif isinstance(obj, dict):
-        return {key: convert_numpy_types(value) for key, value in obj.items()}
-    elif isinstance(obj, list):
-        return [convert_numpy_types(item) for item in obj]
-    return obj
+    
+    def __init__(self):
+        self.logger = log.get_logger("Engine")
 
-def create_interpreter(use_numpy=True, max_time=5.0, readonly=False):
-    """
-    Create an asteval Interpreter with optional NumPy support and safety features.
-    
-    This function initializes a restricted Python expression evaluator with 
-    carefully selected safe functions. It prevents access to potentially dangerous
-    operations while providing rich mathematical functionality.
-    
-    Args:
-        use_numpy (bool): Whether to include NumPy functions in the interpreter. Default is True.
-        max_time (float): Maximum execution time in seconds to prevent infinite loops. Default is 5.0.
-        readonly (bool): Whether to run in readonly mode (blocks assignment operations for added safety). Default is False.
+    def convert_numpy_types(self, obj):
+        """
+        Convert numpy data types to Python native types for JSON serialization.
         
-    Returns:
-        Interpreter: Configured asteval Interpreter instance ready for safe formula evaluation
-    """
-    # logger.debug(f"Creating interpreter with params: use_numpy={use_numpy}, max_time={max_time}, readonly={readonly}")
-    
-    # Start with a minimal set of safe builtins
-    numpy_functions = {
-        # Funções matemáticas básicas
-        'sum': np.sum,            # Soma de elementos
-        'mean': np.mean,          # Média aritmética
-        'average': np.average,    # Média ponderada
-        'median': np.median,      # Mediana
-        'std': np.std,            # Desvio padrão
-        'var': np.var,            # Variância
-        'min': np.min,            # Valor mínimo
-        'max': np.max,            # Valor máximo
-        'argmin': np.argmin,      # Índice do valor mínimo
-        'argmax': np.argmax,      # Índice do valor máximo
+        This function recursively converts numpy integers, floats, and arrays
+        to their Python equivalents to ensure JSON serialization compatibility.
         
-        # Operações estatísticas
-        'percentile': np.percentile,  # Percentil
-        'quantile': np.quantile,      # Quantil
-        'cov': np.cov,                # Covariância
-        'corrcoef': np.corrcoef,      # Coeficiente de correlação
-        
-        # Operações de agregação
-        'prod': np.prod,          # Produto dos elementos
-        'cumsum': np.cumsum,      # Soma acumulativa
-        'cumprod': np.cumprod,    # Produto acumulativo
-        
-        # Funções trigonométricas
-        'sin': np.sin,            # Seno
-        'cos': np.cos,            # Cosseno
-        'tan': np.tan,            # Tangente
-        'arcsin': np.arcsin,      # Arco seno
-        'arccos': np.arccos,      # Arco cosseno
-        'arctan': np.arctan,      # Arco tangente
-        
-        # Funções exponenciais e logarítmicas
-        'exp': np.exp,            # Exponencial
-        'log': np.log,            # Logaritmo natural
-        'log10': np.log10,        # Logaritmo base 10
-        'log2': np.log2,          # Logaritmo base 2
-        'sqrt': np.sqrt,          # Raiz quadrada
-        
-        # Funções de arredondamento
-        'round': np.round,        # Arredondamento
-        'floor': np.floor,        # Arredondamento para baixo
-        'ceil': np.ceil,          # Arredondamento para cima
-        'trunc': np.trunc,        # Truncamento
-        
-        # Funções lógicas
-        'all': np.all,            # Verifica se todos são verdadeiros
-        'any': np.any,            # Verifica se algum é verdadeiro
-        
-        # Manipulação de arrays
-        'concatenate': np.concatenate,  # Concatenar arrays
-        'stack': np.stack,              # Empilhar arrays
-        'vstack': np.vstack,            # Empilhar verticalmente
-        'hstack': np.hstack,            # Empilhar horizontalmente
-        'reshape': np.reshape,          # Remodelar arrays
-        'transpose': np.transpose,      # Transpor arrays
-        
-        # Operações condicionais
-        'where': np.where,        # Operador condicional
-        'select': np.select,      # Seleção condicional
-        
-        # Outras funções úteis
-        'unique': np.unique,      # Valores únicos
-        'diff': np.diff,          # Diferenças entre elementos adjacentes
-        'gradient': np.gradient,  # Gradiente
-        'clip': np.clip,          # Recortar valores
-        'absolute': np.absolute,  # Valor absoluto (alias: np.abs)
-        'abs': np.abs,            # Valor absoluto
-    }
-    
-    # logger.debug(f"Configured {len(numpy_functions)} safe builtin functions")
+        Args:
+            obj: The object to convert (can be dict, list, numpy type, etc.)
+            
+        Returns:
+            The converted object with all numpy types replaced by Python native types
+        """
+        if isinstance(obj, np.integer):
+            return int(obj)
+        elif isinstance(obj, np.floating):
+            return float(obj)
+        elif isinstance(obj, np.ndarray):
+            return obj.tolist()
+        elif isinstance(obj, dict):
+            return {key: self.convert_numpy_types(value) for key, value in obj.items()}
+        elif isinstance(obj, list):
+            return [self.convert_numpy_types(item) for item in obj]
+        return obj
 
-    # Funções que permaneceriam inalteradas:
-    default_functions = {
-        'bin': bin,          # Representação binária
-        'bool': bool,        # Conversão para booleano
-        'bytearray': bytearray,  # Criar bytearray
-        'bytes': bytes,      # Criar bytes
-        'chr': chr,          # Converter inteiro para caractere Unicode
-        'complex': complex,  # Criar número complexo
-        'dict': dict,        # Criar dicionário
-        'divmod': divmod,    # Divisão e módulo
-        'enumerate': enumerate,  # Enumerar sequência
-        'filter': filter,    # Filtrar sequência
-        'float': float,      # Conversão para ponto flutuante
-        'format': format,    # Formatação de string
-        'frozenset': frozenset,  # Criar frozenset
-        'hash': hash,        # Calcular hash
-        'hex': hex,          # Representação hexadecimal
-        'id': id,            # Identificador único
-        'int': int,          # Conversão para inteiro
-        'isinstance': isinstance,  # Verificar tipo
-        'issubclass': issubclass,  # Verificar herança
-        'len': len,          # Tamanho da sequência
-        'list': list,        # Criar lista
-        'map': map,          # Mapear função
-        'oct': oct,          # Representação octal
-        'ord': ord,          # Converter caractere para inteiro
-        'pow': pow,          # Potenciação (embora np.power seja uma alternativa)
-        'range': range,      # Gerar sequência
-        'reversed': reversed,  # Inverter sequência
-        'set': set,          # Criar conjunto
-        'slice': slice,      # Criar objeto slice
-        'sorted': sorted,    # Ordenar
-        'str': str,          # Conversão para string
-        'tuple': tuple,      # Criar tupla
-        'type': type,        # Obter tipo
-        'zip': zip,          # Combinar sequências
-        'True': True,        # Constante booleana
-        'False': False,      # Constante booleana
-        'None': None,        # Constante nula
-    }
+    def create_interpreter(self, use_numpy=True, max_time=5.0, readonly=False):
+        """
+        Create an asteval Interpreter with optional NumPy support and safety features.
+        
+        This function initializes a restricted Python expression evaluator with 
+        carefully selected safe functions. It prevents access to potentially dangerous
+        operations while providing rich mathematical functionality.
+        
+        Args:
+            use_numpy (bool): Whether to include NumPy functions in the interpreter. Default is True.
+            max_time (float): Maximum execution time in seconds to prevent infinite loops. Default is 5.0.
+            readonly (bool): Whether to run in readonly mode (blocks assignment operations for added safety). Default is False.
+            
+        Returns:
+            Interpreter: Configured asteval Interpreter instance ready for safe formula evaluation
+        """
+        
+        # Start with a minimal set of safe builtins
+        numpy_functions = {
+            # Funções matemáticas básicas
+            'sum': np.sum,            # Soma de elementos
+            'mean': np.mean,          # Média aritmética
+            'average': np.average,    # Média ponderada
+            'median': np.median,      # Mediana
+            'std': np.std,            # Desvio padrão
+            'var': np.var,            # Variância
+            'min': np.min,            # Valor mínimo
+            'max': np.max,            # Valor máximo
+            'argmin': np.argmin,      # Índice do valor mínimo
+            'argmax': np.argmax,      # Índice do valor máximo
+            
+            # Operações estatísticas
+            'percentile': np.percentile,  # Percentil
+            'quantile': np.quantile,      # Quantil
+            'cov': np.cov,                # Covariância
+            'corrcoef': np.corrcoef,      # Coeficiente de correlação
+            
+            # Operações de agregação
+            'prod': np.prod,          # Produto dos elementos
+            'cumsum': np.cumsum,      # Soma acumulativa
+            'cumprod': np.cumprod,    # Produto acumulativo
+            
+            # Funções trigonométricas
+            'sin': np.sin,            # Seno
+            'cos': np.cos,            # Cosseno
+            'tan': np.tan,            # Tangente
+            'arcsin': np.arcsin,      # Arco seno
+            'arccos': np.arccos,      # Arco cosseno
+            'arctan': np.arctan,      # Arco tangente
+            
+            # Funções exponenciais e logarítmicas
+            'exp': np.exp,            # Exponencial
+            'log': np.log,            # Logaritmo natural
+            'log10': np.log10,        # Logaritmo base 10
+            'log2': np.log2,          # Logaritmo base 2
+            'sqrt': np.sqrt,          # Raiz quadrada
+            
+            # Funções de arredondamento
+            'round': np.round,        # Arredondamento
+            'floor': np.floor,        # Arredondamento para baixo
+            'ceil': np.ceil,          # Arredondamento para cima
+            'trunc': np.trunc,        # Truncamento
+            
+            # Funções lógicas
+            'all': np.all,            # Verifica se todos são verdadeiros
+            'any': np.any,            # Verifica se algum é verdadeiro
+            
+            # Manipulação de arrays
+            'concatenate': np.concatenate,  # Concatenar arrays
+            'stack': np.stack,              # Empilhar arrays
+            'vstack': np.vstack,            # Empilhar verticalmente
+            'hstack': np.hstack,            # Empilhar horizontalmente
+            'reshape': np.reshape,          # Remodelar arrays
+            'transpose': np.transpose,      # Transpor arrays
+            
+            # Operações condicionais
+            'where': np.where,        # Operador condicional
+            'select': np.select,      # Seleção condicional
+            
+            # Outras funções úteis
+            'unique': np.unique,      # Valores únicos
+            'diff': np.diff,          # Diferenças entre elementos adjacentes
+            'gradient': np.gradient,  # Gradiente
+            'clip': np.clip,          # Recortar valores
+            'absolute': np.absolute,  # Valor absoluto (alias: np.abs)
+            'abs': np.abs,            # Valor absoluto
+        }
 
-    # logger.debug(f"Configured {len(default_functions)} safe builtin functions")
-       
-    # Combine all functions
-    all_symbols = {}
-    all_symbols.update(numpy_functions)
-    all_symbols.update(default_functions)
-    
-    # logger.debug(f"Total available symbols in interpreter: {len(all_symbols)}")
-    
-    # Define which AST nodes should be blocked for security
-    blocked_nodes = ['Import', 'ImportFrom', 'Exec', 'Eval', 
-                    'Attribute', 'Call', 'ClassDef', 'FunctionDef',
-                    'Delete', 'Assert', 'Raise', 'Try', 'TryExcept',
-                    'TryFinally', 'With', 'AsyncFunctionDef', 'AsyncWith',
-                    'Global', 'Nonlocal']
-    
-    # logger.debug(f"Base blocked nodes: {len(blocked_nodes)}")
-    
-    # If in readonly mode, block more nodes for extra safety
-    if readonly:
-        blocked_nodes.extend(['Assign', 'AugAssign', 'AnnAssign'])
-        logger.debug(f"Added assignment nodes to blocked list in readonly mode")
-    
-    # Create the interpreter with our configuration
-    interpreter = Interpreter(
-        usersyms=all_symbols,
-        use_numpy=use_numpy,
-        readonly=readonly,
-        max_time=max_time,
-        no_if=False,  # Allow if-else expressions for formula logic
-        builtins_readonly=True,  # Prevent overwriting builtins
-        blocked_nodes=blocked_nodes
-    )
-    
-    # logger.info(f"Created asteval interpreter: numpy={use_numpy}, max_time={max_time}s, readonly={readonly}, {len(all_symbols)} symbols available")
-    
-    return interpreter
+        # Funções que permaneceriam inalteradas:
+        default_functions = {
+            'bin': bin,          # Representação binária
+            'bool': bool,        # Conversão para booleano
+            'bytearray': bytearray,  # Criar bytearray
+            'bytes': bytes,      # Criar bytes
+            'chr': chr,          # Converter inteiro para caractere Unicode
+            'complex': complex,  # Criar número complexo
+            'dict': dict,        # Criar dicionário
+            'divmod': divmod,    # Divisão e módulo
+            'enumerate': enumerate,  # Enumerar sequência
+            'filter': filter,    # Filtrar sequência
+            'float': float,      # Conversão para ponto flutuante
+            'format': format,    # Formatação de string
+            'frozenset': frozenset,  # Criar frozenset
+            'hash': hash,        # Calcular hash
+            'hex': hex,          # Representação hexadecimal
+            'id': id,            # Identificador único
+            'int': int,          # Conversão para inteiro
+            'isinstance': isinstance,  # Verificar tipo
+            'issubclass': issubclass,  # Verificar herança
+            'len': len,          # Tamanho da sequência
+            'list': list,        # Criar lista
+            'map': map,          # Mapear função
+            'oct': oct,          # Representação octal
+            'ord': ord,          # Converter caractere para inteiro
+            'pow': pow,          # Potenciação (embora np.power seja uma alternativa)
+            'range': range,      # Gerar sequência
+            'reversed': reversed,  # Inverter sequência
+            'set': set,          # Criar conjunto
+            'slice': slice,      # Criar objeto slice
+            'sorted': sorted,    # Ordenar
+            'str': str,          # Conversão para string
+            'tuple': tuple,      # Criar tupla
+            'type': type,        # Obter tipo
+            'zip': zip,          # Combinar sequências
+            'True': True,        # Constante booleana
+            'False': False,      # Constante booleana
+            'None': None,        # Constante nula
+        }
+        
+        # Combine all functions
+        all_symbols = {}
+        all_symbols.update(numpy_functions)
+        all_symbols.update(default_functions)
+        
+        # Define which AST nodes should be blocked for security
+        blocked_nodes = ['Import', 'ImportFrom', 'Exec', 'Eval', 
+                        'Attribute', 'Call', 'ClassDef', 'FunctionDef',
+                        'Delete', 'Assert', 'Raise', 'Try', 'TryExcept',
+                        'TryFinally', 'With', 'AsyncFunctionDef', 'AsyncWith',
+                        'Global', 'Nonlocal']
+        
+        # If in readonly mode, block more nodes for extra safety
+        if readonly:
+            blocked_nodes.extend(['Assign', 'AugAssign', 'AnnAssign'])
+            self.log_debug(f"Added assignment nodes to blocked list in readonly mode")
+        
+        # Create the interpreter with our configuration
+        interpreter = Interpreter(
+            usersyms=all_symbols,
+            use_numpy=use_numpy,
+            readonly=readonly,
+            max_time=max_time,
+            no_if=False,  # Allow if-else expressions for formula logic
+            builtins_readonly=True,  # Prevent overwriting builtins
+            blocked_nodes=blocked_nodes
+        )
+        
+        # logger.info(f"Created asteval interpreter: numpy={use_numpy}, max_time={max_time}s, readonly={readonly}, {len(all_symbols)} symbols available")
+        
+        return interpreter
 
-def evaluate_formula(formula, variables=None, use_numpy=True, max_time=5.0):
-    """
-    Evaluate a formula string using asteval with the provided variables.
+    def evaluate_formula(self, formula, variables=None, use_numpy=True, max_time=5.0):
+        """
+        Evaluate a formula string using asteval with the provided variables.
 
-    This function creates a secure evaluation environment, populates it with
-    the provided variables, and evaluates the given formula with comprehensive
-    error handling and logging.
+        This function creates a secure evaluation environment, populates it with
+        the provided variables, and evaluates the given formula with comprehensive
+        error handling and logging.
 
-    Args:
-        formula (str): Formula string to evaluate
-        variables (dict): Dictionary of variables to use in evaluation
-        use_numpy (bool): Whether to include NumPy functions
-        max_time (float): Maximum execution time in seconds
+        Args:
+            formula (str): Formula string to evaluate
+            variables (dict): Dictionary of variables to use in evaluation
+            use_numpy (bool): Whether to include NumPy functions
+            max_time (float): Maximum execution time in seconds
 
-    Returns:
-        Any: Result of formula evaluation, or None if evaluation fails
-    """
-    logger.info(f"Evaluating formula: '{formula}'")
-    
-    # Create interpreter
-    interpreter = create_interpreter(use_numpy=use_numpy, max_time=max_time)
-    logger.debug("Interpreter created successfully")
+        Returns:
+            Any: Result of formula evaluation, or None if evaluation fails
+        """
+        self.log_info(f"Evaluating formula: '{formula}'")
+        
+        # Create interpreter
+        interpreter = self.create_interpreter(use_numpy=use_numpy, max_time=max_time)
+        self.log_debug("Interpreter created successfully")
 
-    # Add variables to interpreter's symbol table
-    if variables:
-        for name, value in variables.items():
-            interpreter.symtable[name] = value
+        # Add variables to interpreter's symbol table
+        if variables:
+            for name, value in variables.items():
+                interpreter.symtable[name] = value
 
-    # Evaluate the formula
-    try:
-        logger.debug(f"Starting formula evaluation: '{formula}'")
-        result = interpreter.eval(formula)
-        logger.debug("Formula evaluation completed")
+        # Evaluate the formula
+        try:
+            self.log_debug(f"Starting formula evaluation: '{formula}'")
+            result = interpreter.eval(formula)
+            self.log_debug("Formula evaluation completed")
 
-        # Check for errors in the interpreter
-        if len(interpreter.error) > 0:
-            error_msg = interpreter.error[0].get_error()
-            logger.error(f"Error evaluating formula '{formula}': {error_msg}")
+            # Check for errors in the interpreter
+            if len(interpreter.error) > 0:
+                error_msg = interpreter.error[0].get_error()
+                self.log_error(f"Error evaluating formula '{formula}': {error_msg}")
+                return None
+
+            # Log the result
+            if isinstance(result, (list, np.ndarray)) and len(str(result)) > 100:
+                self.log_info(f"Result type: {type(result).__name__}, shape/length: {getattr(result, 'shape', len(result) if hasattr(result, '__len__') else 'N/A')}")
+            else:
+                self.log_info(f"Result: {result} (type: {type(result).__name__})")
+
+            return result
+        except Exception as e:
+            self.log_error(f"Exception evaluating formula '{formula}': {str(e)}", exc_info=True)
             return None
 
-        # Log the result
-        if isinstance(result, (list, np.ndarray)) and len(str(result)) > 100:
-            logger.info(f"Result type: {type(result).__name__}, shape/length: {getattr(result, 'shape', len(result) if hasattr(result, '__len__') else 'N/A')}")
-        else:
-            logger.info(f"Result: {result} (type: {type(result).__name__})")
-
-        return result
-    except Exception as e:
-        logger.error(f"Exception evaluating formula '{formula}': {str(e)}", exc_info=True)
-        return None
-
-def find_vars_position(formula_str):
-    """
-    Find positions of variable patterns in a formula string.
-    
-    Identifies all occurrences of variables matching the pattern 'eXXXXXv'
-    where XXXXX is a 5-digit number.
-    
-    Args:
-        formula_str (str): The formula string to search in
+    def find_vars_position(self, formula_str):
+        """
+        Find positions of variable patterns in a formula string.
         
-    Returns:
-        list: List of tuples (start_index, end_index, matched_text)
-    """
-    logger.debug(f"Finding variable positions in formula: '{formula_str}'")
-    pattern = r'e\d{5}v'
-    matches = re.finditer(pattern, formula_str)
-    
-    positions = [(match.start(), match.end(), match.group()) for match in matches]
-    logger.debug(f"Found {len(positions)} variables in formula")
-    return positions
+        Identifies all occurrences of variables matching the pattern 'eXXXXXv'
+        where XXXXX is a 5-digit number.
+        
+        Args:
+            formula_str (str): The formula string to search in
+            
+        Returns:
+            list: List of tuples (start_index, end_index, matched_text)
+        """
+        self.log_debug(f"Finding variable positions in formula: '{formula_str}'")
+        pattern = r'e\d{5}v'
+        matches = re.finditer(pattern, formula_str)
+        
+        positions = [(match.start(), match.end(), match.group()) for match in matches]
+        self.log_debug(f"Found {len(positions)} variables in formula")
+        return positions
 
-def get_formula(formulas, path):
-    """
-    Find a formula by its path in the formulas collection.
-    
-    Args:
-        formulas (list): List of formula collections
-        path (str): Path identifier of the formula to find
+    def get_formula(self, formulas, path):
+        """
+        Find a formula by its path in the formulas collection.
         
-    Returns:
-        dict: The formula object if found, None otherwise
-    """
-    
-    for f0 in formulas:
-        for f1 in f0["formulas"]:
-            if f1["path"] == path:
-                logger.debug(f"Found: {f1['path']}")
-                return f1
-                
-    logger.warning(f"Formula with path {path} not found")
-    return None
-
-def get_aggr(formula, base):
-    """
-    Get aggregation information for a base variable from a formula.
-    
-    Args:
-        formula (dict): The formula object
-        base (str): Base identifier of the aggregation
+        Args:
+            formulas (list): List of formula collections
+            path (str): Path identifier of the formula to find
+            
+        Returns:
+            dict: The formula object if found, None otherwise
+        """
         
-    Returns:
-        dict: Aggregation information if found, None otherwise
-    """
-    
-    if "parsed" not in formula or "aggr" not in formula["parsed"]:
-        log_warning(f"No parsed aggregations found in formula")
-        return None
-        
-    for aggr in formula["parsed"]["aggr"]:
-        if aggr["base"] == base:
-            log_debug(f"Found aggregation: {base}", indent=1)
-            return aggr
-            
-    log_warning(f"Aggregation with base {base} not found")
-    return None
-
-def eval_formula(entities_eval, formulas):
-    """
-    Evaluate formulas for multiple entities with their associated data.
-    
-    This function processes a collection of entities, evaluates their formulas
-    by substituting variables with values, and returns the evaluation results.
-    It handles both regular variables and aggregation functions.
-    
-    Args:
-        entities_eval (list): List of entities with formula data
-        formulas (list): Collection of formula definitions
-        
-    Returns:
-        list: Results of formula evaluations for each entity
-    """
-    log_info(f"Starting batch evaluation of formulas")
-    
-    results = []
-    counter = 0
-
-    for entity_idx, entity in enumerate(entities_eval):
-        log_info("=" * 80)
-        log_info(f"Entity [{entity_idx+1}/{len(entities_eval)}] - Id: {entity.get('id', f'entity_{entity_idx}')}")
-        log_info("=" * 80)
-        entity_results = {"id": entity.get("id", f"entity_{entity_idx}"), "results": []}
-        
-        if "formula_data" not in entity or "formulas" not in entity["formula_data"]:
-            log_warning(f"Entity {entity_idx} has no formula data - Skipping")
-            continue
-            
-        for id_eval in entity["formula_data"]["formulas"]:
- 
-            log_info(f"Evaluating formula: {id_eval['formula']}", indent=1)
-            log_info("." * 80, indent=0)
-            
-            # Create a fresh interpreter for each formula evaluation
-            aeval = create_interpreter(use_numpy=True, max_time=5.0, readonly=False)
-            
-            # Get the formula
-            formula = get_formula(formulas, id_eval["formula"])
-            if not formula:
-                log_error(f"Formula not found: {id_eval['formula']}", indent=1)
-                continue
-                
-            formula_str = formula["value"]
-            log_info(f"Id:{entity.get("id")}")
-            log_info(f"Expression: '{formula_str}'", indent=1)
-            
-            # Track variable replacements for debugging
-            var_replacements = {}
-            
-            # First process aggregation functions
-            if "data" not in id_eval:
-                log_warning(f"No data for fourmula: {id_eval['formula']}", indent=1)
-                continue
-            
-            # Process aggregation variables first
-            for i, value in enumerate(id_eval["data"]):
-                if "aggr" in value:
-                    log_info(f"Processing aggregation variables")
+        for f0 in formulas:
+            for f1 in f0["formulas"]:
+                if f1["path"] == path:
+                    self.log_debug(f"Found: {f1['path']}")
+                    return f1
                     
-                    # Get the aggregation function
-                    aggr = get_aggr(formula, value["aggr"]["base"])
-                    if not aggr:
-                        log_warning(f"Aggregation not found for base: {value['aggr']['base']}", indent=3)
-                        continue
+        self.log_warning(f"Formula with path {path} not found")
+        return None
+
+    def get_aggr(self, formula, base):
+        """
+        Get aggregation information for a base variable from a formula.
+        
+        Args:
+            formula (dict): The formula object
+            base (str): Base identifier of the aggregation
+            
+        Returns:
+            dict: Aggregation information if found, None otherwise
+        """
+        
+        if "parsed" not in formula or "aggr" not in formula["parsed"]:
+            self.log_warning(f"No parsed aggregations found in formula")
+            return None
+            
+        for aggr in formula["parsed"]["aggr"]:
+            if aggr["base"] == base:
+                self.log_debug(f"Found aggregation: {base}", indent=1)
+                return aggr
+                
+        self.log_warning(f"Aggregation with base {base} not found")
+        return None
+
+    def eval_formula(self, entities_eval, formulas):
+        """
+        Evaluate formulas for multiple entities with their associated data.
+        
+        This function processes a collection of entities, evaluates their formulas
+        by substituting variables with values, and returns the evaluation results.
+        It handles both regular variables and aggregation functions.
+        
+        Args:
+            entities_eval (list): List of entities with formula data
+            formulas (list): Collection of formula definitions
+            
+        Returns:
+            list: Results of formula evaluations for each entity
+        """
+        self.log_info(f"Starting batch evaluation of formulas")
+        
+        results = []
+        counter = 0
+
+        for entity_idx, entity in enumerate(entities_eval):
+            self.log_info("=" * 80)
+            self.log_info(f"Entity [{entity_idx+1}/{len(entities_eval)}] - Id: {entity.get('id', f'entity_{entity_idx}')}")
+            self.log_info("=" * 80)
+            entity_results = {"id": entity.get("id", f"entity_{entity_idx}"), "results": []}
+            
+            if "formula_data" not in entity or "formulas" not in entity["formula_data"]:
+                self.log_warning(f"Entity {entity_idx} has no formula data - Skipping")
+                continue
+                
+            for id_eval in entity["formula_data"]["formulas"]:
+    
+                self.log_info(f"Evaluating formula: {id_eval['formula']}", indent=1)
+                self.log_info("." * 80, indent=0)
+                
+                # Create a fresh interpreter for each formula evaluation
+                aeval = self.create_interpreter(use_numpy=True, max_time=5.0, readonly=False)
+                
+                # Get the formula
+                formula = self.get_formula(formulas, id_eval["formula"])
+                if not formula:
+                    self.log_error(f"Formula not found: {id_eval['formula']}", indent=1)
+                    continue
+                    
+                formula_str = formula["value"]
+                self.log_info(f"Id:{entity.get("id")}")
+                self.log_info(f"Expression: '{formula_str}'", indent=1)
+                
+                # Track variable replacements for debugging
+                var_replacements = {}
+                
+                # First process aggregation functions
+                if "data" not in id_eval:
+                    self.log_warning(f"No data for fourmula: {id_eval['formula']}", indent=1)
+                    continue
+                
+                # Process aggregation variables first
+                for i, value in enumerate(id_eval["data"]):
+                    if "aggr" in value:
+                        self.log_info(f"Processing aggregation variables")
                         
-                    # Process each variable in the aggregation
-                    for v in aggr["vars"]:
+                        # Get the aggregation function
+                        aggr = self.get_aggr(formula, value["aggr"]["base"])
+                        if not aggr:
+                            self.log_warning(f"Aggregation not found for base: {value['aggr']['base']}", indent=3)
+                            continue
+                            
+                        # Process each variable in the aggregation
+                        for v in aggr["vars"]:
+                            counter += 1
+                            new_var = f"{v}_{counter}"
+                            old_formula = formula_str
+                            formula_str = formula_str.replace(aggr["base"], aggr["eval"].replace(v, new_var))
+                            
+                            if old_formula != formula_str:
+                                self.log_info(f"Replaced: {aggr['base']} → {new_var}", indent=3)
+                                var_replacements[aggr["base"]] = aggr["eval"].replace(v, new_var)
+                            
+                            # Add the variable to the interpreter
+                            aggregation_var = value["aggr"]["vars"]
+                            if "values" in aggregation_var and len(aggregation_var["values"]) > 0:
+                                aeval.symtable[new_var] = np.array(aggregation_var["values"])
+                                self.log_info(f"Added: {new_var} = array[{len(aggregation_var['values'])} values]", indent=3)
+                                self.log_debug(f"Values: {aggregation_var['values']}")
+                            else:
+                                self.log_warning(f"No values found for aggregation variable {v}")
+                                aeval.symtable[new_var] = np.array([0])  # Default value
+
+                # Process other (non-aggregation) variables
+                for i, value in enumerate(id_eval["data"]):
+                    if "non_aggr" in value:
+                        self.log_info(f"→ Processing REGULAR variable", indent=2)
+                        self.log_debug(f"Path: {value['non_aggr']['path']}", indent=3)
+                        
                         counter += 1
-                        new_var = f"{v}_{counter}"
+                        pattern = r'e\d{5}v'
+                        matches = re.search(pattern, value["non_aggr"]["path"])
+                        
+                        if not matches:
+                            self.log_warning(f"No variable pattern found in path: {value['non_aggr']['path']}", indent=3)
+                            continue
+                            
+                        var = matches.group()
+                        new_var = f"{var}_{counter}"
                         old_formula = formula_str
-                        formula_str = formula_str.replace(aggr["base"], aggr["eval"].replace(v, new_var))
+                        formula_str = formula_str.replace(var, new_var)
                         
                         if old_formula != formula_str:
-                            log_info(f"Replaced: {aggr['base']} → {new_var}", indent=3)
-                            var_replacements[aggr["base"]] = aggr["eval"].replace(v, new_var)
+                            var_replacements[var] = new_var
                         
                         # Add the variable to the interpreter
-                        aggregation_var = value["aggr"]["vars"]
-                        if "values" in aggregation_var and len(aggregation_var["values"]) > 0:
-                            aeval.symtable[new_var] = np.array(aggregation_var["values"])
-                            log_info(f"Added: {new_var} = array[{len(aggregation_var['values'])} values]", indent=3)
-                            log_debug(f"Values: {aggregation_var['values']}")
+                        if "values" in value["non_aggr"]:
+                            aeval.symtable[new_var] = value["non_aggr"]["values"][0]
+                            self.log_info(f"Added: {new_var}", indent=3)
+                            self.log_debug(f"Value: {value["non_aggr"]["values"][0]}")                        
                         else:
-                            log_warning(f"No values found for aggregation variable {v}")
-                            aeval.symtable[new_var] = np.array([0])  # Default value
+                            self.log_warning(f"No values found for non-aggregation variable {var}", indent=3)
+                            aeval.symtable[new_var] = 0  # Empty array
 
-            # Process other (non-aggregation) variables
-            for i, value in enumerate(id_eval["data"]):
-                if "non_aggr" in value:
-                    log_info(f"→ Processing REGULAR variable", indent=2)
-                    log_debug(f"Path: {value['non_aggr']['path']}", indent=3)
+                # Execute the formula
+                try:
+                    self.log_info("Executing formula")
+                    self.log_info(f"Expression: '{formula_str}'", indent=2)
                     
-                    counter += 1
-                    pattern = r'e\d{5}v'
-                    matches = re.search(pattern, value["non_aggr"]["path"])
+                    # Regular expression without assignment
+                    result = aeval(formula_str)
                     
-                    if not matches:
-                        log_warning(f"No variable pattern found in path: {value['non_aggr']['path']}", indent=3)
-                        continue
+                    # Check for errors
+                    if result is None or (hasattr(aeval, 'error') and aeval.error):
+                        if hasattr(aeval, 'error') and aeval.error:
+                            error_msg = str(aeval.error[0])
+                            error_details = str(aeval.error[1]) if len(aeval.error) > 1 else ""
+                        else:
+                            error_msg = "Unknown error"
+                            error_details = ""
                         
-                    var = matches.group()
-                    new_var = f"{var}_{counter}"
-                    old_formula = formula_str
-                    formula_str = formula_str.replace(var, new_var)
+                        self.log_error(f"ERROR - Formula: {id_eval['formula']}", indent=1)
+                        self.log_error(f"Expression: '{formula_str}'", indent=2)
+                        self.log_error(f"Error: {error_msg}", indent=2)
+                        if error_details:
+                            self.log_error(f"Details: {error_details}", indent=2)
+                        
+                        # Debug: print available symbols
+                        self.log_debug(f"Available symbols: {list(aeval.symtable.keys())}", indent=2)
+                        entity_results["results"].append({
+                            "path": id_eval["formula"],
+                            "status": "error",
+                            "error": error_msg
+                        })
+                        continue
                     
-                    if old_formula != formula_str:
-                        var_replacements[var] = new_var
-                    
-                    # Add the variable to the interpreter
-                    if "values" in value["non_aggr"]:
-                        aeval.symtable[new_var] = value["non_aggr"]["values"][0]
-                        log_info(f"Added: {new_var}", indent=3)
-                        log_debug(f"Value: {value["non_aggr"]["values"][0]}")                        
+                    # Log and store successful result
+                    if isinstance(result, np.ndarray):
+                        self.log_info(f"Success - Formula: {id_eval['formula']}", indent=1)
+                        self.log_info(f"Result type: numpy.ndarray", indent=2)
+                        self.log_info(f"Shape: {result.shape}", indent=2)
+                        self.log_info(f"Sample values (first 5): {result.flatten()[:5].tolist() if result.size > 0 else []}", indent=2)
                     else:
-                        log_warning(f"No values found for non-aggregation variable {var}", indent=3)
-                        aeval.symtable[new_var] = 0  # Empty array
+                        self.log_info(f"Success - Formula: {id_eval['formula']}", indent=1)
+                        self.log_info(f"Result: {result}", indent=2)
 
-            # Execute the formula
-            try:
-                log_info("Executing formula")
-                log_info(f"Expression: '{formula_str}'", indent=2)
-                
-                # Regular expression without assignment
-                result = aeval(formula_str)
-                
-                # Check for errors
-                if result is None or (hasattr(aeval, 'error') and aeval.error):
-                    if hasattr(aeval, 'error') and aeval.error:
-                        error_msg = str(aeval.error[0])
-                        error_details = str(aeval.error[1]) if len(aeval.error) > 1 else ""
-                    else:
-                        error_msg = "Unknown error"
-                        error_details = ""
+                    entity_results["results"].append({
+                        "path": id_eval["formula"],
+                        "status": "success",
+                        "result": result.tolist() if isinstance(result, np.ndarray) else result,
+                    })
                     
-                    log_error(f"✗ ERROR - Formula: {id_eval['formula']}", indent=1)
-                    log_error(f"Expression: '{formula_str}'", indent=2)
-                    log_error(f"Error: {error_msg}", indent=2)
-                    if error_details:
-                        log_error(f"Details: {error_details}", indent=2)
-                    
-                    # Debug: print available symbols
-                    log_debug(f"Available symbols: {list(aeval.symtable.keys())}", indent=2)
+                except Exception as e:
+                    self.log_error(f"EXCEPTION - Formula: {id_eval['formula']}", indent=1)
+                    self.log_error(f"Expression: '{formula_str}'", indent=2)
+                    self.log_error(f"Exception: {str(e)}", indent=2)
                     entity_results["results"].append({
                         "path": id_eval["formula"],
                         "status": "error",
-                        "error": error_msg
+                        "error": str(e)
                     })
-                    continue
-                
-                # Log and store successful result
-                if isinstance(result, np.ndarray):
-                    log_info(f"Success - Formula: {id_eval['formula']}", indent=1)
-                    log_info(f"Result type: numpy.ndarray", indent=2)
-                    log_info(f"Shape: {result.shape}", indent=2)
-                    log_info(f"Sample values (first 5): {result.flatten()[:5].tolist() if result.size > 0 else []}", indent=2)
-                else:
-                    log_info(f"Success - Formula: {id_eval['formula']}", indent=1)
-                    log_info(f"Result: {result}", indent=2)
+            
+            results.append(entity_results)
 
-                entity_results["results"].append({
-                    "path": id_eval["formula"],
-                    "status": "success",
-                    "result": result.tolist() if isinstance(result, np.ndarray) else result,
-                })
-                
-            except Exception as e:
-                log_error(f"✗ EXCEPTION - Formula: {id_eval['formula']}", indent=1)
-                log_error(f"Expression: '{formula_str}'", indent=2)
-                log_error(f"Exception: {str(e)}", indent=2)
-                entity_results["results"].append({
-                    "path": id_eval["formula"],
-                    "status": "error",
-                    "error": str(e)
-                })
-        
-        results.append(entity_results)
-
-    log_info("=" * 80)
-    log_info(f"BATCH EVALUATION COMPLETED")
-    log_info(f"Total entities processed: {len(results)}")
-    log_info("=" * 80)
-    return results
+        self.log_info("=" * 80)
+        self.log_info(f"BATCH EVALUATION COMPLETED")
+        self.log_info(f"Total entities processed: {len(results)}")
+        self.log_info("=" * 80)
+        return results
 
 if __name__ == "__main__":
     """
@@ -554,7 +523,9 @@ if __name__ == "__main__":
     Loads formula and entity data from JSON files and evaluates formulas.
     """
 
-    logger.info("Starting formula evaluation from main")
+    engine = EngineEval()
+
+    engine.log_info("Starting formula evaluation from main")
 
     # Load tree data
     tree_data_path = "tree_data.json"
@@ -563,49 +534,49 @@ if __name__ == "__main__":
 
     # Get the current directory for file paths
     current_dir = os.path.dirname(os.path.abspath(__file__))
-    logger.debug(f"Current directory: {current_dir}")
+    engine.log_debug(f"Current directory: {current_dir}")
 
     # Paths for input and output files
     formulas_json = "extracted_formulas.json"
     entities_eval_json = "processed_formulas_with_variables.json"
     engine_result_json = "engine_result.json"
     
-    logger.info(f"Loading formula definitions from: {formulas_json}")
-    logger.info(f"Loading entity data from: {entities_eval_json}")
+    engine.log_info(f"Loading formula definitions from: {formulas_json}")
+    engine.log_info(f"Loading entity data from: {entities_eval_json}")
 
     try:
         with open(formulas_json, 'r', encoding='utf-8') as f:
-            logger.debug(f"Reading formulas file: {formulas_json}")
+            engine.log_debug(f"Reading formulas file: {formulas_json}")
             formulas = json.load(f)
-            logger.info(f"Loaded {len(formulas)} formula collections")
+            engine.log_info(f"Loaded {len(formulas)} formula collections")
     except Exception as e:
-        logger.error(f"Error loading formulas file: {str(e)}", exc_info=True)
+        engine.log_error(f"Error loading formulas file: {str(e)}", exc_info=True)
         formulas = []
 
     try:
         with open(entities_eval_json, 'r', encoding='utf-8') as f:
-            logger.debug(f"Reading entities evaluation file: {entities_eval_json}")
+            engine.log_debug(f"Reading entities evaluation file: {entities_eval_json}")
             entities_eval = json.load(f)
-            logger.info(f"Loaded {len(entities_eval)} entities for evaluation")
+            engine.log_info(f"Loaded {len(entities_eval)} entities for evaluation")
     except Exception as e:
-        logger.error(f"Error loading entities evaluation file: {str(e)}", exc_info=True)
+        engine.log_error(f"Error loading entities evaluation file: {str(e)}", exc_info=True)
         entities_eval = []
 
     # Evaluate formulas
     if formulas and entities_eval:
-        logger.info("Starting formula evaluation")
-        results = eval_formula(entities_eval, formulas)
+        engine.log_info("Starting formula evaluation")
+        results = engine.eval_formula(entities_eval, formulas)
         
         # Print summary of results
         success_count = sum(1 for entity in results for fr in entity["results"] if fr["status"] == "success")
         error_count = sum(1 for entity in results for fr in entity["results"] if fr["status"] == "error")
         
-        logger.info(f"Formula evaluation complete. Successful: {success_count}, Errors: {error_count}")
+        engine.log_info(f"Formula evaluation complete. Successful: {success_count}, Errors: {error_count}")
     else:
-        logger.error("Cannot perform evaluation: missing formula definitions or entity data")
+        engine.log_error("Cannot perform evaluation: missing formula definitions or entity data")
 
     # Convert numpy types to native Python types before saving
-    results_converted = convert_numpy_types(results)
+    results_converted = engine.convert_numpy_types(results)
 
     with open(engine_result_json, 'w', encoding='utf-8') as f:
         json.dump(results_converted, f, indent=4, ensure_ascii=False)
@@ -614,8 +585,8 @@ if __name__ == "__main__":
     update_tree = UpdateTreeData(tree_data, formulas[0], results_converted)
     tree_data = update_tree.update_tree()
     
-    api_token = os.getenv("ARTERIS_API_TOKEN")
-    update_frappe = UpdateFrappe(f"https://arteris.meb.services/api/method/arteris_app.api.engine.update_doctype", api_token, results_converted, formulas[0])
+
+    update_frappe = UpdateFrappe(results_converted, formulas[0])
     update_frappe.update()
 
     with open("tree_data_updated.json", 'w', encoding='utf-8') as f:

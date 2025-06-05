@@ -439,7 +439,7 @@ class FormulaParser:
         Returns:
             Dictionary with aggregation functions, their variables, and other variables
         """
-        logger.info(f"Analyzing formula: {formula_str[:50]}...")
+        logger.info(f"Analyzing formula: {formula_str}...")
         
         # Initialize lists to store results
         aggr_functions = []
@@ -508,208 +508,208 @@ class FormulaParser:
         return result
 
 
-# Main function for external use
-def parse_formula(formula: str) -> Dict:
-    """
-    Parses a formula and extracts its aggregation functions, variables, and DAG paths.
-    
-    This is the main entry point for formula parsing, creating a FormulaParser instance
-    and using it to analyze the formula.
-    
-    Args:
-        formula: The formula to analyze
+    # Main function for external use
+    def parse_formula(self, formula: str) -> Dict:
+        """
+        Parses a formula and extracts its aggregation functions, variables, and DAG paths.
         
-    Returns:
-        Dictionary with aggregation functions, their variables, and DAG paths
-    """
-    logger.info(f"Parsing formula: {formula[:50]}...")
-    parser = FormulaParser()
-    result = parser.analyze_formula(formula)
-    logger.info("Formula parsing complete")
-    return result
-
-def extract_formulas(data: Any, results_dict: Optional[Dict[str, Dict]] = None) -> List[Dict]:
-    """
-    Recursively extract formulas from the tree data structure.
-    
-    This function traverses the data structure, identifying entities with formulas
-    and collecting them into a results dictionary keyed by entity path to avoid duplicates.
-    
-    The function handles hierarchical data structures, recursively exploring nested
-    objects and arrays to find all formula definitions.
-    
-    Args:
-        data: The data object to process (can be a dict or list)
-        results_dict: The dictionary to store results by path (to avoid duplicates)
+        This is the main entry point for formula parsing, creating a FormulaParser instance
+        and using it to analyze the formula.
         
-    Returns:
-        List of entities with their formulas and IDs
-    """
+        Args:
+            formula: The formula to analyze
+            
+        Returns:
+            Dictionary with aggregation functions, their variables, and DAG paths
+        """
+        logger.info(f"Parsing formula: {formula[:50]}...")
+        parser = FormulaParser()
+        result = parser.analyze_formula(formula)
+        logger.info("Formula parsing complete")
+        return result
 
-    # Initialize results dictionary if not provided
-    if results_dict is None:
-        results_dict = {}
-        logger.debug("Initializing new results dictionary")
-    
-    # Process data list by recursively calling extract_formulas on each item
-    if isinstance(data, list):
-        logger.debug(f"Processing list of {len(data)} items")
-        for idx, item in enumerate(data):
-            logger.debug(f"Processing list item {idx+1}/{len(data)}")
-            extract_formulas(item, results_dict)
-        logger.debug(f"Finished processing list, returning {len(results_dict)} results")
+    def extract_formulas(self, data: Any, results_dict: Optional[Dict[str, Dict]] = None) -> List[Dict]:
+        """
+        Recursively extract formulas from the tree data structure.
+        
+        This function traverses the data structure, identifying entities with formulas
+        and collecting them into a results dictionary keyed by entity path to avoid duplicates.
+        
+        The function handles hierarchical data structures, recursively exploring nested
+        objects and arrays to find all formula definitions.
+        
+        Args:
+            data: The data object to process (can be a dict or list)
+            results_dict: The dictionary to store results by path (to avoid duplicates)
+            
+        Returns:
+            List of entities with their formulas and IDs
+        """
+
+        # Initialize results dictionary if not provided
+        if results_dict is None:
+            results_dict = {}
+            logger.debug("Initializing new results dictionary")
+        
+        # Process data list by recursively calling extract_formulas on each item
+        if isinstance(data, list):
+            logger.debug(f"Processing list of {len(data)} items")
+            for idx, item in enumerate(data):
+                logger.debug(f"Processing list item {idx+1}/{len(data)}")
+                self.extract_formulas(item, results_dict)
+            logger.debug(f"Finished processing list, returning {len(results_dict)} results")
+            return list(results_dict.values())
+                
+        # Process data object (dictionary)
+        if isinstance(data, dict):
+            # Check if this is an entity with formulas
+            if "path" in data and "formulas" in data and "data" in data:
+                path = data["path"]
+                formulas = data.get("formulas", [])
+                
+                # Only process if it has formulas
+                if formulas:
+                    logger.info(f"Found entity with path '{path}' containing {len(formulas)} formulas")
+                    
+                    # Extract IDs from data
+                    ids = []
+                    for item in data.get("data", []):
+                        if "id" in item and item["id"]:  # Only add non-null IDs
+                            ids.append({"id": item["id"]})
+                    
+                    logger.debug(f"Extracted {len(ids)} IDs for entity '{path}'")
+                    
+                    # Create or update the entity in results_dict
+                    if path in results_dict:
+                        # If the entity already exists, merge the formulas and IDs
+                        logger.info(f"Merging duplicated entity '{path}'")
+                        existing = results_dict[path]
+                        
+                        # Add new formulas if they don't already exist
+                        existing_formula_paths = {f["path"] for f in existing["formulas"]}
+                        formulas_added = 0
+                        
+                        for formula in formulas:
+                            if formula["path"] not in existing_formula_paths:
+                                existing["formulas"].append(formula)
+                                existing_formula_paths.add(formula["path"])
+                                formulas_added += 1
+                        
+                        logger.debug(f"Added {formulas_added} new formulas to existing entity '{path}'")
+                        
+                        # Add new IDs if they don't already exist
+                        existing_ids = {id_obj["id"] for id_obj in existing["ids"]}
+                        ids_added = 0
+                        
+                        for id_obj in ids:
+                            if id_obj["id"] not in existing_ids:
+                                existing["ids"].append(id_obj)
+                                existing_ids.add(id_obj["id"])
+                                ids_added += 1
+                        
+                        logger.debug(f"Added {ids_added} new IDs to existing entity '{path}'")
+                    else:
+                        # Add the entity with its formulas and IDs to results
+                        logger.debug(f"Adding new entity '{path}' to results")
+                        results_dict[path] = {
+                            "path": path,
+                            "formulas": formulas,
+                            "ids": ids
+                        }
+                
+                # Continue recursively processing the data field
+                logger.debug(f"Recursively processing 'data' field of entity '{path}'")
+                self.extract_formulas(data.get("data", []), results_dict)
+            
+            # Process other fields that might contain nested data
+            for key, value in data.items():
+                if isinstance(value, (dict, list)) and key != "formulas":
+                    logger.debug(f"Processing nested field '{key}'")
+                    self.extract_formulas(value, results_dict)
+
         return list(results_dict.values())
+
+    def parse_formulas(self, data: Any) -> List[Dict]:
+        """
+        Extract, parse, and order formulas from the data structure.
+        
+        This function provides a complete pipeline for formula processing:
+        1. Extract formulas from the hierarchical data structure
+        2. Parse each formula to identify its components (variables, aggregations, filters)
+        3. Order the formulas based on their dependencies for proper evaluation
+        
+        Args:
+            data: The data object to process (can be a dict or list)
             
-    # Process data object (dictionary)
-    if isinstance(data, dict):
-        # Check if this is an entity with formulas
-        if "path" in data and "formulas" in data and "data" in data:
-            path = data["path"]
-            formulas = data.get("formulas", [])
+        Returns:
+            List of entities with their formulas and IDs, ordered for execution
+        """
+        logger.info("Extracting formulas from data structure")
+        results = self.extract_formulas(data)
+        logger.info(f"Extracted {len(results)} formula groups")
+
+        # Parse each formula to extract aggregation functions and variables
+        formula_count = 0
+        for r in results:
+            group_path = r.get("path", "unknown")
+            formulas = r.get("formulas", [])
+            logger.info(f"Processing group '{group_path}' with {len(formulas)} formulas")
             
-            # Only process if it has formulas
-            if formulas:
-                logger.info(f"Found entity with path '{path}' containing {len(formulas)} formulas")
+            for f in formulas:
+                formula_path = f.get("path", "unknown")
+                formula_value = f.get("value", "")
+                logger.debug(f"Parsing formula '{formula_path}': {formula_value[:50]}...")
                 
-                # Extract IDs from data
-                ids = []
-                for item in data.get("data", []):
-                    if "id" in item and item["id"]:  # Only add non-null IDs
-                        ids.append({"id": item["id"]})
-                
-                logger.debug(f"Extracted {len(ids)} IDs for entity '{path}'")
-                
-                # Create or update the entity in results_dict
-                if path in results_dict:
-                    # If the entity already exists, merge the formulas and IDs
-                    logger.info(f"Merging duplicated entity '{path}'")
-                    existing = results_dict[path]
-                    
-                    # Add new formulas if they don't already exist
-                    existing_formula_paths = {f["path"] for f in existing["formulas"]}
-                    formulas_added = 0
-                    
-                    for formula in formulas:
-                        if formula["path"] not in existing_formula_paths:
-                            existing["formulas"].append(formula)
-                            existing_formula_paths.add(formula["path"])
-                            formulas_added += 1
-                    
-                    logger.debug(f"Added {formulas_added} new formulas to existing entity '{path}'")
-                    
-                    # Add new IDs if they don't already exist
-                    existing_ids = {id_obj["id"] for id_obj in existing["ids"]}
-                    ids_added = 0
-                    
-                    for id_obj in ids:
-                        if id_obj["id"] not in existing_ids:
-                            existing["ids"].append(id_obj)
-                            existing_ids.add(id_obj["id"])
-                            ids_added += 1
-                    
-                    logger.debug(f"Added {ids_added} new IDs to existing entity '{path}'")
-                else:
-                    # Add the entity with its formulas and IDs to results
-                    logger.debug(f"Adding new entity '{path}' to results")
-                    results_dict[path] = {
-                        "path": path,
-                        "formulas": formulas,
-                        "ids": ids
-                    }
-            
-            # Continue recursively processing the data field
-            logger.debug(f"Recursively processing 'data' field of entity '{path}'")
-            extract_formulas(data.get("data", []), results_dict)
+                try:
+                    f["parsed"] = self.parse_formula(formula_value)
+                    formula_count += 1
+                    logger.debug(f"Successfully parsed formula '{formula_path}'")
+                except Exception as e:
+                    logger.error(f"Error parsing formula '{formula_path}': {e}", exc_info=True)
         
-        # Process other fields that might contain nested data
-        for key, value in data.items():
-            if isinstance(value, (dict, list)) and key != "formulas":
-                logger.debug(f"Processing nested field '{key}'")
-                extract_formulas(value, results_dict)
+        logger.info(f"Successfully parsed {formula_count} formulas")
 
-    return list(results_dict.values())
+        # Order formulas based on dependencies
+        logger.info("Ordering formulas based on dependencies")
+        try:
+            ordered_results = get_ordered_formulas(results)
+            logger.info("Formula ordering complete")
+        except Exception as e:
+            logger.error(f"Error ordering formulas: {e}", exc_info=True)
+            ordered_results = results
+            logger.warning("Using unordered formulas due to ordering error")
 
-def parse_formulas(data: Any) -> List[Dict]:
-    """
-    Extract, parse, and order formulas from the data structure.
+        return ordered_results
+
+# # Function for direct module testing
+# if __name__ == "__main__":
+#     # Configure logging for console output
+#     logger = get_logger("Formula Parser")
+#     logger.info("Starting formula parser module test")
     
-    This function provides a complete pipeline for formula processing:
-    1. Extract formulas from the hierarchical data structure
-    2. Parse each formula to identify its components (variables, aggregations, filters)
-    3. Order the formulas based on their dependencies for proper evaluation
-    
-    Args:
-        data: The data object to process (can be a dict or list)
+#     input_path = "tree_data.json"
+#     output_path = "extracted_formulas.json"
+
+#     logger.info(f"Loading data from {input_path}")
+#     try:
+#         with open(input_path, 'r', encoding='utf-8') as f:
+#             logger.debug("Reading input file")
+#             data = json.load(f)
+#         logger.info(f"Successfully loaded data from {input_path}")
         
-    Returns:
-        List of entities with their formulas and IDs, ordered for execution
-    """
-    logger.info("Extracting formulas from data structure")
-    results = extract_formulas(data)
-    logger.info(f"Extracted {len(results)} formula groups")
+#         logger.info("Parsing and ordering formulas")
+#         results = parse_formulas(data)
+#         logger.info(f"Successfully parsed and ordered {len(results)} formula groups")
 
-    # Parse each formula to extract aggregation functions and variables
-    formula_count = 0
-    for r in results:
-        group_path = r.get("path", "unknown")
-        formulas = r.get("formulas", [])
-        logger.info(f"Processing group '{group_path}' with {len(formulas)} formulas")
+#         logger.info(f"Writing results to {output_path}")
+#         with open(output_path, 'w', encoding='utf-8') as f:
+#             logger.debug("Writing output file")
+#             json.dump(results, f, indent=4, ensure_ascii=False)        
+#         logger.info(f"Successfully wrote results to {output_path}")
         
-        for f in formulas:
-            formula_path = f.get("path", "unknown")
-            formula_value = f.get("value", "")
-            logger.debug(f"Parsing formula '{formula_path}': {formula_value[:50]}...")
-            
-            try:
-                f["parsed"] = parse_formula(formula_value)
-                formula_count += 1
-                logger.debug(f"Successfully parsed formula '{formula_path}'")
-            except Exception as e:
-                logger.error(f"Error parsing formula '{formula_path}': {e}", exc_info=True)
+#         print(f"Processed formulas saved to: {output_path}")
+#     except Exception as e:
+#         logger.error(f"Error processing formulas: {e}", exc_info=True)
+#         print(f"Error: {e}")
     
-    logger.info(f"Successfully parsed {formula_count} formulas")
-
-    # Order formulas based on dependencies
-    logger.info("Ordering formulas based on dependencies")
-    try:
-        ordered_results = get_ordered_formulas(results)
-        logger.info("Formula ordering complete")
-    except Exception as e:
-        logger.error(f"Error ordering formulas: {e}", exc_info=True)
-        ordered_results = results
-        logger.warning("Using unordered formulas due to ordering error")
-
-    return ordered_results
-
-# Function for direct module testing
-if __name__ == "__main__":
-    # Configure logging for console output
-    logger = get_logger("Formula Parser")
-    logger.info("Starting formula parser module test")
-    
-    input_path = "tree_data.json"
-    output_path = "extracted_formulas.json"
-
-    logger.info(f"Loading data from {input_path}")
-    try:
-        with open(input_path, 'r', encoding='utf-8') as f:
-            logger.debug("Reading input file")
-            data = json.load(f)
-        logger.info(f"Successfully loaded data from {input_path}")
-        
-        logger.info("Parsing and ordering formulas")
-        results = parse_formulas(data)
-        logger.info(f"Successfully parsed and ordered {len(results)} formula groups")
-
-        logger.info(f"Writing results to {output_path}")
-        with open(output_path, 'w', encoding='utf-8') as f:
-            logger.debug("Writing output file")
-            json.dump(results, f, indent=4, ensure_ascii=False)        
-        logger.info(f"Successfully wrote results to {output_path}")
-        
-        print(f"Processed formulas saved to: {output_path}")
-    except Exception as e:
-        logger.error(f"Error processing formulas: {e}", exc_info=True)
-        print(f"Error: {e}")
-    
-    logger.info("Formula parser completed")
+#     logger.info("Formula parser completed")

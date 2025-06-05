@@ -4,7 +4,7 @@
         "formulas": [
             {
                 "path": "e00004v",
-                "value": "sum(e00008v, e00007v == e00003v)",
+                "value": "funcao = sum(e00008v, e00007v == e00003v)\nativo = sum(e00011v, e00010v == e00003v)\nrecurso = sum(e00014v, e00013v == e00003v)\n\nfuncao+ativo+recurso",
                 "update": {
                     "doctype": "Contract Measurement Item",
                     "fieldname": "valortotalmedido"
@@ -23,13 +23,43 @@
                                 "e00007v",
                                 "e00003v"
                             ]
+                        },
+                        {
+                            "base": "sum(e00011v, e00010v == e00003v)",
+                            "eval": "sum(e00011v)",
+                            "vars": [
+                                "e00011v"
+                            ],
+                            "global": true,
+                            "filter": "e00010v == e00003v",
+                            "filter_vars": [
+                                "e00010v",
+                                "e00003v"
+                            ]
+                        },
+                        {
+                            "base": "sum(e00014v, e00013v == e00003v)",
+                            "eval": "sum(e00014v)",
+                            "vars": [
+                                "e00014v"
+                            ],
+                            "global": true,
+                            "filter": "e00013v == e00003v",
+                            "filter_vars": [
+                                "e00013v",
+                                "e00003v"
+                            ]
                         }
                     ],
                     "vars": [],
                     "dag_paths": [
                         "e00008v",
                         "e00007v",
-                        "e00003v"
+                        "e00003v",
+                        "e00011v",
+                        "e00010v",
+                        "e00014v",
+                        "e00013v"
                     ]
                 }
             }
