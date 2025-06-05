@@ -108,6 +108,7 @@ def process_formula_variables(extracted_formulas: List[Dict[str, Any]], tree_dat
     Raises:
         Exception: For errors in variable extraction or tree data filtering
     """
+
     logger.info(f"Starting to process formula variables for {len(extracted_formulas)} formula groups")
     
     group_result = []
@@ -155,33 +156,44 @@ def process_formula_variables(extracted_formulas: List[Dict[str, Any]], tree_dat
                     filter_expr = aggr["filter"]
                     is_global = aggr["global"]
 
+                    filter_aggr_expr = []
+
                     # Check if exits var fields in right side of filter expression
                     if filter_expr:
+                        # Extract unique variables from the filter expression
                         filter_vars = FilterVariableExtractor().extract_unique_variables(filter_expr)
+                        # If there are variables in the filter expression, we need to process them
                         if filter_vars:
                             logger.debug(f"Filter expression found: {filter_expr}")
-
+                            # Highlight variables in the filter expression
                             new_filter_expr = FilterVariableExtractor().highlight_variables(filter_expr)
-
                             logger.debug(f"Get values for right variables: {filter_vars}")
                             try:
                                 # Apply "first" transformation to get only the first match for each variable
                                 for v in filter_vars:
+                                    # Set function to get the first value of the variable
                                     var_list = [f"first({v})"]
+                                    logger.debug(f"Searching for variable: {v} in tree data")
+                                    # Search for the variable in the tree data
                                     node = filter_tree_data(tree_data, return_paths=var_list, record_id=id_value, lock_node=True)
                                     if node:
                                         n_value = node[0]["values"][0]
-                                        # Check if the value is a number
-                                        try:
-                                            float(value)
-                                        except (ValueError, TypeError):
-                                            n_value = f"'{n_value}'"  # Enclose in quotes if not a number
+                                        # Append the variable value to the filter aggregation expression
+                                        filter_aggr_expr.append({v:n_value})
                                         logger.debug(f"Found variable value {n_value}")
+                                        try:
+                                            # Check if the value is a number
+                                            float(n_value)
+                                        except (ValueError, TypeError):
+                                            # Enclose in quotes if not a number
+                                            n_value = f"'{n_value}'"  
+                                        # Replace the variable in the filter expression
                                         new_filter_expr = new_filter_expr.replace(f"__{v}__", n_value)
                             except Exception as e:
                                 logger.error(f"Error processing non-aggregated variables: {e}")
-                                raise                
+                                raise
                             logger.debug(f"Updated filter expression: {new_filter_expr}")
+                            # Change the filter expression to the new one with values
                             filter_expr = new_filter_expr
                     
                     logger.debug(f"Processing aggregation function - vars: {vars}, filter: {filter_expr}, global: {is_global}")
@@ -192,19 +204,21 @@ def process_formula_variables(extracted_formulas: List[Dict[str, Any]], tree_dat
                         logger.debug("Processing global aggregation")
                         try:
                             if filter_expr:
+                                logger.debug(f"Applying global filter: {filter_expr}")
                                 # For variables in aggregation functions with filter
                                 # Global filter ignores the ID
-                                logger.debug(f"Applying global filter: {filter_expr}")
                                 node = filter_tree_data(tree_data, vars, filter_expr=filter_expr)
                             else:
-                                # If no filter, just get all values
                                 logger.debug("No filter applied, getting all values")
+                                # If no filter, just get all values
                                 node = filter_tree_data(tree_data, vars)
-                                
                             logger.debug(f"Found {len(node)} nodes for global aggregation")
                             # Append all values to the formula_ids
                             for n in node:
-                                formula_ids[formula["path"]].append({"aggr": {"base": aggr["base"], "vars": n}})
+                                formula_ids[formula["path"]].append({"aggr": {"base": aggr["base"], "vars": n, "filter": filter_aggr_expr}})
+                            # If no nodes found
+                            if not node:
+                                formula_ids[formula["path"]].append({"aggr": {"base": aggr["base"], "vars": [], "filter": filter_aggr_expr}})
                         except Exception as e:
                             logger.error(f"Error processing global aggregation: {e}")
                             raise
@@ -214,17 +228,19 @@ def process_formula_variables(extracted_formulas: List[Dict[str, Any]], tree_dat
                         logger.debug("Processing local aggregation (ID-specific)")
                         try:
                             if filter_expr:
-                                # For variables in aggregation functions with filter
                                 logger.debug(f"Applying local filter with ID {id_value}: {filter_expr}")
+                                # For variables in aggregation functions with filter
                                 node = filter_tree_data(tree_data, vars, id_value, filter_expr, lock_node=True)
                             else:
-                                # If no filter, just get all values
                                 logger.debug(f"No filter applied, getting all values for ID {id_value}")
+                                # If no filter, just get all values
                                 node = filter_tree_data(tree_data, vars, id_value, lock_node=True)
-                            
                             logger.debug(f"Found {len(node)} nodes for local aggregation")
                             for n in node:  
-                                formula_ids[formula["path"]].append({"aggr": aggr["base"], "vars": n})
+                                formula_ids[formula["path"]].append({"aggr": aggr["base"], "vars": n, "filter": filter_aggr_expr})
+                            # If no nodes found
+                            if not node:
+                                formula_ids[formula["path"]].append({"aggr": {"base": aggr["base"], "vars": [], "filter": filter_aggr_expr}})
                         except Exception as e:
                             logger.error(f"Error processing local aggregation: {e}")
                             raise

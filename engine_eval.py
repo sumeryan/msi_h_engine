@@ -23,6 +23,8 @@ import log
 import os
 import json
 from asteval import Interpreter
+from update_tree import UpdateTreeData
+from update_frappe import UpdateFrappe
 
 # Setup logging
 logger = log.get_logger("Engine Eval")
@@ -89,7 +91,7 @@ def create_interpreter(use_numpy=True, max_time=5.0, readonly=False):
     Returns:
         Interpreter: Configured asteval Interpreter instance ready for safe formula evaluation
     """
-    logger.debug(f"Creating interpreter with params: use_numpy={use_numpy}, max_time={max_time}, readonly={readonly}")
+    # logger.debug(f"Creating interpreter with params: use_numpy={use_numpy}, max_time={max_time}, readonly={readonly}")
     
     # Start with a minimal set of safe builtins
     numpy_functions = {
@@ -162,7 +164,7 @@ def create_interpreter(use_numpy=True, max_time=5.0, readonly=False):
         'abs': np.abs,            # Valor absoluto
     }
     
-    logger.debug(f"Configured {len(numpy_functions)} safe builtin functions")
+    # logger.debug(f"Configured {len(numpy_functions)} safe builtin functions")
 
     # Funções que permaneceriam inalteradas:
     default_functions = {
@@ -205,14 +207,14 @@ def create_interpreter(use_numpy=True, max_time=5.0, readonly=False):
         'None': None,        # Constante nula
     }
 
-    logger.debug(f"Configured {len(default_functions)} safe builtin functions")
+    # logger.debug(f"Configured {len(default_functions)} safe builtin functions")
        
     # Combine all functions
     all_symbols = {}
     all_symbols.update(numpy_functions)
     all_symbols.update(default_functions)
     
-    logger.debug(f"Total available symbols in interpreter: {len(all_symbols)}")
+    # logger.debug(f"Total available symbols in interpreter: {len(all_symbols)}")
     
     # Define which AST nodes should be blocked for security
     blocked_nodes = ['Import', 'ImportFrom', 'Exec', 'Eval', 
@@ -221,7 +223,7 @@ def create_interpreter(use_numpy=True, max_time=5.0, readonly=False):
                     'TryFinally', 'With', 'AsyncFunctionDef', 'AsyncWith',
                     'Global', 'Nonlocal']
     
-    logger.debug(f"Base blocked nodes: {len(blocked_nodes)}")
+    # logger.debug(f"Base blocked nodes: {len(blocked_nodes)}")
     
     # If in readonly mode, block more nodes for extra safety
     if readonly:
@@ -239,7 +241,7 @@ def create_interpreter(use_numpy=True, max_time=5.0, readonly=False):
         blocked_nodes=blocked_nodes
     )
     
-    logger.info(f"Created asteval interpreter: numpy={use_numpy}, max_time={max_time}s, readonly={readonly}, {len(all_symbols)} symbols available")
+    # logger.info(f"Created asteval interpreter: numpy={use_numpy}, max_time={max_time}s, readonly={readonly}, {len(all_symbols)} symbols available")
     
     return interpreter
 
@@ -326,12 +328,11 @@ def get_formula(formulas, path):
     Returns:
         dict: The formula object if found, None otherwise
     """
-    logger.debug(f"Searching for formula with path: {path}")
     
     for f0 in formulas:
         for f1 in f0["formulas"]:
             if f1["path"] == path:
-                logger.debug(f"Found formula: {f1['path']}")
+                logger.debug(f"Found: {f1['path']}")
                 return f1
                 
     logger.warning(f"Formula with path {path} not found")
@@ -348,18 +349,17 @@ def get_aggr(formula, base):
     Returns:
         dict: Aggregation information if found, None otherwise
     """
-    logger.debug(f"Searching for aggregation with base: {base}")
     
     if "parsed" not in formula or "aggr" not in formula["parsed"]:
-        logger.warning(f"No parsed aggregations found in formula")
+        log_warning(f"No parsed aggregations found in formula")
         return None
         
     for aggr in formula["parsed"]["aggr"]:
         if aggr["base"] == base:
-            logger.debug(f"Found aggregation: {aggr}")
+            log_debug(f"Found aggregation: {base}", indent=1)
             return aggr
             
-    logger.warning(f"Aggregation with base {base} not found")
+    log_warning(f"Aggregation with base {base} not found")
     return None
 
 def eval_formula(entities_eval, formulas):
@@ -377,24 +377,25 @@ def eval_formula(entities_eval, formulas):
     Returns:
         list: Results of formula evaluations for each entity
     """
-    log_info("=" * 80)
-    log_info(f"STARTING BATCH FORMULA EVALUATION")
-    log_info("=" * 80)
+    log_info(f"Starting batch evaluation of formulas")
+    
     results = []
     counter = 0
 
     for entity_idx, entity in enumerate(entities_eval):
-        log_info(f"ENTITY [{entity_idx+1}/{len(entities_eval)}] - ID: {entity.get('id', f'entity_{entity_idx}')}")
-        log_info("-" * 60)
-        entity_results = {"entity_id": entity.get("id", f"entity_{entity_idx}"), "formula_results": []}
+        log_info("=" * 80)
+        log_info(f"Entity [{entity_idx+1}/{len(entities_eval)}] - Id: {entity.get('id', f'entity_{entity_idx}')}")
+        log_info("=" * 80)
+        entity_results = {"id": entity.get("id", f"entity_{entity_idx}"), "results": []}
         
         if "formula_data" not in entity or "formulas" not in entity["formula_data"]:
-            log_warning(f"⚠ Entity {entity_idx} has no formula data - SKIPPING", indent=1)
+            log_warning(f"Entity {entity_idx} has no formula data - Skipping")
             continue
             
         for id_eval in entity["formula_data"]["formulas"]:
-            log_info(f"FORMULA: {id_eval['formula']}", indent=0)
-            log_info("." * 40, indent=0)
+ 
+            log_info(f"Evaluating formula: {id_eval['formula']}", indent=1)
+            log_info("." * 80, indent=0)
             
             # Create a fresh interpreter for each formula evaluation
             aeval = create_interpreter(use_numpy=True, max_time=5.0, readonly=False)
@@ -402,7 +403,7 @@ def eval_formula(entities_eval, formulas):
             # Get the formula
             formula = get_formula(formulas, id_eval["formula"])
             if not formula:
-                log_error(f"✗ FORMULA NOT FOUND: {id_eval['formula']}", indent=1)
+                log_error(f"Formula not found: {id_eval['formula']}", indent=1)
                 continue
                 
             formula_str = formula["value"]
@@ -414,14 +415,13 @@ def eval_formula(entities_eval, formulas):
             
             # First process aggregation functions
             if "data" not in id_eval:
-                log_warning(f"⚠ NO DATA for formula: {id_eval['formula']}", indent=1)
+                log_warning(f"No data for fourmula: {id_eval['formula']}", indent=1)
                 continue
             
             # Process aggregation variables first
             for i, value in enumerate(id_eval["data"]):
                 if "aggr" in value:
-                    log_info(f"→ Processing AGGREGATION variable", indent=2)
-                    log_debug(f"Base: {value['aggr']['base'] if 'base' in value['aggr'] else 'N/A'}", indent=3)
+                    log_info(f"Processing aggregation variables")
                     
                     # Get the aggregation function
                     aggr = get_aggr(formula, value["aggr"]["base"])
@@ -447,7 +447,7 @@ def eval_formula(entities_eval, formulas):
                             log_info(f"Added: {new_var} = array[{len(aggregation_var['values'])} values]", indent=3)
                             log_debug(f"Values: {aggregation_var['values']}")
                         else:
-                            log_warning(f"No values found for aggregation variable {v}", indent=3)
+                            log_warning(f"No values found for aggregation variable {v}")
                             aeval.symtable[new_var] = np.array([0])  # Default value
 
             # Process other (non-aggregation) variables
@@ -481,16 +481,9 @@ def eval_formula(entities_eval, formulas):
                         log_warning(f"No values found for non-aggregation variable {var}", indent=3)
                         aeval.symtable[new_var] = 0  # Empty array
 
-            # Log all variable replacements
-            log_info(f"Final expression: '{formula_str}'", indent=2)
-            if var_replacements:
-                for old, new in var_replacements.items():
-                    log_info(f"{old} → {new}", indent=3)
-            
             # Execute the formula
             try:
-                log_info(">>> EXECUTING FORMULA <<<", indent=1)
-                log_info(f"Path: {id_eval['formula']}", indent=2)
+                log_info("Executing formula")
                 log_info(f"Expression: '{formula_str}'", indent=2)
                 
                 # Regular expression without assignment
@@ -513,8 +506,8 @@ def eval_formula(entities_eval, formulas):
                     
                     # Debug: print available symbols
                     log_debug(f"Available symbols: {list(aeval.symtable.keys())}", indent=2)
-                    entity_results["formula_results"].append({
-                        "formula_path": id_eval["formula"],
+                    entity_results["results"].append({
+                        "path": id_eval["formula"],
                         "status": "error",
                         "error": error_msg
                     })
@@ -522,16 +515,16 @@ def eval_formula(entities_eval, formulas):
                 
                 # Log and store successful result
                 if isinstance(result, np.ndarray):
-                    log_info(f"✓ SUCCESS - Formula: {id_eval['formula']}", indent=1)
+                    log_info(f"Success - Formula: {id_eval['formula']}", indent=1)
                     log_info(f"Result type: numpy.ndarray", indent=2)
                     log_info(f"Shape: {result.shape}", indent=2)
                     log_info(f"Sample values (first 5): {result.flatten()[:5].tolist() if result.size > 0 else []}", indent=2)
                 else:
-                    log_info(f"✓ SUCCESS - Formula: {id_eval['formula']}", indent=1)
+                    log_info(f"Success - Formula: {id_eval['formula']}", indent=1)
                     log_info(f"Result: {result}", indent=2)
 
-                entity_results["formula_results"].append({
-                    "formula_path": id_eval["formula"],
+                entity_results["results"].append({
+                    "path": id_eval["formula"],
                     "status": "success",
                     "result": result.tolist() if isinstance(result, np.ndarray) else result,
                 })
@@ -540,8 +533,8 @@ def eval_formula(entities_eval, formulas):
                 log_error(f"✗ EXCEPTION - Formula: {id_eval['formula']}", indent=1)
                 log_error(f"Expression: '{formula_str}'", indent=2)
                 log_error(f"Exception: {str(e)}", indent=2)
-                entity_results["formula_results"].append({
-                    "formula_path": id_eval["formula"],
+                entity_results["results"].append({
+                    "path": id_eval["formula"],
                     "status": "error",
                     "error": str(e)
                 })
@@ -560,7 +553,13 @@ if __name__ == "__main__":
     
     Loads formula and entity data from JSON files and evaluates formulas.
     """
+
     logger.info("Starting formula evaluation from main")
+
+    # Load tree data
+    tree_data_path = "tree_data.json"
+    with open(tree_data_path, 'r', encoding='utf-8') as f:
+        tree_data = json.load(f)
 
     # Get the current directory for file paths
     current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -598,8 +597,8 @@ if __name__ == "__main__":
         results = eval_formula(entities_eval, formulas)
         
         # Print summary of results
-        success_count = sum(1 for entity in results for fr in entity["formula_results"] if fr["status"] == "success")
-        error_count = sum(1 for entity in results for fr in entity["formula_results"] if fr["status"] == "error")
+        success_count = sum(1 for entity in results for fr in entity["results"] if fr["status"] == "success")
+        error_count = sum(1 for entity in results for fr in entity["results"] if fr["status"] == "error")
         
         logger.info(f"Formula evaluation complete. Successful: {success_count}, Errors: {error_count}")
     else:
@@ -607,6 +606,17 @@ if __name__ == "__main__":
 
     # Convert numpy types to native Python types before saving
     results_converted = convert_numpy_types(results)
-    
+
     with open(engine_result_json, 'w', encoding='utf-8') as f:
         json.dump(results_converted, f, indent=4, ensure_ascii=False)
+
+    # Update tree_data and database
+    update_tree = UpdateTreeData(tree_data, formulas[0], results_converted)
+    tree_data = update_tree.update_tree()
+    
+    api_token = os.getenv("ARTERIS_API_TOKEN")
+    update_frappe = UpdateFrappe(f"https://arteris.meb.services/api/method/arteris_app.api.engine.update_doctype", api_token, results_converted, formulas[0])
+    update_frappe.update()
+
+    with open("tree_data_updated.json", 'w', encoding='utf-8') as f:
+        json.dump(tree_data, f, indent=4, ensure_ascii=False)
