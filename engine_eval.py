@@ -331,7 +331,7 @@ class EngineEval(EngineLogger):
         self.log_warning(f"Aggregation with base {base} not found")
         return None
 
-    def eval_formula(self, entities_eval, formulas):
+    def eval_formula(self, entities_eval, formulas, data_tree):
         """
         Evaluate formulas for multiple entities with their associated data.
         
@@ -368,6 +368,9 @@ class EngineEval(EngineLogger):
                 
                 # Create a fresh interpreter for each formula evaluation
                 aeval = self.create_interpreter(use_numpy=True, max_time=5.0, readonly=False)
+
+                # Load data tree into the interpreter's symbol table
+                aeval.symtable["data_tree"] = data_tree
                 
                 # Get the formula
                 formula = self.get_formula(formulas, id_eval["formula"])

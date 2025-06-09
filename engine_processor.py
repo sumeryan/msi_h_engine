@@ -263,7 +263,8 @@ class EngineProcessor(EngineLogger):
         formulas = entities_processor.get_formula_data(using_cached_data=False)
 
         # Load and calculate tree data for each contract
-        for k in contract_keys:
+        #for k in contract_keys:
+        for k in ['0196b01a-2163-7cb2-93b9-c8b1342e3a4e']:
 
             self.log_info("=" * 80)
             self.log_info(f"Processing contract: {k}\n\n")
@@ -281,7 +282,17 @@ class EngineProcessor(EngineLogger):
                 continue
 
             # Extract contract formula IDs
-            contract_formula_id = find_contract[0]['Contract'][0]['grupoformulas'] if 'grupoformulas' in find_contract[0]['Contract'][0] else []
+            contract_formula_id = None
+            try:                
+                if find_contract[0]:
+                    if find_contract[0]['Contract']:
+                        if find_contract[0]['Contract'][0]:
+                            if find_contract[0]['Contract'][0]['grupoformulas']:
+                                contract_formula_id = find_contract[0]['Contract'][0]['grupoformulas'] if 'grupoformulas' in find_contract[0]['Contract'][0] else []
+            except Exception as e:
+                self.log_error(f"Error extracting contract formula IDs for {k}: {e}")
+                continue
+
             if not contract_formula_id:
                 self.log_error(f"No formula group IDs found for contract {k}. Skipping.")
                 continue   
@@ -330,7 +341,7 @@ class EngineProcessor(EngineLogger):
 
             self.log_info("Starting formula evaluation")
 
-            engine_results = engine.eval_formula(enrich_formulas, extract_formulas)
+            engine_results = engine.eval_formula(enrich_formulas, extract_formulas, engine_data_tree)
                 
             # Print summary of results
             success_count = sum(1 for entity in engine_results for fr in entity["results"] if fr["status"] == "success")
