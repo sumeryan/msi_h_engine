@@ -1,0 +1,40 @@
+# Git
+.git
+.gitignore
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs (keep structure but ignore content)
+logs/*.log
+logs/*.log.*
+
+# Temporary files
+*.tmp
+*.temp
+
+# DevContainer
+.devcontainer/
+
+# Documentation
+README.md

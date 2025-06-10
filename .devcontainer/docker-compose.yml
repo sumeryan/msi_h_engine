@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    volumes:
+      - ../:/app:cached
+      - vscode-server:/vscode-server
+    ports:
+      - "5000:5000"
+    environment:
+      - PYTHONPATH=/app
+      - LOG_DIR=/app/logs
+      - LOG_TO_CONSOLE=true
+      - LOG_TO_FILE=true
+    command: sleep infinity
+    
+volumes:
+  vscode-server:

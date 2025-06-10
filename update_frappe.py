@@ -58,4 +58,6 @@ class UpdateFrappe(EngineLogger):
                     self.log_error(f"Failed to update {doctype} {field} for ID {id}: {e}")
                     continue
 
+        # sum_measurement_orders
+
 
