@@ -34,7 +34,7 @@ logs/*.log.*
 *.temp
 
 # DevContainer
-.devcontainer/
+# .devcontainer/
 
 # Documentation
 README.md

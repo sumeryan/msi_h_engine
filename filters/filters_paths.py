@@ -11,6 +11,7 @@ and convert them into an abstract syntax tree (AST) that can be evaluated agains
 the tree data.
 
 Main features:
+
 - Support for comparison operators (==, !=, >=, <=, >, <)
 - Logical operators (and, or)
 - Special functions (contains, first, last, firstc, lastc)
