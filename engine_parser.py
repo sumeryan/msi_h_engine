@@ -64,7 +64,7 @@ class FormulaParser:
         
         # Pattern to identify variables in e12345v format
         self.var_pattern = re.compile(r'e\d{5}v')
-        logger.debug("Compiled variable pattern: e\\d{5}v")
+        # logger.debug("Compiled variable pattern: e\\d{5}v")
         
         # Create efficient regex patterns to identify aggregation functions
         self._compile_patterns()
@@ -79,19 +79,19 @@ class FormulaParser:
         
         These patterns are used throughout the parsing process for efficient formula analysis.
         """
-        logger.debug("Compiling regex patterns for function detection")
+        # logger.debug("Compiling regex patterns for function detection")
         
         # Create pattern for aggregation functions
         aggr_funcs = '|'.join(self.safe_aggr_functions)
         pattern = rf'({aggr_funcs})\s*\((.*?)(?:,\s*(.*?))?\)'
         self.aggr_pattern = re.compile(pattern, re.DOTALL)
-        logger.debug(f"Compiled aggregation pattern: {pattern}")
+        # logger.debug(f"Compiled aggregation pattern: {pattern}")
         
         # Pattern to find custom functions in filters
         custom_funcs = '|'.join(self.safe_custom_functions)
         custom_pattern = rf'({custom_funcs})\s*\((.*?)\)'
         self.custom_func_pattern = re.compile(custom_pattern, re.DOTALL)
-        logger.debug(f"Compiled custom function pattern: {custom_pattern}")
+        # logger.debug(f"Compiled custom function pattern: {custom_pattern}")
     
     def extract_variables(self, expression: str) -> List[str]:
         """
@@ -107,14 +107,14 @@ class FormulaParser:
             List of unique variables found while preserving their original order
         """
         if not expression:
-            logger.debug("Empty expression provided, returning empty variables list")
+            # logger.debug("Empty expression provided, returning empty variables list")
             return []
         
-        logger.debug(f"Extracting variables from: {expression}")
+        # logger.debug(f"Extracting variables from: {expression}")
         
         # Find all variables
         variables = self.var_pattern.findall(expression)
-        logger.debug(f"Found {len(variables)} variables (with duplicates): {variables}")
+        # logger.debug(f"Found {len(variables)} variables (with duplicates): {variables}")
         
         # Remove duplicates while preserving order
         unique_vars = []
@@ -122,7 +122,7 @@ class FormulaParser:
             if var not in unique_vars:
                 unique_vars.append(var)
         
-        logger.debug(f"Extracted {len(unique_vars)} unique variables: {unique_vars}")
+        # logger.debug(f"Extracted {len(unique_vars)} unique variables: {unique_vars}")
         return unique_vars
     
     def _fix_comparison_operators(self, str_expr):
@@ -140,19 +140,19 @@ class FormulaParser:
             The expression with properly corrected comparison operators
         """
         if not str_expr:
-            logger.debug("Empty expression provided to fix comparison operators")
+            # logger.debug("Empty expression provided to fix comparison operators")
             return str_expr
             
-        logger.debug(f"Fixing comparison operators in: {str_expr}")
+        # logger.debug(f"Fixing comparison operators in: {str_expr}")
         import re
         
         # Substitutes '=' with '==' only when not part of '==' or '===' and avoids duplication
         result = re.sub(r'(?<![=!<>])=(?![=])', '==', str_expr).replace('== ==', '==')
         
-        if result != str_expr:
-            logger.debug(f"Fixed comparison operators: '{str_expr}' -> '{result}'")
-        else:
-            logger.debug("No comparison operators needed fixing")
+        # if result != str_expr:
+        #     logger.debug(f"Fixed comparison operators: '{str_expr}' -> '{result}'")
+        # else:
+        #     logger.debug("No comparison operators needed fixing")
             
         return result
 
@@ -172,16 +172,16 @@ class FormulaParser:
         Returns:
             Dictionary with information about the aggregation function
         """
-        logger.debug("Parsing aggregate function call from regex match")
+        # logger.debug("Parsing aggregate function call from regex match")
         
         func_name = match.group(1)
         arg_expr = match.group(2).strip() if match.group(2) else ""
         filter_expr = match.group(3).strip() if match.group(3) else ""
         filter_expr = self._fix_comparison_operators(filter_expr)
     
-        logger.debug(f"Function name: {func_name}")
-        logger.debug(f"Argument expression: {arg_expr}")
-        logger.debug(f"Filter expression: {filter_expr}")
+        # logger.debug(f"Function name: {func_name}")
+        # logger.debug(f"Argument expression: {arg_expr}")
+        # logger.debug(f"Filter expression: {filter_expr}")
         
         # Extract variables from the main argument
         arg_vars = self.extract_variables(arg_expr)
@@ -195,7 +195,7 @@ class FormulaParser:
             full_func += f", {filter_expr}"
         full_func += ")"
         
-        logger.debug(f"Full function string: {full_func}")
+        # logger.debug(f"Full function string: {full_func}")
         
         return {
             "formula": full_func,
@@ -222,23 +222,23 @@ class FormulaParser:
             logger.warning(f"Invalid start index {start_idx} for parenthesis balancing")
             return -1, ""
         
-        logger.debug(f"Balancing parentheses starting at index {start_idx} in: {expression[start_idx:start_idx+20]}...")
+        # logger.debug(f"Balancing parentheses starting at index {start_idx} in: {expression[start_idx:start_idx+20]}...")
         
         stack = []
         for i in range(start_idx, len(expression)):
             if expression[i] == '(':
                 stack.append('(')
-                logger.debug(f"Found opening parenthesis at index {i}, stack depth: {len(stack)}")
+                # logger.debug(f"Found opening parenthesis at index {i}, stack depth: {len(stack)}")
             elif expression[i] == ')':
                 if stack:
                     stack.pop()
-                    logger.debug(f"Found closing parenthesis at index {i}, stack depth after pop: {len(stack)}")
+                    # logger.debug(f"Found closing parenthesis at index {i}, stack depth after pop: {len(stack)}")
                     if not stack:  # Balanced parentheses
                         subexpr = expression[start_idx+1:i]
-                        logger.debug(f"Balanced parentheses: closing at index {i}, extracted: {subexpr[:20]}...")
+                        # logger.debug(f"Balanced parentheses: closing at index {i}, extracted: {subexpr[:20]}...")
                         return i, subexpr
         
-        logger.warning(f"Unbalanced parentheses starting at index {start_idx} in: {expression[start_idx:]}")
+        # logger.warning(f"Unbalanced parentheses starting at index {start_idx} in: {expression[start_idx:]}")
         return -1, ""  # Unbalanced parentheses
     
     def find_top_level_commas(self, expr: str) -> List[int]:
@@ -254,7 +254,7 @@ class FormulaParser:
         Returns:
             List of indices of top-level commas
         """
-        logger.debug(f"Finding top-level commas in: {expr[:20]}...")
+        # logger.debug(f"Finding top-level commas in: {expr[:20]}...")
         
         comma_positions = []
         paren_level = 0
@@ -262,15 +262,15 @@ class FormulaParser:
         for i, char in enumerate(expr):
             if char == '(':
                 paren_level += 1
-                logger.debug(f"Found open parenthesis at {i}, level increased to {paren_level}")
+                # logger.debug(f"Found open parenthesis at {i}, level increased to {paren_level}")
             elif char == ')':
                 paren_level -= 1
-                logger.debug(f"Found close parenthesis at {i}, level decreased to {paren_level}")
+                # logger.debug(f"Found close parenthesis at {i}, level decreased to {paren_level}")
             elif char == ',' and paren_level == 0:
-                logger.debug(f"Found top-level comma at position {i}")
+                # logger.debug(f"Found top-level comma at position {i}")
                 comma_positions.append(i)
         
-        logger.debug(f"Found {len(comma_positions)} top-level commas at positions: {comma_positions}")
+        # logger.debug(f"Found {len(comma_positions)} top-level commas at positions: {comma_positions}")
         return comma_positions
     
     def parse_aggregate_functions(self, formula: str) -> List[Dict]:
@@ -286,13 +286,13 @@ class FormulaParser:
         Returns:
             List of dictionaries with information about the aggregation functions found
         """
-        logger.debug(f"Analyzing formula: {formula}")
+        # logger.debug(f"Analyzing formula: {formula}")
         
         if not formula:
             logger.debug("Empty formula provided, returning empty list")
             return []
         
-        logger.info(f"Parsing formula for aggregation functions: {formula[:50]}...")
+        # logger.info(f"Parsing formula for aggregation functions: {formula[:50]}...")
         
         # Result
         aggregations = []
@@ -314,7 +314,7 @@ class FormulaParser:
                         next_pos += 1
                     
                     if next_pos < formula_len and formula[next_pos] == '(':
-                        logger.debug(f"Found aggregation function '{func_name}' at position {pos}")
+                        # logger.debug(f"Found aggregation function '{func_name}' at position {pos}")
                         found_func = func_name
                         pos = next_pos
                         break
@@ -325,7 +325,7 @@ class FormulaParser:
                 closing_paren_pos, content = self.balance_parentheses(formula, pos)
                 
                 if closing_paren_pos != -1:
-                    logger.debug(f"Successfully balanced parentheses, content length: {len(content)}")
+                    # logger.debug(f"Successfully balanced parentheses, content length: {len(content)}")
                     
                     # Find top-level commas to separate arguments from filters
                     comma_positions = self.find_top_level_commas(content)
@@ -334,35 +334,35 @@ class FormulaParser:
                         # There's a top-level comma, separate the argument from the filter
                         arg_expr = content[:comma_positions[0]].strip()
                         filter_expr = content[comma_positions[0]+1:].strip()
-                        logger.debug(f"Found filter expression: {filter_expr}")
+                        # logger.debug(f"Found filter expression: {filter_expr}")
                     else:
                         # No filter
                         arg_expr = content.strip()
                         filter_expr = ""
-                        logger.debug("No filter expression found")
+                        # logger.debug("No filter expression found")
                     
                     # Extract variables from argument and filter
                     arg_vars = self.extract_variables(arg_expr)
                     filter_vars = self.extract_variables(filter_expr)
                     
-                    logger.debug(f"Argument variables: {arg_vars}")
-                    logger.debug(f"Filter variables: {filter_vars}")
+                    # logger.debug(f"Argument variables: {arg_vars}")
+                    # logger.debug(f"Filter variables: {filter_vars}")
                     
                     full_func = f"{found_func}({content})"
-                    logger.debug(f"Full function: {full_func}")
+                    # logger.debug(f"Full function: {full_func}")
 
                     # Build the aggregation object
                     # Include aggregation function without the internal filter
                     if found_func in ["first", "last", "firstc", "lastc"]:
                         # Special case for first/last functions
                         base_func = f"{arg_expr}"   
-                        logger.debug(f"Special case for {found_func}, base function: {base_func}")                     
+                        # logger.debug(f"Special case for {found_func}, base function: {base_func}")                     
                     else:
                         base_func = f"{found_func.replace('_node','')}({arg_expr})"
-                        logger.debug(f"Standard case, base function: {base_func}")
+                        # logger.debug(f"Standard case, base function: {base_func}")
                     
                     filter_expr = self._fix_comparison_operators(filter_expr)
-                    logger.debug(f"Fixed filter expression: {filter_expr}")
+                    # logger.debug(f"Fixed filter expression: {filter_expr}")
 
                     aggr_obj = {
                         "base": full_func,  # Aggregation without filter
@@ -374,10 +374,10 @@ class FormulaParser:
                     }
                     
                     aggregations.append(aggr_obj)
-                    logger.debug(f"Added aggregation function: {found_func}")
+                    # logger.debug(f"Added aggregation function: {found_func}")
                     
                     pos = closing_paren_pos + 1
-                    logger.debug(f"Updated position to {pos}")
+                    # logger.debug(f"Updated position to {pos}")
                 else:
                     # Unbalanced parentheses, move to next character
                     logger.warning(f"Unbalanced parentheses at position {pos}, skipping character")
@@ -404,23 +404,23 @@ class FormulaParser:
         Returns:
             List of variables that are not in aggregation functions or filters
         """
-        logger.debug(f"Extracting non-aggregated variables from formula")
+        # logger.debug(f"Extracting non-aggregated variables from formula")
         
         # Find all variables in the formula
         all_vars = set(self.extract_variables(formula))
-        logger.debug(f"All variables in formula: {all_vars}")
+        # logger.debug(f"All variables in formula: {all_vars}")
         
         # Remove variables already present in aggregation functions or filters
         aggr_set = set(aggr_vars)
         filter_set = set(filter_vars)
         
-        logger.debug(f"Aggregation variables to exclude: {aggr_set}")
-        logger.debug(f"Filter variables to exclude: {filter_set}")
+        # logger.debug(f"Aggregation variables to exclude: {aggr_set}")
+        # logger.debug(f"Filter variables to exclude: {filter_set}")
         
         # Variables that are not in aggregation functions or filters
         other_vars = all_vars - aggr_set - filter_set
         
-        logger.debug(f"Non-aggregated variables: {other_vars}")
+        # logger.debug(f"Non-aggregated variables: {other_vars}")
         return list(other_vars)
     
     def analyze_formula(self, formula_str: str) -> Dict:
@@ -449,12 +449,12 @@ class FormulaParser:
         
         # Extract aggregation functions
         aggregations = self.parse_aggregate_functions(formula_str)
-        logger.debug(f"Found {len(aggregations)} aggregation functions")
+        # logger.debug(f"Found {len(aggregations)} aggregation functions")
         
         # Process the aggregation functions found
-        logger.debug("Processing aggregation functions")
+        # logger.debug("Processing aggregation functions")
         for idx, aggr in enumerate(aggregations):
-            logger.debug(f"Processing aggregation function {idx+1}/{len(aggregations)}")
+            # logger.debug(f"Processing aggregation function {idx+1}/{len(aggregations)}")
             aggr_functions.append(aggr)
             all_aggr_vars.extend(aggr["vars"])
             all_filter_vars.extend(aggr["filter_vars"])
@@ -464,7 +464,7 @@ class FormulaParser:
             dag_paths.extend(aggr["filter_vars"])
         
         # Remove duplicates while preserving order
-        logger.debug("Removing duplicates from variable lists")
+        # logger.debug("Removing duplicates from variable lists")
         unique_aggr_vars = []
         for var in all_aggr_vars:
             if var not in unique_aggr_vars:
@@ -475,27 +475,27 @@ class FormulaParser:
             if var not in unique_filter_vars:
                 unique_filter_vars.append(var)
         
-        logger.debug(f"Unique aggregation variables: {unique_aggr_vars}")
-        logger.debug(f"Unique filter variables: {unique_filter_vars}")
+        # logger.debug(f"Unique aggregation variables: {unique_aggr_vars}")
+        # logger.debug(f"Unique filter variables: {unique_filter_vars}")
         
         # Extract non-aggregated variables
         logger.debug("Extracting non-aggregated variables")
         other_vars = self.extract_non_aggregated_variables(
             formula_str, unique_aggr_vars, unique_filter_vars
         )
-        logger.debug(f"Non-aggregated variables: {other_vars}")
+        # logger.debug(f"Non-aggregated variables: {other_vars}")
         
         # Add other variables to DAG paths
         dag_paths.extend(other_vars)
         
         # Remove duplicates from DAG paths while preserving order
-        logger.debug("Building final DAG paths list")
+        # logger.debug("Building final DAG paths list")
         unique_dag_paths = []
         for path in dag_paths:
             if path not in unique_dag_paths:
                 unique_dag_paths.append(path)
         
-        logger.debug(f"Final DAG paths: {unique_dag_paths}")
+        # logger.debug(f"Final DAG paths: {unique_dag_paths}")
         
         # Build the final result
         result = {
@@ -549,15 +549,15 @@ class FormulaParser:
         # Initialize results dictionary if not provided
         if results_dict is None:
             results_dict = {}
-            logger.debug("Initializing new results dictionary")
+            # logger.debug("Initializing new results dictionary")
         
         # Process data list by recursively calling extract_formulas on each item
         if isinstance(data, list):
-            logger.debug(f"Processing list of {len(data)} items")
+            # logger.debug(f"Processing list of {len(data)} items")
             for idx, item in enumerate(data):
-                logger.debug(f"Processing list item {idx+1}/{len(data)}")
+                # logger.debug(f"Processing list item {idx+1}/{len(data)}")
                 self.extract_formulas(item, results_dict)
-            logger.debug(f"Finished processing list, returning {len(results_dict)} results")
+            # logger.debug(f"Finished processing list, returning {len(results_dict)} results")
             return list(results_dict.values())
                 
         # Process data object (dictionary)
@@ -577,7 +577,7 @@ class FormulaParser:
                         if "id" in item and item["id"]:  # Only add non-null IDs
                             ids.append({"id": item["id"]})
                     
-                    logger.debug(f"Extracted {len(ids)} IDs for entity '{path}'")
+                    # logger.debug(f"Extracted {len(ids)} IDs for entity '{path}'")
                     
                     # Create or update the entity in results_dict
                     if path in results_dict:
@@ -595,7 +595,7 @@ class FormulaParser:
                                 existing_formula_paths.add(formula["path"])
                                 formulas_added += 1
                         
-                        logger.debug(f"Added {formulas_added} new formulas to existing entity '{path}'")
+                        # logger.debug(f"Added {formulas_added} new formulas to existing entity '{path}'")
                         
                         # Add new IDs if they don't already exist
                         existing_ids = {id_obj["id"] for id_obj in existing["ids"]}
@@ -607,10 +607,10 @@ class FormulaParser:
                                 existing_ids.add(id_obj["id"])
                                 ids_added += 1
                         
-                        logger.debug(f"Added {ids_added} new IDs to existing entity '{path}'")
+                        # logger.debug(f"Added {ids_added} new IDs to existing entity '{path}'")
                     else:
                         # Add the entity with its formulas and IDs to results
-                        logger.debug(f"Adding new entity '{path}' to results")
+                        # logger.debug(f"Adding new entity '{path}' to results")
                         results_dict[path] = {
                             "path": path,
                             "formulas": formulas,
@@ -618,13 +618,13 @@ class FormulaParser:
                         }
                 
                 # Continue recursively processing the data field
-                logger.debug(f"Recursively processing 'data' field of entity '{path}'")
+                # logger.debug(f"Recursively processing 'data' field of entity '{path}'")
                 self.extract_formulas(data.get("data", []), results_dict)
             
             # Process other fields that might contain nested data
             for key, value in data.items():
                 if isinstance(value, (dict, list)) and key != "formulas":
-                    logger.debug(f"Processing nested field '{key}'")
+                    # logger.debug(f"Processing nested field '{key}'")
                     self.extract_formulas(value, results_dict)
 
         return list(results_dict.values())
@@ -658,12 +658,12 @@ class FormulaParser:
             for f in formulas:
                 formula_path = f.get("path", "unknown")
                 formula_value = f.get("value", "")
-                logger.debug(f"Parsing formula '{formula_path}': {formula_value[:50]}...")
+                # logger.debug(f"Parsing formula '{formula_path}': {formula_value[:50]}...")
                 
                 try:
                     f["parsed"] = self.parse_formula(formula_value)
                     formula_count += 1
-                    logger.debug(f"Successfully parsed formula '{formula_path}'")
+                    # logger.debug(f"Successfully parsed formula '{formula_path}'")
                 except Exception as e:
                     logger.error(f"Error parsing formula '{formula_path}': {e}", exc_info=True)
         

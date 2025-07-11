@@ -27,13 +27,16 @@ class UpdateTreeData:
         path_node = self.formulas.get('path')
         update_node = self.search_node_path(path_node, self.tree_data['data'])
 
-        # Update the node with the formula results
-        for formula_result in self.formulas_results:
-            for node in update_node['data']:
-                if formula_result['id'] == node['id']:
-                    for path_result in formula_result['results']:
-                        for field in node['fields']:
-                            if field['path'] == path_result['path']:
-                                field['value'] = path_result['result']
+        try:
+            # Update the node with the formula results
+            for formula_result in self.formulas_results:
+                for node in update_node['data']:
+                    if formula_result['id'] == node['id']:
+                        for path_result in formula_result['results']:
+                            for field in node['fields']:
+                                if field['path'] == path_result['path'] and path_result['status'] != 'error':
+                                    field['value'] = path_result['result']
+        except Exception as e:
+            print(f"Error updating tree: {e}")
 
         return self.tree_data

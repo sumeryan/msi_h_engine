@@ -2,6 +2,7 @@
 Powered by Renoir
 Author: Igor Daniel G Goncalves - igor.goncalves@renoirgroup.com
 """
+from ast import expr
 import numpy as np
 import re
 import log
@@ -331,6 +332,37 @@ class EngineEval(EngineLogger):
         self.log_warning(f"Aggregation with base {base} not found")
         return None
 
+    def simple_reference_substitution(self, formula, references):
+        """
+        Substitutes references (e.g., e00002v, e00002v_4) with their corresponding values in the formula.
+        
+        Args:
+            formula (str): The Python formula containing coded references
+            references (dict): Dictionary with references and their values
+        
+        Returns:
+            str: The formula with references replaced
+        """
+        # Find all references in the formula (like e00002v or e00002v_4)
+        pattern = re.compile(r'e\d{5}v(?:_\d+)?')
+        found_references = pattern.findall(formula)
+        
+        # For each reference found, substitute with the corresponding value
+        processed_str = formula
+        
+        for ref in found_references:
+            # Extract the base key (for example, e00002v from e00002v_4)
+            base_key = ref.split('_')[0]
+            
+            # Check if the key exists in the references dictionary
+            if base_key in references:
+                # Replace the reference with the value
+                # Here we'll replace with a temporary placeholder to avoid affecting subsequent substitutions
+                value = str(references[base_key])
+                processed_str = re.sub(rf'\b{re.escape(ref)}\b', value, processed_str)
+    
+        return processed_str        
+
     def eval_formula(self, entities_eval, formulas, data_tree):
         """
         Evaluate formulas for multiple entities with their associated data.
@@ -351,6 +383,8 @@ class EngineEval(EngineLogger):
         results = []
         counter = 0
 
+        references = data_tree.get("referencia", {})[0]
+
         for entity_idx, entity in enumerate(entities_eval):
             self.log_info("=" * 80)
             self.log_info(f"Entity [{entity_idx+1}/{len(entities_eval)}] - Id: {entity.get('id', f'entity_{entity_idx}')}")
@@ -363,6 +397,8 @@ class EngineEval(EngineLogger):
                 
             for id_eval in entity["formula_data"]["formulas"]:
     
+                print("\n")
+                print("\n")
                 self.log_info(f"Evaluating formula: {id_eval['formula']}", indent=1)
                 self.log_info("." * 80, indent=0)
                 
@@ -378,22 +414,23 @@ class EngineEval(EngineLogger):
                     self.log_error(f"Formula not found: {id_eval['formula']}", indent=1)
                     continue
                     
-                formula_str = formula["value"]
-                self.log_info(f"Id:{entity.get("id")}")
-                self.log_info(f"Expression: '{formula_str}'", indent=1)
-                
+                formula_str = formula["value"].replace("return ", "")
+                formula_str += "\n"  # Ensure the formula ends with a newline
+                self.log_info(f"Id:{entity.get('id')}")
+
                 # Track variable replacements for debugging
                 var_replacements = {}
                 
                 # First process aggregation functions
                 if "data" not in id_eval:
-                    self.log_warning(f"No data for fourmula: {id_eval['formula']}", indent=1)
+                    self.log_warning(f"No data for formula: {id_eval['formula']}", indent=1)
                     continue
+
+                print("\n")
                 
                 # Process aggregation variables first
                 for i, value in enumerate(id_eval["data"]):
                     if "aggr" in value:
-                        self.log_info(f"Processing aggregation variables")
                         
                         # Get the aggregation function
                         aggr = self.get_aggr(formula, value["aggr"]["base"])
@@ -415,17 +452,22 @@ class EngineEval(EngineLogger):
                             # Add the variable to the interpreter
                             aggregation_var = value["aggr"]["vars"]
                             if "values" in aggregation_var and len(aggregation_var["values"]) > 0:
-                                aeval.symtable[new_var] = np.array(aggregation_var["values"])
+                                if aggregation_var["values"][0] is None:
+                                    self.log_warning(f"None value, using 0.0")
+                                    aeval.symtable[new_var] = np.array([0.0])
+                                else:
+                                    aeval.symtable[new_var] = np.array(aggregation_var["values"])
                                 self.log_info(f"Added: {new_var} = array[{len(aggregation_var['values'])} values]", indent=3)
                                 self.log_debug(f"Values: {aggregation_var['values']}")
                             else:
-                                self.log_warning(f"No values found for aggregation variable {v}")
-                                aeval.symtable[new_var] = np.array([0])  # Default value
+                                self.log_warning(f"No values, using: 0.0")
+                                aeval.symtable[new_var] = np.array([0.0])  # Default value
+                            
+                            print("\n")
 
                 # Process other (non-aggregation) variables
                 for i, value in enumerate(id_eval["data"]):
                     if "non_aggr" in value:
-                        self.log_info(f"→ Processing REGULAR variable", indent=2)
                         self.log_debug(f"Path: {value['non_aggr']['path']}", indent=3)
                         
                         counter += 1
@@ -446,17 +488,30 @@ class EngineEval(EngineLogger):
                         
                         # Add the variable to the interpreter
                         if "values" in value["non_aggr"]:
-                            aeval.symtable[new_var] = value["non_aggr"]["values"][0]
+                            if value["non_aggr"]["values"][0] is None:
+                                self.log_warning(f"None value, using 0.0")
+                                aeval.symtable[new_var] =  0.0
+                            else:
+                                aeval.symtable[new_var] = value["non_aggr"]["values"][0]
                             self.log_info(f"Added: {new_var}", indent=3)
-                            self.log_debug(f"Value: {value["non_aggr"]["values"][0]}")                        
+                            self.log_debug(f"Value: {value['non_aggr']['values'][0]}")                        
                         else:
-                            self.log_warning(f"No values found for non-aggregation variable {var}", indent=3)
-                            aeval.symtable[new_var] = 0  # Empty array
+                            self.log_warning(f"No values, using: 0.0")
+                            aeval.symtable[new_var] = 0.0  # Empty array
+
+                        print("\n")
+
+                # print(aeval.symtable)
 
                 # Execute the formula
                 try:
                     self.log_info("Executing formula")
-                    self.log_info(f"Expression: '{formula_str}'", indent=2)
+                    self.log_info(f"Expression:", indent=1)
+                    print("\n")
+                    print(formula_str)
+                    print("\n")
+                    print(self.simple_reference_substitution(formula_str, references))
+                    print("\n")
                     
                     # Regular expression without assignment
                     result = aeval(formula_str)
@@ -479,7 +534,7 @@ class EngineEval(EngineLogger):
                         # Debug: print available symbols
                         self.log_debug(f"Available symbols: {list(aeval.symtable.keys())}", indent=2)
                         entity_results["results"].append({
-                            "path": id_eval["formula"],
+                            "path":  self.simple_reference_substitution(id_eval["formula"], references),
                             "status": "error",
                             "error": error_msg
                         })
@@ -491,6 +546,7 @@ class EngineEval(EngineLogger):
                         self.log_info(f"Result type: numpy.ndarray", indent=2)
                         self.log_info(f"Shape: {result.shape}", indent=2)
                         self.log_info(f"Sample values (first 5): {result.flatten()[:5].tolist() if result.size > 0 else []}", indent=2)
+                        self.log_info(f"Result: {result.tolist()}")
                     else:
                         self.log_info(f"Success - Formula: {id_eval['formula']}", indent=1)
                         self.log_info(f"Result: {result}", indent=2)
@@ -506,7 +562,7 @@ class EngineEval(EngineLogger):
                     self.log_error(f"Expression: '{formula_str}'", indent=2)
                     self.log_error(f"Exception: {str(e)}", indent=2)
                     entity_results["results"].append({
-                        "path": id_eval["formula"],
+                        "path": self.simple_reference_substitution(id_eval["formula"], references),
                         "status": "error",
                         "error": str(e)
                     })
@@ -553,7 +609,7 @@ if __name__ == "__main__":
             formulas = json.load(f)
             engine.log_info(f"Loaded {len(formulas)} formula collections")
     except Exception as e:
-        engine.log_error(f"Error loading formulas file: {str(e)}", exc_info=True)
+        engine.log_error(f"Error loading formulas file: {str(e)}")
         formulas = []
 
     try:
@@ -562,7 +618,7 @@ if __name__ == "__main__":
             entities_eval = json.load(f)
             engine.log_info(f"Loaded {len(entities_eval)} entities for evaluation")
     except Exception as e:
-        engine.log_error(f"Error loading entities evaluation file: {str(e)}", exc_info=True)
+        engine.log_error(f"Error loading entities evaluation file: {str(e)}")
         entities_eval = []
 
     # Evaluate formulas
