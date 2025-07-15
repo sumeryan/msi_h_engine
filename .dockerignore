@@ -19,6 +19,8 @@ venv.bak/
 
 # OS
 .DS_Store
+*DS_Store
+*DS_Store*
 Thumbs.db
 
 # Logs (keep structure but ignore content)
