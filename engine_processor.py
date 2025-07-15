@@ -35,6 +35,7 @@ Dependencies:
 """
 import json
 import copy
+from sqlite3.dbapi2 import Timestamp
 import engine_entities
 import engine_parser
 import engine_eval
@@ -86,12 +87,24 @@ class EngineProcessor(EngineLogger):
         
         group_result = []
     
+        datetime = Timestamp.now()
+        total_count_01 = 0
+        total_count_02 = 0
+        total_count_03 = 0
+        count_01 = 0
+        count_02 = 0
+        count_03 = 0        
+
+        total_count_01 = len(extracted_formulas)
         for i, formula_group in enumerate(extracted_formulas):
+            count_01 += 1
             self.log_debug(f"Processing formula group {i+1}/{len(extracted_formulas)}: {formula_group.get('path', 'unknown')}")
             
             # Process each ID in the group
             id_obj_count = 0
+            total_count_02 = len(formula_group['ids'])
             for id_obj in formula_group.get("ids", []):
+                count_02 += 1
                 self.log_debug(f"Processing ID object {id_obj_count + 1}/{len(formula_group['ids'])} for group {formula_group.get('path', 'unknown')}")
                 id_obj_count += 1
                 id_value = id_obj["id"]
@@ -101,7 +114,10 @@ class EngineProcessor(EngineLogger):
 
                 # For each formula, extract variable values
                 formula_count = 0
+                
+                total_count_03 = len(formula_group['formulas'])
                 for formula in formula_group["formulas"]:
+                    count_03 += 1
                     self.log_debug(f"Processing formula {formula_count + 1}/{len(formula_group['formulas'])} for ID {id_value}: {formula.get('path', 'unknown')}")
                     formula_count += 1
                     # formula_path = formula["path"]

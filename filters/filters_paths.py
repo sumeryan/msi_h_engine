@@ -1042,16 +1042,16 @@ class tree_data_filter:
 
         # Cria chave do cache
         cache_hash = None
-        if filter_expr:
+        if (filter_expr or record_id) and return_paths:
             cache_hash = self._create_cache_hash(
                 return_paths,
                 record_id if record_id else "",
-                filter_expr,
+                filter_expr if filter_expr else "",
                 lock_node)
 
         # If in cache return 
         if cache_hash:
-            if self.result_cache[cache_hash]:
+            if self.result_cache.get(cache_hash, None):
                 return self.result_cache[cache_hash]
 
         if filter_expr:
@@ -1085,7 +1085,7 @@ class tree_data_filter:
             logger.debug(f"Looking for record with ID: {record_id}")
 
             # Find the record and childs with the specified ID
-            record_node = _find_record_by_id(tree_data, record_id)
+            record_node = self._find_record_by_id(tree_data, record_id)
 
             # If the record is found, first we can limit the search to this record and its children
             if record_node:
@@ -1094,7 +1094,7 @@ class tree_data_filter:
 
                 # The path seems to be internal to the record, so we limit the search to this record
                 # and its children
-                records = _extract_records_from_node(record_node)
+                records = self._extract_records_from_node(record_node)
                 logger.debug(f"Extracted {len(records)} records from node with ID: {record_id}")
                 
                 # Apply the filter function to each record
@@ -1110,7 +1110,7 @@ class tree_data_filter:
                 logger.debug(f"Extracting values for {len(return_paths)} paths from filtered records")
 
                 # Extract values for specified paths if return_paths is provided
-                result = _extract_values_for_paths(filtered_records, return_paths)
+                result = self._extract_values_for_paths(filtered_records, return_paths)
                 
                 logger.info(f"Extracted values for {len(result)} paths")
 
