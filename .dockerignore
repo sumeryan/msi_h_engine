@@ -37,4 +37,5 @@ README.md
 
 *.__pycache__
 *.pyc
-*pyc
+
+*.log*
