@@ -755,7 +755,7 @@ class DoctypeProcessor:
         """Retrieve contract data"""
         logger.info("Retrieving contract data...")
 
-        keys = self.get_keys("Contract", filters='[["contratoencerrado","=",null]]')
+        keys = self.get_keys("Contract", filters='[["contratoencerrado","=",null],["datainiciomedicao",">=","2025-01-01"]]')
 
         return keys
 

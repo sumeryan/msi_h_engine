@@ -264,4 +264,4 @@ class ArterisApi:
         except json.JSONDecodeError:
             # Captures error if the response is not valid JSON
             print(f"Error decoding keys JSON response for {doctype_name}.")
-            return None    
+            return None   

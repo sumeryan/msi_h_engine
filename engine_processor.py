@@ -324,7 +324,7 @@ class EngineProcessor(EngineLogger):
         
         # Load and calculate tree data for each contract
         #for k in contract_keys:
-        for k in ['01974609-0a12-70e1-a32c-4fba54fa8939']:
+        for k in ['019745f2-cb96-7782-9699-d5223234d984']:
 
             ufrappe.update_measurement_records(k) 
 
@@ -425,7 +425,7 @@ class EngineProcessor(EngineLogger):
                 engine_results_converted = engine.convert_numpy_types(engine_results)            
 
                 # Write the results to a JSON file
-                with open(f"engine_result_{i}.json", 'w', encoding='utf-8') as f:
+                with open(f"engine_result_{k}_{i}.json", 'w', encoding='utf-8') as f:
                     json.dump(engine_results_converted, f, indent=4, ensure_ascii=False)
 
                 # Select the first formula to update

@@ -1,7 +1,3 @@
-# Git
-.git
-.gitignore
-
 # Python
 __pycache__/
 *.py[cod]
@@ -38,3 +34,7 @@ logs/*.log.*
 
 # Documentation
 README.md
+
+*.__pycache__
+*.pyc
+*pyc
