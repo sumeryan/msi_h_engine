@@ -42,7 +42,7 @@ import update_frappe
 import update_tree
 import engine_entities.engine_data, engine_entities.get_doctypes, engine_parser 
 from typing import Dict, List, Any
-from filters.filters_paths import filter_tree_data
+from filters.filters_paths import tree_data_filter
 from log.logger import get_logger
 from variable_filter import FilterVariableExtractor
 from engine_logger import EngineLogger
@@ -51,6 +51,7 @@ class EngineProcessor(EngineLogger):
 
     def __init__(self):
         self.logger = get_logger("Engine - Processor")
+        self.data_filter = tree_data_filter()
 
     def enrich_formulas_with_values(self, extracted_formulas: List[Dict[str, Any]], tree_data: Dict[str, Any]) -> List[Dict[str, Any]]:
         """
@@ -116,7 +117,11 @@ class EngineProcessor(EngineLogger):
                     #self.log_debug(f"Extracting non-aggregated variables: {vars}")
                     try:
                         # Apply "first" transformation to get only the first match for each variable
-                        node = filter_tree_data(tree_data, [f"first({v})" for v in vars], id_value)
+                        node = self.data_filter.filter_tree_data(
+                            tree_data,
+                            [f"first({v})" for v in vars], 
+                            id_value, 
+                            filter_expr=None)
                         #self.log_debug(f"Found {len(node)} non-aggregated variable nodes")
                         for n in node:
                             formula_ids[formula["path"]].append({"non_aggr": n})
@@ -153,7 +158,11 @@ class EngineProcessor(EngineLogger):
                                         var_list = [f"first({v})"]
                                         # self.log_debug(f"Searching for variable: {v} in tree data")
                                         # Search for the variable in the tree data
-                                        node = filter_tree_data(tree_data, return_paths=var_list, record_id=id_value, lock_node=True)
+                                        node = self.data_filter.filter_tree_data(
+                                            tree_data,
+                                            return_paths=var_list,
+                                            record_id=id_value,
+                                            lock_node=True)
                                         if node:
                                             n_value = node[0]["values"][0]
                                             # Append the variable value to the filter aggregation expression
@@ -185,11 +194,16 @@ class EngineProcessor(EngineLogger):
                                     # self.log_debug(f"Applying global filter: {filter_expr}")
                                     # For variables in aggregation functions with filter
                                     # Global filter ignores the ID
-                                    node = filter_tree_data(tree_data, vars, filter_expr=filter_expr)
+                                    node = self.data_filter.filter_tree_data(
+                                        tree_data, 
+                                        vars, 
+                                        filter_expr=filter_expr)
                                 else:
                                     # self.log_debug("No filter applied, getting all values")
                                     # If no filter, just get all values
-                                    node = filter_tree_data(tree_data, vars)
+                                    node = self.data_filter.filter_tree_data(
+                                        tree_data, 
+                                        vars)
                                 # self.log_debug(f"Found {len(node)} nodes for global aggregation")
                                 # Append all values to the formula_ids
                                 for n in node:
@@ -208,11 +222,20 @@ class EngineProcessor(EngineLogger):
                                 if filter_expr:
                                     # self.log_debug(f"Applying local filter with ID {id_value}: {filter_expr}")
                                     # For variables in aggregation functions with filter
-                                    node = filter_tree_data(tree_data, vars, id_value, filter_expr, lock_node=True)
+                                    node = self.data_filter.filter_tree_data(
+                                        tree_data, 
+                                        vars, 
+                                        id_value, 
+                                        filter_expr, 
+                                        lock_node=True)
                                 else:
                                     # self.log_debug(f"No filter applied, getting all values for ID {id_value}")
                                     # If no filter, just get all values
-                                    node = filter_tree_data(tree_data, vars, id_value, lock_node=True)
+                                    node = self.data_filter.filter_tree_data(
+                                        tree_data, 
+                                        vars, 
+                                        id_value, 
+                                        lock_node=True)
                                 # self.log_debug(f"Found {len(node)} nodes for local aggregation")
                                 for n in node:  
                                     formula_ids[formula["path"]].append({"aggr": aggr["base"], "vars": n, "filter": filter_aggr_expr})

@@ -991,9 +991,9 @@ class tree_data_filter:
             self, 
             tree_data: Dict, 
             return_paths: List[str], 
-            record_id: None, 
-            filter_expr: None, 
-            lock_node: bool = False) -> Union[List[Dict], Dict[str, Any]]:
+            record_id: Optional[str] = None, 
+            filter_expr: Optional[str] = None, 
+            lock_node: Optional[bool] = False) -> Union[List[Dict], Dict[str, Any]]:
         logger.info(f"===== Starting filter operation =====")
         """
         Filters tree data using a custom conditional expression.
