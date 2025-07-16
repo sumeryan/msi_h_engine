@@ -35,6 +35,7 @@ Dependencies:
 """
 import json
 import copy
+from os import urandom
 from sqlite3.dbapi2 import Timestamp
 import engine_entities
 import engine_parser
@@ -96,6 +97,7 @@ class EngineProcessor(EngineLogger):
         count_03 = 0        
 
         total_count_01 = len(extracted_formulas)
+        count_01 = 0
         for i, formula_group in enumerate(extracted_formulas):
             count_01 += 1
             self.log_debug(f"Processing formula group {i+1}/{len(extracted_formulas)}: {formula_group.get('path', 'unknown')}")
@@ -103,6 +105,7 @@ class EngineProcessor(EngineLogger):
             # Process each ID in the group
             id_obj_count = 0
             total_count_02 = len(formula_group['ids'])
+            count_02 = 0
             for id_obj in formula_group.get("ids", []):
                 count_02 += 1
                 self.log_debug(f"Processing ID object {id_obj_count + 1}/{len(formula_group['ids'])} for group {formula_group.get('path', 'unknown')}")
@@ -116,6 +119,7 @@ class EngineProcessor(EngineLogger):
                 formula_count = 0
                 
                 total_count_03 = len(formula_group['formulas'])
+                count_03 = 0
                 for formula in formula_group["formulas"]:
                     count_03 += 1
                     self.log_debug(f"Processing formula {formula_count + 1}/{len(formula_group['formulas'])} for ID {id_value}: {formula.get('path', 'unknown')}")
@@ -131,19 +135,20 @@ class EngineProcessor(EngineLogger):
                     # These are direct variable references without aggregation functions
                     vars = formula.get("parsed", []).get("vars", [])
                     #self.log_debug(f"Extracting non-aggregated variables: {vars}")
-                    try:
-                        # Apply "first" transformation to get only the first match for each variable
-                        node = self.data_filter.filter_tree_data(
-                            tree_data,
-                            [f"first({v})" for v in vars], 
-                            id_value, 
-                            filter_expr=None)
-                        #self.log_debug(f"Found {len(node)} non-aggregated variable nodes")
-                        for n in node:
-                            formula_ids[formula["path"]].append({"non_aggr": n})
-                    except Exception as e:
-                        self.log_error(f"Error processing non-aggregated variables: {e}")
-                        raise
+                    if vars:
+                        try:
+                            # Apply "first" transformation to get only the first match for each variable
+                            node = self.data_filter.filter_tree_data(
+                                tree_data,
+                                [f"first({v})" for v in vars], 
+                                id_value, 
+                                filter_expr=None)
+                            #self.log_debug(f"Found {len(node)} non-aggregated variable nodes")
+                            for n in node:
+                                formula_ids[formula["path"]].append({"non_aggr": n})
+                        except Exception as e:
+                            self.log_error(f"Error processing non-aggregated variables: {e}")
+                            raise
 
                     # Process aggregation functions (sum, avg, etc.)
                     aggr_funcs = formula.get("parsed", []).get("aggr", [])
@@ -363,9 +368,10 @@ class EngineProcessor(EngineLogger):
         
         # Load and calculate tree data for each contract
         #for k in contract_keys:
-        for k in ['019745f2-cb96-7782-9699-d5223234d984']:
+        for k in ['ad3fb0c7-4e6b-4213-a59a-b57a21fe49ee']:
 
             ufrappe.update_measurement_records(k) 
+            ufrappe.update_hours_measurement_record(k)
 
             self.log_info("=" * 80)
             self.log_info(f"Processing contract: {k}\n\n")

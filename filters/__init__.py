@@ -7,4 +7,4 @@ This package provides tools for filtering and querying hierarchical tree data.
 """
 
 # Import main function to be accessible directly from the package
-from .filters_paths import filter_tree_data
+# from .filters_paths import filter_tree_data

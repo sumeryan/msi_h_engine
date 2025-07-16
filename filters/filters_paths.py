@@ -220,14 +220,10 @@ class tree_data_filter:
         """
         Initializes the filter expression parser.
         """
-        logger.debug("Initializing tree_data_filter parser")
-        # Initialize the lexer (lexical analyzer) and parser (syntactic analyzer)
-        logger.debug("Creating lexical analyzer using PLY lex")
         self.lexer = lex.lex(module=self)
-        logger.debug("Creating syntactic analyzer using PLY yacc")
         self.parser = yacc.yacc(module=self)
-        logger.info("Filter expression parser initialized successfully")
         self.result_cache = {}
+        self.filtered_nodes = []
     
     def _create_cache_hash(self, return_paths: List[str], record_id: str, filter_expr: str, lock_node: bool) -> str:
         """
@@ -321,8 +317,7 @@ class tree_data_filter:
         Raises:
             ValueError: If the expression cannot be parsed
         """
-        logger.info(f"Converting expression to filter function: {expression}")
-        
+
         # Parse the expression to generate the AST
         ast = self.parse(expression)
         if ast is None:
@@ -330,17 +325,14 @@ class tree_data_filter:
             logger.error(error_msg)
             raise ValueError(error_msg)
         
-        logger.debug(f"Generated AST for expression: {ast}")
-        
         # Create a filter function that evaluates the AST for each record
         def filter_function(record, tree_data):
-            record_id = record.get('id', 'unknown')
-            logger.debug(f"Evaluating expression on record {record_id}")
+            # record_id = record.get('id', 'unknown')
+            # ogger.debug(f"Evaluation result for record {record_id}: {result}")
             result = self._evaluate_ast(ast, record, tree_data)
-            logger.debug(f"Evaluation result for record {record_id}: {result}")
             return result
         
-        logger.info(f"Successfully created filter function for expression: {expression}")
+        # logger.info(f"Successfully created filter function for expression: {expression}")
         return filter_function
     
     def _evaluate_ast(self, ast_node, record, tree_data):
@@ -382,11 +374,11 @@ class tree_data_filter:
                 right_result = self._evaluate_condition(ast_node[3], record, tree_data)
                 
                 # If both sides are satisfied at the current level, return true
-                if right_result:
-                    return True
+                if not right_result:
+                    return self._check_recursive(ast_node, record, tree_data)
                 
-                # If the right side is not satisfied, check if any subnode satisfies the right side
-                return self._check_subnodes_for_condition(ast_node[3], record, tree_data)
+                self.filtered_nodes.append(record)
+                return True
             
             elif op == 'or':
                 # Evaluate the left side at the current level first
@@ -394,11 +386,13 @@ class tree_data_filter:
                 
                 # If the left side is true, we don't need to evaluate the right
                 if left_result:
+                    self.filtered_nodes.append(record)
                     return True
                 
                 # If the left side is false, the result depends on the right side at the current level
                 right_result = self._evaluate_condition(ast_node[3], record, tree_data)
                 if right_result:
+                    self.filtered_nodes.append(record)
                     return True
                     
                 # If both sides are false at the current level, recursively check subnodes
@@ -410,18 +404,22 @@ class tree_data_filter:
             
             # Safe handling for comparison operators
             try:
+                operator_result = False
                 if op == '==':
-                    return left == right
+                    operator_result = left == right
                 elif op == '!=':
-                    return left != right
+                    operator_result = left != right
                 elif op == '>=':
-                    return left >= right
+                    operator_result = left >= right
                 elif op == '<=':
-                    return left <= right
+                    operator_result = left <= right
                 elif op == '>':
-                    return left > right
+                    operator_result = left > right
                 elif op == '<':
-                    return left < right
+                    operator_result = left < right
+                if operator_result:
+                    self.filtered_nodes.append(record)
+                    return True
             except (TypeError, ValueError):
                 # If there is a type or value error in the comparison, consider it as false
                 # This can occur when comparing incompatible types
@@ -615,50 +613,65 @@ class tree_data_filter:
             True if any subnode satisfies the condition, False otherwise
         """
         # If the record has no subnodes, return false
-        if not isinstance(record, dict) or 'data' not in record or not record['data']:
-            return False
+        # if not isinstance(record, dict) or 'data' not in record or not record['data']:
+        #     return False
+
+        if 'data' in record and record['data']:
             
+            # Check in each subnode
+            for subnode in record['data']:
+                if self._evaluate_ast(ast_node, subnode, tree_data):
+                    self.filtered_nodes.append(subnode)
+
+
         # Check in each subnode
         for subnode in record['data']:
             if isinstance(subnode, dict):
+
+                # Deep check
+                if 'data' in record and subnode['data']:
+                    for deep_subnode in subnode['data']:
+                        self._check_recursive(ast_node, deep_subnode, tree_data)
+                    
                 # Check if the subnode satisfies the condition
                 if self._evaluate_ast(ast_node, subnode, tree_data):
                     return True
-                # Recursively check the subnodes of the current subnode
-                if self._check_recursive(ast_node, subnode, tree_data):
-                    return True
+                
+                # # Recursively check the subnodes of the current subnode
+                # if self._check_recursive(ast_node, subnode, tree_data):
+                #     return True
                     
         return False
     
-    def _check_subnodes_for_condition(self, ast_node, record, tree_data):
-        """
-        Checks if any subnode satisfies a specific condition.
-        Unlike _check_recursive, this function checks only a part
-        of the condition, not the complete condition.
+    # def _check_subnodes_for_condition(self, ast_node, record, tree_data):
+    #     """
+    #     Checks if any subnode satisfies a specific condition.
+    #     Unlike _check_recursive, this function checks only a part
+    #     of the condition, not the complete condition.
         
-        Args:
-            ast_node: AST node representing the condition to check
-            record: Current record being checked
-            tree_data: Complete tree data
+    #     Args:
+    #         ast_node: AST node representing the condition to check
+    #         record: Current record being checked
+    #         tree_data: Complete tree data
             
-        Returns:
-            True if any subnode satisfies the condition, False otherwise
-        """
-        # If the record has no subnodes, return false
-        if not isinstance(record, dict) or 'data' not in record or not record['data']:
-            return False
+    #     Returns:
+    #         True if any subnode satisfies the condition, False otherwise
+    #     """
+    #     # If the record has no subnodes, return false
+    #     if not isinstance(record, dict) or 'data' not in record or not record['data']:
+    #         return False
             
-        # Check in each subnode
-        for subnode in record['data']:
-            if isinstance(subnode, dict):
-                # Check if the subnode satisfies the condition
-                if self._evaluate_condition(ast_node, subnode, tree_data):
-                    return True
-                # Recursively check the subnodes of the current subnode
-                if self._check_subnodes_for_condition(ast_node, subnode, tree_data):
-                    return True
+    #     # Check in each subnode
+    #     for subnode in record['data']:
+    #         if isinstance(subnode, dict):
+    #             # Check if the subnode satisfies the condition
+    #             if self._evaluate_condition(ast_node, subnode, tree_data):
+    #                 return True
+    #             # Recursively check the subnodes of the current subnode
+    #             if self._check_subnodes_for_condition(ast_node, subnode, tree_data):
+    #                 return True
                     
-        return False
+    #     return False
     
     def _get_path_from_ast(self, ast_node):
         """
@@ -1022,21 +1035,27 @@ class tree_data_filter:
 
         def filter_global(records):
             logger.debug(f"Performing global recursive filter on {len(records) if isinstance(records, list) else 'non-list'} records")
+            
             g_filtered_records = []
-
+            
             # Apply the filter function to each record
             for record in records:
                 
                 if 'id' in record and isinstance(record, dict):
                     # logger.debug(f"Evaluating record with ID: {record.get('id')} path {record.get('fields')[0]['path']}")
                     if filter_function is not None and filter_function(record, tree_data):
-                        #return record
-                        g_filtered_records.append(record)
-                
+                        if self.filtered_nodes:
+                            g_filtered_records.append(self.filtered_nodes)
+                        else:
+                            g_filtered_records.append(record)
+
                 if isinstance(record, dict) and 'data' in record and record['data']:
                     f_record = filter_global(record["data"])
                     if f_record:
-                        g_filtered_records.extend(f_record)
+                        if self.filtered_nodes:
+                            g_filtered_records.append(self.filtered_nodes)
+                        else:
+                            g_filtered_records.append(record)
 
             return g_filtered_records
 
@@ -1158,6 +1177,7 @@ class tree_data_filter:
 
         # Apply the filter function to each record
         if filter_expr:
+            self.filtered_nodes = []
             r_global = filter_global(records)
             if isinstance(r_global, dict) and 'data' in r_global:
                 filtered_records = r_global['data']
