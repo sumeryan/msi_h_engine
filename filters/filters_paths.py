@@ -769,6 +769,19 @@ class tree_data_filter:
         # Variable to store the first value found
         # Uses a list to allow modification inside the nested function
         first_value = [None]
+
+        def set_default_value(value, value_type):
+            if not value == None:
+                return value
+            else:
+                if value_type == "numeric":
+                    return 0.0
+                elif value_type == "key":
+                    return ''
+                elif value_type == "string":
+                    return ''
+                else:
+                    return ''
         
         # Traverse the data nodes recursively
         def search_nodes(nodes):
@@ -788,8 +801,9 @@ class tree_data_filter:
                 if 'fields' in node and node['fields'] is not None:
                     for field in node['fields']:
                         if field.get('path') == path:
+                            value_type = field.get('type')
                             first_value[0] = field.get('value')
-                            return first_value[0]
+                            return set_default_value(first_value[0], value_type)
                 
                 # Search in subnodes recursively
                 if first_value[0] is None and 'data' in node and node['data']:
@@ -802,8 +816,9 @@ class tree_data_filter:
                             # If found a node with the correct path, return the first value
                             sub_node = data_item['data'][0]
                             if 'fields' in sub_node and sub_node['fields']:
+                                value_type = sub_node['fields'][0].get('type')
                                 first_value[0] = sub_node['fields'][0].get('value')
-                                return first_value[0]
+                                return set_default_value(first_value[0], value_type)
                     
                     # If not found, search recursively in all subnodes
                     if first_value[0] is None:
@@ -1087,16 +1102,16 @@ class tree_data_filter:
             logger.info(f"Extracting values for paths: {return_paths}")
         
         # Initialize the expression converter
-        logger.debug("Creating tree_data_filter instance for parsing and evaluating expressions")
+        # logger.debug("Creating tree_data_filter instance for parsing and evaluating expressions")
         #converter = tree_data_filter()
         
         # Convert the expression to a Python filter function
         if filter_expr:
             try:
-                logger.debug("Converting filter expression to Python function")
+                #logger.debug("Converting filter expression to Python function")
                 #filter_function = converter.convert_to_python_function(filter_expr)
                 filter_function = self.convert_to_python_function(filter_expr)
-                logger.debug("Filter function created successfully")
+                #logger.debug("Filter function created successfully")
             except Exception as e:
                 error_msg = f"Error converting expression '{filter_expr}': {str(e)}"
                 logger.error(error_msg)
@@ -1120,7 +1135,7 @@ class tree_data_filter:
                 # The path seems to be internal to the record, so we limit the search to this record
                 # and its children
                 records = self._extract_records_from_node(record_node)
-                logger.debug(f"Extracted {len(records)} records from node with ID: {record_id}")
+                # logger.debug(f"Extracted {len(records)} records from node with ID: {record_id}")
                 
                 # Apply the filter function to each record
                 if filter_expr:
@@ -1131,13 +1146,13 @@ class tree_data_filter:
                 else:
                     filtered_records = records
 
-                logger.info(f"Found {len(filtered_records)} matching records in record with ID: {record_id}")
-                logger.debug(f"Extracting values for {len(return_paths)} paths from filtered records")
+                # logger.info(f"Found {len(filtered_records)} matching records in record with ID: {record_id}")
+                # logger.debug(f"Extracting values for {len(return_paths)} paths from filtered records")
 
                 # Extract values for specified paths if return_paths is provided
                 result = self._extract_values_for_paths(filtered_records, return_paths)
                 
-                logger.info(f"Extracted values for {len(result)} paths")
+                # logger.info(f"Extracted values for {len(result)} paths")
 
                 # Check if the paths are internal to the record
                 for path in return_paths:                        
@@ -1179,7 +1194,7 @@ class tree_data_filter:
         #         if isinstance(nodes_data, list):
         #             records.extend(nodes_data)
 
-        logger.debug(f"Found {len(records)} records to filter")
+        # logger.debug(f"Found {len(records)} records to filter")
 
         # Apply the filter function to each record
         if filter_expr:
@@ -1233,68 +1248,80 @@ class tree_data_filter:
             # Initialize the result for the path
             result[path] = []
 
-            logger.debug(f"Processing path: {path}")
+            # logger.debug(f"Processing path: {path}")
 
             # Handle special functions (first, last, firstc, lastc)
             if path.startswith("first(") and path.endswith(")"):
 
                 # Extract the field path from first(...)
                 field_path = path[6:-1]
-                logger.debug(f"Extracting first value for field: {field_path}")
+                # logger.debug(f"Extracting first value for field: {field_path}")
                 value = converter._find_first_value_for_path(field_path, records)
                 result[path] = [value] if value is not None else []
-                if value:
-                    logger.debug(f"First value for {field_path}: {value}")
-                else:
+                # if value:
+                #     logger.debug(f"First value for {field_path}: {value}")
+                # else:
+                #     logger.warning(f"Cannot extract first value: {field_path} not found")
+                if not value:
                     logger.warning(f"Cannot extract first value: {field_path} not found")
+
                 continue
                 
             elif path.startswith("last(") and path.endswith(")"):
                 # Extract the field path from last(...)
                 field_path = path[5:-1]
-                logger.debug(f"Extracting last value for field: {field_path}")
+                # logger.debug(f"Extracting last value for field: {field_path}")
                 value = converter._find_last_value_for_path(field_path, records)
                 result[path] = [value] if value is not None else []
-                if value:
+                # if value:
+                #     logger.debug(f"Last value for {field_path}: {value}")            
+                # else:
+                #     logger.warning(f"Cannot extract last value: {field_path} not found")
+                if not value:
                     logger.debug(f"Last value for {field_path}: {value}")            
-                else:
-                    logger.warning(f"Cannot extract last value: {field_path} not found")
                 continue
                 
             elif path.startswith("firstc(") and path.endswith(")"):
                 # Extract the field path from firstc(...)
                 field_path = path[7:-1]
-                logger.debug(f"Extracting first value by creation date for field: {field_path}")
+                # logger.debug(f"Extracting first value by creation date for field: {field_path}")
                 value = converter._find_firstc_value_for_path(field_path, records)
                 result[path] = [value] if value is not None else []
-                if value:
-                    logger.debug(f"First value by creation date for {field_path}: {value}")
-                else:
+                # if value:
+                #     logger.debug(f"First value by creation date for {field_path}: {value}")
+                # else:
+                #     logger.warning(f"Cannot extract firstc value: {field_path} not found")
+                if not value:
                     logger.warning(f"Cannot extract firstc value: {field_path} not found")
+
                 continue
                 
             elif path.startswith("lastc(") and path.endswith(")"):
                 # Extract the field path from lastc(...)
                 field_path = path[6:-1]
-                logger.debug(f"Extracting last value by creation date for field: {field_path}")
+                # logger.debug(f"Extracting last value by creation date for field: {field_path}")
                 value = converter._find_lastc_value_for_path(field_path, records)
                 result[path] = [value] if value is not None else []
-                if value:
-                    logger.debug(f"Last value by creation date for {field_path}: {value}")
-                else:
-                    logger.warning(f"Cannot extract lastc value: {field_path} not found")
+                # if value:
+                #     logger.debug(f"Last value by creation date for {field_path}: {value}")
+                # else:
+                #     logger.warning(f"Cannot extract lastc value: {field_path} not found")
+                if not value:
+                    logger.warning(f"Cannot extract lastc value: {field_path} not found")                
                 continue
             
             # Regular field path
-            logger.debug(f"Extracting values for regular path: {path}")
+            # logger.debug(f"Extracting values for regular path: {path}")
             values = converter._find_value_for_path(path, records)
             result[path] = values if values is not None else []
-            if values:
-                logger.debug(f"Last value by creation date for {path}: {values}")
-            else:
-                logger.warning(f"Cannot extract lastc value: {path} not found")        
+            # if values:
+            #     logger.debug(f"Last value by creation date for {path}: {values}")
+            # else:
+            #     logger.warning(f"Cannot extract lastc value: {path} not found")        
+            if not values:
+                logger.warning(f"Cannot extract lastc value: {path} not found")               
         
-        logger.debug(f"Extraction complete. Result has {len(result)} paths")
+        # logger.debug(f"Extraction complete. Result has {len(result)} paths")
 
         return result
 
