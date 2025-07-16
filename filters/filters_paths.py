@@ -616,12 +616,12 @@ class tree_data_filter:
         # if not isinstance(record, dict) or 'data' not in record or not record['data']:
         #     return False
 
-        if 'data' in record and record['data']:
+        # if 'data' in record and record['data']:
             
-            # Check in each subnode
-            for subnode in record['data']:
-                if self._evaluate_ast(ast_node, subnode, tree_data):
-                    self.filtered_nodes.append(subnode)
+        #     # Check in each subnode
+        #     for subnode in record['data']:
+        #         if self._evaluate_ast(ast_node, subnode, tree_data):
+        #             self.filtered_nodes.append(subnode)
 
 
         # Check in each subnode
