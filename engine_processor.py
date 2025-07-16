@@ -489,7 +489,7 @@ class EngineProcessor(EngineLogger):
                 # Save data to Frappe
                 ufrappe.update(engine_results_converted, to_update_formula)       
 
-        ufrappe.sumarize()
+        #ufrappe.sumarize()
 
         
 if __name__ == "__main__":
