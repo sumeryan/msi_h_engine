@@ -1,4 +1,3 @@
-
 import requests
 import log
 import os
@@ -11,6 +10,7 @@ class UpdateFrappe(EngineLogger):
         self.api_sumarize = f"{os.getenv('ARTERIS_API_BASE_URL')}/method/arteris_app.api.measurement.sumarize_measurements"
         self.api_update_measurement_records = f"{os.getenv('ARTERIS_API_BASE_URL')}/method/arteris_app.api.measurement.update_contract_measurement_records"
         self.api_update_hours_measurement_records = f"{os.getenv('ARTERIS_API_BASE_URL')}/method/arteris_app.api.measurement.update_contract_hours_measurement_records"
+        self.api_update_reidi_measurement_records = f"{os.getenv('ARTERIS_API_BASE_URL')}/method/arteris_app.api.measurement.update_reidi_measurement_records"
         self.logger = log.get_logger("Engine - Update Frappe")
 
     def _update_measurement_records(self, contract: str):
@@ -56,6 +56,28 @@ class UpdateFrappe(EngineLogger):
         except requests.exceptions.RequestException as e:
             print(f"Error: {e}")
             return None            
+
+    def _update_reidi_measurement_records(self, contract: str):
+
+        resource_url = f"{self.api_update_reidi_measurement_records}"
+        params = {
+            "contract": contract
+        }
+        headers = {
+            "Authorization": self.api_token,
+            "Content-Type": "application/json",
+        }
+
+        try:
+
+            response = requests.post(resource_url, headers=headers, params=params, timeout=30)
+            response.raise_for_status() # Raises HTTPError for 4xx/5xx responses
+            data = response.json()
+            return data
+
+        except requests.exceptions.RequestException as e:
+            print(f"Error: {e}")
+            return None            
         
     def _sumarize(self):
 
@@ -76,7 +98,7 @@ class UpdateFrappe(EngineLogger):
         except requests.exceptions.RequestException as e:
             print(f"Error: {e}")
             return None
-        
+
     def _post(self, doctype: str, field: str, id: str, value: any):
 
         resource_url = f"{self.api_update_doctype}"
@@ -141,6 +163,10 @@ class UpdateFrappe(EngineLogger):
 
     def update_hours_measurement_record(self, contract: str):
 
-        self.log_info(f"Uodating measurement hours records", indent=1)
+        self.log_info(f"Updating measurement hours records", indent=1)
         self._update_hours_measurement_records(contract)
 
+    def update_reidi_measurement_records(self, contract: str):
+
+        self.log_info(f"Updating measurement REIDI records", indent=1)
+        self._update_reidi_measurement_records(contract)
