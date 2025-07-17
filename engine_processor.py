@@ -366,12 +366,17 @@ class EngineProcessor(EngineLogger):
 
         ufrappe = update_frappe.UpdateFrappe()
         
+        # ufrappe.sumarize()
+
         # Load and calculate tree data for each contract
         #for k in contract_keys:
+            # 44149 10b3cd58-d02b-48f7-990f-78c7d3b3b741
+            # 38733 ad3fb0c7-4e6b-4213-a59a-b57a21fe49ee        
         for k in ['ad3fb0c7-4e6b-4213-a59a-b57a21fe49ee']:
 
             ufrappe.update_measurement_records(k) 
             ufrappe.update_hours_measurement_record(k)
+            # ufrappe.update_reidi_measurement_records(k)
 
             self.log_info("=" * 80)
             self.log_info(f"Processing contract: {k}\n\n")
@@ -489,8 +494,7 @@ class EngineProcessor(EngineLogger):
                 # Save data to Frappe
                 ufrappe.update(engine_results_converted, to_update_formula)       
 
-        #ufrappe.sumarize()
-
+        ufrappe.sumarize()
         
 if __name__ == "__main__":
     processor = EngineProcessor()
