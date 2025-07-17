@@ -161,3 +161,8 @@ cython_debug/
 
 # VS Code
 .vscode/
+
+*.json
+.env
+*.log*
+log/
