@@ -445,9 +445,9 @@ class Translations:
             "SAP_Order_Period": "Linhas",
             "Item Group": "Grupos de itens",
             "Item_Sub_Group": "Subgrupos de itens",
-
+            "Contract_Measurement_Performance": "Performance",
+            "Contract_Performance": "Performance"
         }    
-
 
 class DoctypeRetriever:
     """Retrieves doctypes and their fields"""

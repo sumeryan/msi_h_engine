@@ -96,6 +96,8 @@ class EngineProcessor(EngineLogger):
         count_02 = 0
         count_03 = 0        
 
+        self.data_filter.clear_cache()
+
         total_count_01 = len(extracted_formulas)
         count_01 = 0
         for i, formula_group in enumerate(extracted_formulas):
@@ -372,11 +374,12 @@ class EngineProcessor(EngineLogger):
         #for k in contract_keys:
             # 44149 10b3cd58-d02b-48f7-990f-78c7d3b3b741
             # 38733 ad3fb0c7-4e6b-4213-a59a-b57a21fe49ee        
-        for k in ['ad3fb0c7-4e6b-4213-a59a-b57a21fe49ee']:
+        for k in ['10b3cd58-d02b-48f7-990f-78c7d3b3b741']:
 
             ufrappe.update_measurement_records(k) 
             ufrappe.update_hours_measurement_record(k)
-            # ufrappe.update_reidi_measurement_records(k)
+            ufrappe.update_reidi_measurement_records(k)
+            ufrappe.apply_performance_conditions(k)
 
             self.log_info("=" * 80)
             self.log_info(f"Processing contract: {k}\n\n")
@@ -487,7 +490,10 @@ class EngineProcessor(EngineLogger):
                         to_update_formula, 
                         engine_results_converted
                     )
-                    engine_data_tree = utree.update_tree()      
+                    engine_data_tree = utree.update_tree()   
+
+                # with open(f"data_tree_{k}_{i}.json", 'w', encoding='utf-8') as f:
+                #     json.dump(engine_data_tree, f, indent=4, ensure_ascii=False)                           
 
             # Select the first formula to update
             for to_update_formula in extract_formulas:

@@ -224,8 +224,11 @@ class tree_data_filter:
         self.parser = yacc.yacc(module=self)
         self.result_cache = {}
         # self.filtered_nodes = []
+
+    def clear_cache(self):
+        self.result_cache = {}
     
-    def _create_cache_hash(self, return_paths: List[str], record_id: str, filter_expr: str, lock_node: bool) -> str:
+    def _create_cache_hash(self, path: str, filter_expr: str, lock_node: bool) -> str:
         """
         Creates a hash from the filter parameters to use as cache key.
         
@@ -241,10 +244,9 @@ class tree_data_filter:
         """
         # Create a dictionary with all parameters
         params = {
-            'return_paths': return_paths if return_paths else [],
-            'record_id': record_id,
-            'filter_expr': filter_expr,
-            'lock_node': lock_node
+            'path': path,
+            'expr': filter_expr,
+            'lock': lock_node
         }
         
         # Convert parameters to JSON string for consistent serialization
@@ -1080,19 +1082,15 @@ class tree_data_filter:
 
             return g_filtered_records
 
-        # Cria chave do cache
-        cache_hash = None
-        if (filter_expr or record_id) and return_paths:
-            cache_hash = self._create_cache_hash(
-                return_paths,
-                record_id if record_id else "",
-                filter_expr if filter_expr else "",
-                lock_node)
+        def use_cache(path: str, filter_expr: str, lock_node: bool):
+            # Cria chave do cache
+            cache_hash = self._create_cache_hash(path, filter_expr, lock_node)
+            return self.result_cache.get(cache_hash, None)    
 
-        # If in cache return 
-        if cache_hash:
-            if self.result_cache.get(cache_hash, None):
-                return self.result_cache[cache_hash]
+        def set_cache(path: str, filter_expr: str, lock_node: bool, value):
+            # Cria chave do cache
+            cache_hash = self._create_cache_hash(path, filter_expr, lock_node)
+            self.result_cache[cache_hash] = value
 
         if filter_expr:
             logger.info(f"Starting filter operation with expression: {filter_expr}")
@@ -1166,21 +1164,32 @@ class tree_data_filter:
                 # All paths are internal to the record, so we return the values
                 if return_paths == []:
                     logger.info(f"All paths processed internally to record {record_id}, returning {len(values_return)} results")
-                    if cache_hash:
-                        self.result_cache[cache_hash] = values_return
                     return values_return
 
                 # Aggr function with _node, lock search on the record
                 if lock_node:
                     for path in return_paths:
-                        values_return.append({"path": path, "values": []})
-                        if cache_hash:
-                            self.result_cache[cache_hash] = values_return                        
+                        values_return.append({"path": path, "values": []})                   
                     return values_return
 
         # If we get here, we're not limiting the search to a specific record
         # or the path_expr is not inside the record_id, so we ignore the record_id
         logger.debug("Performing global search without record_id restriction")
+
+        # # CACHE
+        # # Check if the paths are internal to the record
+        # for path in return_paths:                        
+        #     cache_value = use_cache(path, filter_expr, lock_node)
+        #     if cache_value:
+        #         values_return.append({"path": path, "values": cache_value})
+
+        # # If the path doesn't seem to be internal, we continue with the global search below
+        # for path in values_return:
+        #     return_paths.remove(path["path"])
+                    
+        # if return_paths == []:
+        #     return values_return
+        # # CACHE
 
         # Get all records from the tree data
         # records = []
@@ -1221,10 +1230,8 @@ class tree_data_filter:
 
         for path in return_paths:                        
             if len(result[path])>0:
+                # set_cache(path, filter_expr, lock_node, result[path])
                 values_return.append({"path": path, "values": result[path]})
-
-        if cache_hash:
-            self.result_cache[cache_hash] = values_return   
 
         return values_return
 
