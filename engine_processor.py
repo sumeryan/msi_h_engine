@@ -373,8 +373,9 @@ class EngineProcessor(EngineLogger):
         # Load and calculate tree data for each contract
         #for k in contract_keys:
             # 44149 10b3cd58-d02b-48f7-990f-78c7d3b3b741
-            # 38733 ad3fb0c7-4e6b-4213-a59a-b57a21fe49ee        
-        for k in ['10b3cd58-d02b-48f7-990f-78c7d3b3b741']:
+            # 38733 ad3fb0c7-4e6b-4213-a59a-b57a21fe49ee      
+            # 34540 019745f2-cb96-7782-9699-d5223234d984  
+        for k in ['019745f2-cb96-7782-9699-d5223234d984']:
 
             ufrappe.update_contract_records(k) 
             ufrappe.update_hours_contract_record(k)
