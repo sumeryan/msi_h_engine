@@ -228,7 +228,7 @@ class tree_data_filter:
     def clear_cache(self):
         self.result_cache = {}
     
-    def _create_cache_hash(self, path: str, filter_expr: str, lock_node: bool) -> str:
+    def _create_cache_hash(self, filter_expr: str, lock_node: bool, return_paths: Dict) -> str:
         """
         Creates a hash from the filter parameters to use as cache key.
         
@@ -244,9 +244,9 @@ class tree_data_filter:
         """
         # Create a dictionary with all parameters
         params = {
-            'path': path,
             'expr': filter_expr,
-            'lock': lock_node
+            'lock': lock_node,
+            'return_paths': return_paths
         }
         
         # Convert parameters to JSON string for consistent serialization
@@ -297,12 +297,12 @@ class tree_data_filter:
         Returns:
             Abstract syntax tree representing the expression
         """
-        logger.debug(f"Parsing expression: {expression}")
+        #logger.debug(f"Parsing expression: {expression}")
         ast = self.parser.parse(expression)
-        if ast:
-            logger.debug(f"Expression parsed successfully: {expression}")
-        else:
-            logger.warning(f"Failed to parse expression: {expression}")
+        # if ast:
+        #     logger.debug(f"Expression parsed successfully: {expression}")
+        # else:
+        #     logger.warning(f"Failed to parse expression: {expression}")
         return ast
     
     def convert_to_python_function(self, expression: str) -> Callable:
@@ -1031,7 +1031,7 @@ class tree_data_filter:
             record_id: Optional[str] = None, 
             filter_expr: Optional[str] = None, 
             lock_node: Optional[bool] = False) -> Union[List[Dict], Dict[str, Any]]:
-        logger.info(f"===== Starting filter operation =====")
+        # logger.info(f"===== Starting filter operation =====")
         """
         Filters tree data using a custom conditional expression.
         
@@ -1082,14 +1082,14 @@ class tree_data_filter:
 
             return g_filtered_records
 
-        def use_cache(path: str, filter_expr: str, lock_node: bool):
+        def use_cache(filter_expr: str, lock_node: bool, return_paths: Dict):
             # Cria chave do cache
-            cache_hash = self._create_cache_hash(path, filter_expr, lock_node)
+            cache_hash = self._create_cache_hash(filter_expr, lock_node, return_paths)
             return self.result_cache.get(cache_hash, None)    
 
-        def set_cache(path: str, filter_expr: str, lock_node: bool, value):
+        def set_cache(filter_expr: str, lock_node: bool, return_paths: Dict, value):
             # Cria chave do cache
-            cache_hash = self._create_cache_hash(path, filter_expr, lock_node)
+            cache_hash = self._create_cache_hash(filter_expr, lock_node, return_paths)
             self.result_cache[cache_hash] = value
 
         if filter_expr:
@@ -1120,7 +1120,7 @@ class tree_data_filter:
 
         # If we have a record_id, we need to check if the path (path_expr) is internal to that record
         if record_id:
-            logger.debug(f"Looking for record with ID: {record_id}")
+            # logger.debug(f"Looking for record with ID: {record_id}")
 
             # Find the record and childs with the specified ID
             record_node = self._find_record_by_id(tree_data, record_id)
@@ -1128,7 +1128,7 @@ class tree_data_filter:
             # If the record is found, first we can limit the search to this record and its children
             if record_node:
 
-                logger.info(f"Found record with ID: {record_id}")
+                # logger.info(f"Found record with ID: {record_id}")
 
                 # The path seems to be internal to the record, so we limit the search to this record
                 # and its children
@@ -1163,7 +1163,7 @@ class tree_data_filter:
 
                 # All paths are internal to the record, so we return the values
                 if return_paths == []:
-                    logger.info(f"All paths processed internally to record {record_id}, returning {len(values_return)} results")
+                    # logger.info(f"All paths processed internally to record {record_id}, returning {len(values_return)} results")
                     return values_return
 
                 # Aggr function with _node, lock search on the record
@@ -1174,14 +1174,13 @@ class tree_data_filter:
 
         # If we get here, we're not limiting the search to a specific record
         # or the path_expr is not inside the record_id, so we ignore the record_id
-        logger.debug("Performing global search without record_id restriction")
+        # logger.debug("Performing global search without record_id restriction")
 
-        # # CACHE
-        # # Check if the paths are internal to the record
-        # for path in return_paths:                        
-        #     cache_value = use_cache(path, filter_expr, lock_node)
-        #     if cache_value:
-        #         values_return.append({"path": path, "values": cache_value})
+        # CACHE
+        # Check if the paths are internal to the record
+        cache_value = use_cache(filter_expr, lock_node, return_paths)
+        if cache_value:
+            return cache_value
 
         # # If the path doesn't seem to be internal, we continue with the global search below
         # for path in values_return:
@@ -1221,17 +1220,21 @@ class tree_data_filter:
         else:
             filtered_records = records
         
-        logger.info(f"Filter applied: found {len(filtered_records)} matching records out of {len(records)}")
+        # logger.info(f"Filter applied: found {len(filtered_records)} matching records out of {len(records)}")
         
         # Extract values for specified paths if return_paths is provided
-        logger.debug(f"Extracting values for {len(return_paths)} paths from filtered records")
+        # logger.debug(f"Extracting values for {len(return_paths)} paths from filtered records")
         result = self._extract_values_for_paths(filtered_records, return_paths)
-        logger.info(f"Extracted values for {len(result)} paths")
+        # logger.info(f"Extracted values for {len(result)} paths")
 
         for path in return_paths:                        
             if len(result[path])>0:
                 # set_cache(path, filter_expr, lock_node, result[path])
                 values_return.append({"path": path, "values": result[path]})
+
+        # CACHE
+        # Check if the paths are internal to the record
+        set_cache(filter_expr, lock_node, return_paths, values_return)
 
         return values_return
 
@@ -1246,7 +1249,7 @@ class tree_data_filter:
         Returns:
             Dictionary mapping each path to a list of values extracted from the records
         """
-        logger.debug(f"Extracting values for {len(paths)} paths from {len(records)} records")
+        # logger.debug(f"Extracting values for {len(paths)} paths from {len(records)} records")
         result = {path: [] for path in paths}
         converter = tree_data_filter()
         
@@ -1284,8 +1287,8 @@ class tree_data_filter:
                 #     logger.debug(f"Last value for {field_path}: {value}")            
                 # else:
                 #     logger.warning(f"Cannot extract last value: {field_path} not found")
-                if not value:
-                    logger.debug(f"Last value for {field_path}: {value}")            
+                # if not value:
+                #     logger.debug(f"Last value for {field_path}: {value}")            
                 continue
                 
             elif path.startswith("firstc(") and path.endswith(")"):
@@ -1298,8 +1301,8 @@ class tree_data_filter:
                 #     logger.debug(f"First value by creation date for {field_path}: {value}")
                 # else:
                 #     logger.warning(f"Cannot extract firstc value: {field_path} not found")
-                if not value:
-                    logger.warning(f"Cannot extract firstc value: {field_path} not found")
+                # if not value:
+                #     logger.warning(f"Cannot extract firstc value: {field_path} not found")
 
                 continue
                 
@@ -1313,8 +1316,8 @@ class tree_data_filter:
                 #     logger.debug(f"Last value by creation date for {field_path}: {value}")
                 # else:
                 #     logger.warning(f"Cannot extract lastc value: {field_path} not found")
-                if not value:
-                    logger.warning(f"Cannot extract lastc value: {field_path} not found")                
+                # if not value:
+                #     logger.warning(f"Cannot extract lastc value: {field_path} not found")                
                 continue
             
             # Regular field path
@@ -1325,8 +1328,8 @@ class tree_data_filter:
             #     logger.debug(f"Last value by creation date for {path}: {values}")
             # else:
             #     logger.warning(f"Cannot extract lastc value: {path} not found")        
-            if not values:
-                logger.warning(f"Cannot extract lastc value: {path} not found")               
+            # if not values:
+            #     logger.warning(f"Cannot extract lastc value: {path} not found")               
         
         # logger.debug(f"Extraction complete. Result has {len(result)} paths")
 
