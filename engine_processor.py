@@ -376,10 +376,10 @@ class EngineProcessor(EngineLogger):
             # 38733 ad3fb0c7-4e6b-4213-a59a-b57a21fe49ee        
         for k in ['10b3cd58-d02b-48f7-990f-78c7d3b3b741']:
 
-            ufrappe.update_measurement_records(k) 
-            ufrappe.update_hours_measurement_record(k)
-            ufrappe.update_reidi_measurement_records(k)
-            ufrappe.apply_performance_conditions(k)
+            ufrappe.update_contract_records(k) 
+            ufrappe.update_hours_contract_record(k)
+            ufrappe.update_reidi_contract_records(k)
+            ufrappe.apply_contract_performance_conditions(k)
 
             self.log_info("=" * 80)
             self.log_info(f"Processing contract: {k}\n\n")
@@ -500,7 +500,7 @@ class EngineProcessor(EngineLogger):
                 # Save data to Frappe
                 ufrappe.update(engine_results_converted, to_update_formula)       
 
-        ufrappe.sumarize()
+            ufrappe.sumarize(k)
         
 if __name__ == "__main__":
     processor = EngineProcessor()
