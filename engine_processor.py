@@ -367,8 +367,6 @@ class EngineProcessor(EngineLogger):
         formulas = entities_processor.get_formula_data(using_cached_data=False)
 
         ufrappe = update_frappe.UpdateFrappe()
-        
-        # ufrappe.sumarize()
 
         # Load and calculate tree data for each contract
         #for k in contract_keys:
@@ -380,7 +378,10 @@ class EngineProcessor(EngineLogger):
             ufrappe.update_contract_records(k) 
             ufrappe.update_hours_contract_record(k)
             ufrappe.update_reidi_contract_records(k)
+
             ufrappe.apply_contract_performance_conditions(k)
+
+            ufrappe.sumarize(k)
 
             self.log_info("=" * 80)
             self.log_info(f"Processing contract: {k}\n\n")

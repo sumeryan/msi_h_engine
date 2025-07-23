@@ -7,11 +7,11 @@ class UpdateFrappe(EngineLogger):
     def __init__(self):
         self.api_token = os.getenv("ARTERIS_API_TOKEN")
         self.api_update_doctype = f"{os.getenv('ARTERIS_API_BASE_URL')}/method/arteris_app.api.engine.update_doctype"
-        self.api_sumarize = f"{os.getenv('ARTERIS_API_BASE_URL')}/method/arteris_app.api.measurement_v3.sumarize_measurements"
-        self.api_update_measurement_records = f"{os.getenv('ARTERIS_API_BASE_URL')}/method/arteris_app.api.measurement_v3.update_contract_measurement_records"
-        self.api_update_hours_measurement_records = f"{os.getenv('ARTERIS_API_BASE_URL')}/method/arteris_app.api.measurement_v3.update_contract_hours_measurement_records"
-        self.api_update_reidi_measurement_records = f"{os.getenv('ARTERIS_API_BASE_URL')}/method/arteris_app.api.measurement_v3.update_reidi_contract_records"
-        self.api_apply_performance_conditions = f"{os.getenv('ARTERIS_API_BASE_URL')}/method/arteris_app.api.measurement_v3.apply_contract_performance_conditions"
+        self.api_sumarize = f"{os.getenv('ARTERIS_API_BASE_URL')}/method/arteris_app.api.measurement.sumarize_contract_measurements"
+        self.api_update_measurement_records = f"{os.getenv('ARTERIS_API_BASE_URL')}/method/arteris_app.api.measurement.update_contract_measurement_records"
+        self.api_update_hours_contract_records = f"{os.getenv('ARTERIS_API_BASE_URL')}/method/arteris_app.api.measurement.update_hours_contract_records"
+        self.api_update_reidi_measurement_records = f"{os.getenv('ARTERIS_API_BASE_URL')}/method/arteris_app.api.measurement.update_reidi_contract_records"
+        self.api_apply_performance_conditions = f"{os.getenv('ARTERIS_API_BASE_URL')}/method/arteris_app.api.measurement.apply_contract_performance_conditions"
         self.logger = log.get_logger("Engine - Update Frappe")
 
     def _update_measurement_records(self, contract: str):
@@ -27,7 +27,7 @@ class UpdateFrappe(EngineLogger):
 
         try:
 
-            response = requests.post(resource_url, headers=headers, params=params, timeout=30)
+            response = requests.post(resource_url, headers=headers, params=params, timeout=300)
             response.raise_for_status() # Raises HTTPError for 4xx/5xx responses
             data = response.json()
             return data
@@ -38,7 +38,7 @@ class UpdateFrappe(EngineLogger):
 
     def _update_hours_measurement_records(self, contract: str):
 
-        resource_url = f"{self.api_update_hours_measurement_records}"
+        resource_url = f"{self.api_update_hours_contract_records}"
         params = {
             "contract": contract
         }
@@ -49,7 +49,7 @@ class UpdateFrappe(EngineLogger):
 
         try:
 
-            response = requests.post(resource_url, headers=headers, params=params, timeout=30)
+            response = requests.post(resource_url, headers=headers, params=params, timeout=300)
             response.raise_for_status() # Raises HTTPError for 4xx/5xx responses
             data = response.json()
             return data
@@ -71,7 +71,7 @@ class UpdateFrappe(EngineLogger):
 
         try:
 
-            response = requests.post(resource_url, headers=headers, params=params, timeout=30)
+            response = requests.post(resource_url, headers=headers, params=params, timeout=300)
             response.raise_for_status() # Raises HTTPError for 4xx/5xx responses
             data = response.json()
             return data
@@ -93,7 +93,7 @@ class UpdateFrappe(EngineLogger):
 
         try:
 
-            response = requests.post(resource_url, headers=headers, params=params, timeout=30)
+            response = requests.post(resource_url, headers=headers, params=params, timeout=300)
             response.raise_for_status() # Raises HTTPError for 4xx/5xx responses
             data = response.json()
             return data
@@ -114,7 +114,7 @@ class UpdateFrappe(EngineLogger):
 
         try:
 
-            response = requests.post(resource_url, headers=headers, params=params, timeout=30)
+            response = requests.post(resource_url, headers=headers, params=params, timeout=300)
             response.raise_for_status() # Raises HTTPError for 4xx/5xx responses
             data = response.json()
             return data
@@ -141,7 +141,7 @@ class UpdateFrappe(EngineLogger):
 
         try:
 
-            response = requests.post(resource_url, headers=headers, params=params, json=body, timeout=30)
+            response = requests.post(resource_url, headers=headers, params=params, json=body, timeout=300)
             response.raise_for_status() # Raises HTTPError for 4xx/5xx responses
             data = response.json()
             return data
