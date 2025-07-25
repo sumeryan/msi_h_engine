@@ -96,7 +96,7 @@ class EngineProcessor(EngineLogger):
         count_02 = 0
         count_03 = 0        
 
-        self.data_filter.clear_cache()
+        # self.data_filter.clear_cache()
 
         total_count_01 = len(extracted_formulas)
         count_01 = 0
@@ -373,7 +373,14 @@ class EngineProcessor(EngineLogger):
             # 44149 10b3cd58-d02b-48f7-990f-78c7d3b3b741
             # 38733 ad3fb0c7-4e6b-4213-a59a-b57a21fe49ee      
             # 34540 019745f2-cb96-7782-9699-d5223234d984  
-        for k in ['019745f2-cb96-7782-9699-d5223234d984']:
+            # 40812 01974609-0a12-70e1-a32c-4fba54fa8939
+            # 33287 019745f2-05db-7a62-8c75-619498b296e2
+            # 32148 019745f1-74f1-7ba0-9b6b-c51aea37e953
+            # 32904-RB 019745f1-b460-7603-9885-3df32abd1390
+            # 34092 019745f2-7b66-7792-ad0f-8b1d17cdbe5f
+            # 32570 019745f1-9759-72c2-a010-90c9d3dfeef3
+            # 31824 019745f1-31b2-7bf3-9ed4-610c56cb4644
+        for k in ['019745f1-31b2-7bf3-9ed4-610c56cb4644']:
 
             ufrappe.update_contract_records(k) 
             ufrappe.update_hours_contract_record(k)
@@ -451,13 +458,15 @@ class EngineProcessor(EngineLogger):
             with open(f"extract_formulas_{k}.json", 'w', encoding='utf-8') as f:
                 json.dump(extract_formulas, f, indent=4, ensure_ascii=False)        
 
-            for i in range(0, 3):
+            for i in range(0, 5):
 
                 # Process formula variables
                 enrich_formulas = self.enrich_formulas_with_values(extract_formulas, engine_data_tree)
                 # Save processed formulas to a file
-                with open(f"enrich_formulas_{k}_{i}.json", 'w', encoding='utf-8') as f:
-                    json.dump(enrich_formulas, f, indent=4, ensure_ascii=False) 
+                # with open(f"enrich_formulas_{k}_{i}.json", 'w', encoding='utf-8') as f:
+                #     json.dump(enrich_formulas, f, indent=4, ensure_ascii=False) 
+                with open(f"enrich_formulas_{k}.json", 'w', encoding='utf-8') as f:
+                    json.dump(enrich_formulas, f, indent=4, ensure_ascii=False)                 
 
                 engine = engine_eval.EngineEval()
 
@@ -480,7 +489,9 @@ class EngineProcessor(EngineLogger):
                 engine_results_converted = engine.convert_numpy_types(engine_results)            
 
                 # Write the results to a JSON file
-                with open(f"engine_result_{k}_{i}.json", 'w', encoding='utf-8') as f:
+                # with open(f"engine_result_{k}_{i}.json", 'w', encoding='utf-8') as f:
+                #     json.dump(engine_results_converted, f, indent=4, ensure_ascii=False)
+                with open(f"engine_result_{k}.json", 'w', encoding='utf-8') as f:
                     json.dump(engine_results_converted, f, indent=4, ensure_ascii=False)
 
                 # Select the first formula to update
@@ -492,7 +503,7 @@ class EngineProcessor(EngineLogger):
                         to_update_formula, 
                         engine_results_converted
                     )
-                    engine_data_tree = utree.update_tree()   
+                    engine_data_tree = utree.update_tree()
 
                 # with open(f"data_tree_{k}_{i}.json", 'w', encoding='utf-8') as f:
                 #     json.dump(engine_data_tree, f, indent=4, ensure_ascii=False)                           
@@ -503,7 +514,7 @@ class EngineProcessor(EngineLogger):
                 ufrappe.update(engine_results_converted, to_update_formula)       
 
             ufrappe.sumarize(k)
-        
+
 if __name__ == "__main__":
     processor = EngineProcessor()
     try:

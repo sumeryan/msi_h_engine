@@ -222,42 +222,42 @@ class tree_data_filter:
         """
         self.lexer = lex.lex(module=self)
         self.parser = yacc.yacc(module=self)
-        self.result_cache = {}
+        # self.result_cache = {}
         # self.filtered_nodes = []
 
-    def clear_cache(self):
-        self.result_cache = {}
+    # def clear_cache(self):
+    #     self.result_cache = {}
     
-    def _create_cache_hash(self, filter_expr: str, lock_node: bool, return_paths: Dict) -> str:
-        """
-        Creates a hash from the filter parameters to use as cache key.
+    # def _create_cache_hash(self, filter_expr: str, lock_node: bool, return_paths: Dict) -> str:
+    #     """
+    #     Creates a hash from the filter parameters to use as cache key.
         
-        Args:
-            tree_data: Tree data structure
-            return_paths: List of paths to return
-            record_id: Record ID to filter
-            filter_expr: Filter expression
-            lock_node: Lock node flag
+    #     Args:
+    #         tree_data: Tree data structure
+    #         return_paths: List of paths to return
+    #         record_id: Record ID to filter
+    #         filter_expr: Filter expression
+    #         lock_node: Lock node flag
             
-        Returns:
-            Hash string to use as cache key
-        """
-        # Create a dictionary with all parameters
-        params = {
-            'expr': filter_expr,
-            'lock': lock_node,
-            'return_paths': return_paths
-        }
+    #     Returns:
+    #         Hash string to use as cache key
+    #     """
+    #     # Create a dictionary with all parameters
+    #     params = {
+    #         'expr': filter_expr,
+    #         'lock': lock_node,
+    #         'return_paths': return_paths
+    #     }
         
-        # Convert parameters to JSON string for consistent serialization
-        params_str = json.dumps(params, sort_keys=True)
+    #     # Convert parameters to JSON string for consistent serialization
+    #     params_str = json.dumps(params, sort_keys=True)
         
-        # Create hash from parameters and tree_data structure
-        # Use only the structure/keys of tree_data, not the full content for better performance
-        combined_str = f"{params_str}"
+    #     # Create hash from parameters and tree_data structure
+    #     # Use only the structure/keys of tree_data, not the full content for better performance
+    #     combined_str = f"{params_str}"
         
-        # Generate SHA256 hash
-        return hashlib.sha256(combined_str.encode('utf-8')).hexdigest()
+    #     # Generate SHA256 hash
+    #     return hashlib.sha256(combined_str.encode('utf-8')).hexdigest()
 
     def _extract_tree_structure(self, tree_data: Dict) -> Any:
         """
@@ -1082,15 +1082,15 @@ class tree_data_filter:
 
             return g_filtered_records
 
-        def use_cache(filter_expr: str, lock_node: bool, return_paths: Dict):
-            # Cria chave do cache
-            cache_hash = self._create_cache_hash(filter_expr, lock_node, return_paths)
-            return self.result_cache.get(cache_hash, None)    
+        # def use_cache(filter_expr: str, lock_node: bool, return_paths: Dict):
+        #     # Cria chave do cache
+        #     cache_hash = self._create_cache_hash(filter_expr, lock_node, return_paths)
+        #     return self.result_cache.get(cache_hash, None)    
 
-        def set_cache(filter_expr: str, lock_node: bool, return_paths: Dict, value):
-            # Cria chave do cache
-            cache_hash = self._create_cache_hash(filter_expr, lock_node, return_paths)
-            self.result_cache[cache_hash] = value
+        # def set_cache(filter_expr: str, lock_node: bool, return_paths: Dict, value):
+        #     # Cria chave do cache
+        #     cache_hash = self._create_cache_hash(filter_expr, lock_node, return_paths)
+        #     self.result_cache[cache_hash] = value
 
         if filter_expr:
             logger.info(f"Starting filter operation with expression: {filter_expr}")
@@ -1176,11 +1176,11 @@ class tree_data_filter:
         # or the path_expr is not inside the record_id, so we ignore the record_id
         # logger.debug("Performing global search without record_id restriction")
 
-        # CACHE
-        # Check if the paths are internal to the record
-        cache_value = use_cache(filter_expr, lock_node, return_paths)
-        if cache_value:
-            return cache_value
+        # # CACHE
+        # # Check if the paths are internal to the record
+        # cache_value = use_cache(filter_expr, lock_node, return_paths)
+        # if cache_value:
+        #     return cache_value
 
         # # If the path doesn't seem to be internal, we continue with the global search below
         # for path in values_return:
@@ -1232,9 +1232,9 @@ class tree_data_filter:
                 # set_cache(path, filter_expr, lock_node, result[path])
                 values_return.append({"path": path, "values": result[path]})
 
-        # CACHE
-        # Check if the paths are internal to the record
-        set_cache(filter_expr, lock_node, return_paths, values_return)
+        # # CACHE
+        # # Check if the paths are internal to the record
+        # set_cache(filter_expr, lock_node, return_paths, values_return)
 
         return values_return
 

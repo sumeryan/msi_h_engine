@@ -1,3 +1,4 @@
+from ast import Dict
 import requests
 import log
 import os
@@ -123,7 +124,7 @@ class UpdateFrappe(EngineLogger):
             print(f"Error: {e}")
             return None
 
-    def _post(self, doctype: str, field: str, id: str, value: any):
+    def _post(self, doctype: str, fields: Dict, values: Dict, id: str):
 
         resource_url = f"{self.api_update_doctype}"
         params = {}
@@ -134,9 +135,9 @@ class UpdateFrappe(EngineLogger):
 
         body = {
             "doctype": doctype,
-            "field": field,
+            "fields": fields,
+            "parameters_values": values,
             "id": id,
-            "value": value
         }
 
         try:
@@ -159,21 +160,36 @@ class UpdateFrappe(EngineLogger):
 
     def update(self, results: dict = None, formulas: dict = None):
 
+        updates = {}
+
         for result in results:
-            id = result.get('id')
 
             for path_result in result.get('results'):
+
                 if path_result.get('status') == 'error':
                     continue
+
                 doctype, field = self._get_formula(path_result.get('path'), formulas)
+
                 if not doctype or not field:
                     continue
-                try:
-                    self.log_info(f"Updating {doctype} {field} for ID {id} with value: {path_result.get('result')}", indent=1)
-                    self._post(doctype, field, id, path_result.get('result'))
-                except Exception as e:
-                    self.log_error(f"Failed to update {doctype} {field} for ID {id}: {e}")
-                    continue
+
+                id = result.get('id')
+                if not id in updates:
+                    updates[id] = {
+                        "doctype": doctype,
+                        "fields": [],
+                        "values": []
+                    }
+
+                updates[id]['fields'].append(field)
+                updates[id]['values'].append(path_result.get('result'))
+
+        for id, update in updates.items():
+            self.log_info(f"Updating {update['doctype']}, {update['fields']} for ID {id} with values: {update['values']}", indent=1)
+            if len(update['fields']) == 0:
+                continue
+            self._post(update['doctype'], update['fields'], update['values'], id)
 
     def sumarize(self, contract):
 
