@@ -110,7 +110,11 @@ class FormulaExecutionClassifier:
                 processed.add(path)
             
             current_group += 1
+
+            unique_groups = set(self.execution_groups.values())
         
+            self.execution_groups
+
         return self.execution_groups
     
     def get_execution_order(self) -> Dict[int, List[str]]:
