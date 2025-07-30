@@ -380,7 +380,7 @@ class EngineProcessor(EngineLogger):
             # 34092 019745f2-7b66-7792-ad0f-8b1d17cdbe5f
             # 32570 019745f1-9759-72c2-a010-90c9d3dfeef3
             # 31824 019745f1-31b2-7bf3-9ed4-610c56cb4644
-        for k in ['019745f1-31b2-7bf3-9ed4-610c56cb4644']:
+        for k in ['10b3cd58-d02b-48f7-990f-78c7d3b3b741']:
 
             ufrappe.update_contract_records(k) 
             ufrappe.update_hours_contract_record(k)
