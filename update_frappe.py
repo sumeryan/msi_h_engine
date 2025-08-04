@@ -7,17 +7,12 @@ from engine_logger import EngineLogger
 class UpdateFrappe(EngineLogger):
     def __init__(self):
         self.api_token = os.getenv("ARTERIS_API_TOKEN")
-        self.api_update_doctype = f"{os.getenv('ARTERIS_API_BASE_URL')}/method/arteris_app.api.engine.update_doctype"
-        self.api_sumarize = f"{os.getenv('ARTERIS_API_BASE_URL')}/method/arteris_app.api.measurement.sumarize_contract_measurements"
-        self.api_update_measurement_records = f"{os.getenv('ARTERIS_API_BASE_URL')}/method/arteris_app.api.measurement.update_contract_measurement_records"
-        self.api_update_hours_contract_records = f"{os.getenv('ARTERIS_API_BASE_URL')}/method/arteris_app.api.measurement.update_hours_contract_records"
-        self.api_update_reidi_measurement_records = f"{os.getenv('ARTERIS_API_BASE_URL')}/method/arteris_app.api.measurement.update_reidi_contract_records"
-        self.api_apply_performance_conditions = f"{os.getenv('ARTERIS_API_BASE_URL')}/method/arteris_app.api.measurement.apply_contract_performance_conditions"
+        self.api_base_url = os.getenv("ARTERIS_API_BASE_URL")
         self.logger = log.get_logger("Engine - Update Frappe")
 
     def _update_measurement_records(self, contract: str):
 
-        resource_url = f"{self.api_update_measurement_records}"
+        resource_url = f"{self.api_base_url}/method/arteris_app.api.measurement.update_contract_measurement_records"
         params = {
             "contract": contract
         }
@@ -39,7 +34,7 @@ class UpdateFrappe(EngineLogger):
 
     def _update_hours_measurement_records(self, contract: str):
 
-        resource_url = f"{self.api_update_hours_contract_records}"
+        resource_url = f"{self.api_base_url}/method/arteris_app.api.measurement.update_hours_contract_records"
         params = {
             "contract": contract
         }
@@ -61,7 +56,7 @@ class UpdateFrappe(EngineLogger):
 
     def _update_reidi_measurement_records(self, contract: str):
 
-        resource_url = f"{self.api_update_reidi_measurement_records}"
+        resource_url = f"{self.api_base_url}/method/arteris_app.api.measurement.update_reidi_contract_records"
         params = {
             "contract": contract
         }
@@ -83,7 +78,7 @@ class UpdateFrappe(EngineLogger):
         
     def _apply_contract_performance_conditions(self, contract: str):
 
-        resource_url = f"{self.api_apply_performance_conditions}"
+        resource_url = f"{self.api_base_url}/method/arteris_app.api.measurement.apply_contract_performance_conditions"
         params = {
             "contract": contract
         }
@@ -103,10 +98,54 @@ class UpdateFrappe(EngineLogger):
             print(f"Error: {e}")
             return None            
         
+    def _apply_contract_items_factor(self, contract: str):
+
+        resource_url = f"{self.api_base_url}/method/arteris_app.api.measurement.apply_contract_items_factor"
+        params = {
+            "contract": contract
+        }
+        headers = {
+            "Authorization": self.api_token,
+            "Content-Type": "application/json",
+        }
+
+        try:
+
+            response = requests.post(resource_url, headers=headers, params=params, timeout=300)
+            response.raise_for_status() # Raises HTTPError for 4xx/5xx responses
+            data = response.json()
+            return data
+
+        except requests.exceptions.RequestException as e:
+            print(f"Error: {e}")
+            return None            
+        
+        
+    def _create_measurement_items_balance(self, contract: str):
+
+        resource_url = f"{self.api_base_url}/method/arteris_app.api.measurement.create_measurement_items_balance"
+        params = {
+            "contract": contract
+        }
+        headers = {
+            "Authorization": self.api_token,
+            "Content-Type": "application/json",
+        }
+
+        try:
+
+            response = requests.post(resource_url, headers=headers, params=params, timeout=300)
+            response.raise_for_status() # Raises HTTPError for 4xx/5xx responses
+            data = response.json()
+            return data
+
+        except requests.exceptions.RequestException as e:
+            print(f"Error: {e}")
+            return None            
 
     def _sumarize(self, contract):
 
-        resource_url = f"{self.api_sumarize}?contract={contract}"
+        resource_url = f"{self.api_base_url}/method/arteris_app.api.measurement.sumarize_contract_measurements?contract={contract}"
         params = {}
         headers = {
             "Authorization": self.api_token,
@@ -126,7 +165,7 @@ class UpdateFrappe(EngineLogger):
 
     def _post(self, doctype: str, fields: Dict, values: Dict, id: str):
 
-        resource_url = f"{self.api_update_doctype}"
+        resource_url = f"{self.api_base_url}/method/arteris_app.api.engine.update_doctype"
         params = {}
         headers = {
             "Authorization": self.api_token,
@@ -215,3 +254,13 @@ class UpdateFrappe(EngineLogger):
 
         self.log_info(f"Apply contract performance conditions", indent=1)
         self._apply_contract_performance_conditions(contract)
+
+    def apply_contract_items_factor(self, contract: str):
+
+        self.log_info(f"Apply contract performance conditions", indent=1)
+        self._apply_contract_items_factor(contract)        
+
+    def create_contract_items_balance(self, contract: str):
+
+        self.log_info(f"Apply contract performance conditions", indent=1)
+        self._create_contract_items_balance(contract)                

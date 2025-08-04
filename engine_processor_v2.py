@@ -382,6 +382,7 @@ class EngineProcessor(EngineLogger):
             # 34092 019745f2-7b66-7792-ad0f-8b1d17cdbe5f
             # 32570 019745f1-9759-72c2-a010-90c9d3dfeef3
             # 31824 019745f1-31b2-7bf3-9ed4-610c56cb4644
+            # 32904-RB 019745f1-b460-7603-9885-3df32abd1390
         for k in ['10b3cd58-d02b-48f7-990f-78c7d3b3b741']:
 
             engine_results_converted = []
@@ -391,6 +392,7 @@ class EngineProcessor(EngineLogger):
             ufrappe.update_reidi_contract_records(k)
 
             ufrappe.apply_contract_performance_conditions(k)
+            ufrappe.apply_contract_items_factor(k)
 
             ufrappe.sumarize(k)
 
@@ -518,7 +520,7 @@ class EngineProcessor(EngineLogger):
                 # Write the results to a JSON file
                 # with open(f"engine_result_{k}_{i}.json", 'w', encoding='utf-8') as f:
                 #     json.dump(engine_results_converted, f, indent=4, ensure_ascii=False)
-                with open(f"engine_result_{g}_{k}.json", 'w', encoding='utf-8') as f:
+                with open(f"engine_result_g{g}_{k}.json", 'w', encoding='utf-8') as f:
                     json.dump(_engine_results, f, indent=4, ensure_ascii=False)
 
                 # Select the first formula to update
@@ -541,6 +543,7 @@ class EngineProcessor(EngineLogger):
                 ufrappe.update(engine_results_converted, to_update_formula)       
 
             ufrappe.sumarize(k)
+            ufrappe.create_contract_items_balance(k)
 
 if __name__ == "__main__":
     processor = EngineProcessor()

@@ -661,7 +661,8 @@ class DoctypeProcessor:
                     # Retrieve data using filters``
                     get_data, keys = self.data_retriever.get_doctype_data(dt["doctype"], filters)
 
-                dt_keys.extend([k for k in keys if k not in dt_keys])
+                if keys:
+                    dt_keys.extend([k for k in keys if k not in dt_keys])
 
                 # If data is configured add to all_doctype_data
                 if dt["data"] and get_data:
