@@ -383,7 +383,12 @@ class EngineProcessor(EngineLogger):
             # 32570 019745f1-9759-72c2-a010-90c9d3dfeef3
             # 31824 019745f1-31b2-7bf3-9ed4-610c56cb4644
             # 32904-RB 019745f1-b460-7603-9885-3df32abd1390
-        for k in ['10b3cd58-d02b-48f7-990f-78c7d3b3b741']:
+            # 36534 01974601-6908-7420-9ec1-4c8851a0baca
+
+        # Update highways and cities records
+        ufrappe.update_cities()
+        
+        for k in ['01974601-6908-7420-9ec1-4c8851a0baca']:
 
             engine_results_converted = []
 

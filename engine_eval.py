@@ -140,6 +140,9 @@ class EngineEval(EngineLogger):
             'clip': np.clip,          # Recortar valores
             'absolute': np.absolute,  # Valor absoluto (alias: np.abs)
             'abs': np.abs,            # Valor absoluto
+
+            'flt': np.round           # Arredondamento para ponto flutuante
+            
         }
 
         # Funções que permaneceriam inalteradas:

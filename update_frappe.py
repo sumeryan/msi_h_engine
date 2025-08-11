@@ -119,11 +119,10 @@ class UpdateFrappe(EngineLogger):
         except requests.exceptions.RequestException as e:
             print(f"Error: {e}")
             return None            
-        
-        
-    def _create_measurement_items_balance(self, contract: str):
+         
+    def _create_contract_items_balance(self, contract: str):
 
-        resource_url = f"{self.api_base_url}/method/arteris_app.api.measurement.create_measurement_items_balance"
+        resource_url = f"{self.api_base_url}/method/arteris_app.api.measurement.create_contract_items_balance"
         params = {
             "contract": contract
         }
@@ -135,6 +134,25 @@ class UpdateFrappe(EngineLogger):
         try:
 
             response = requests.post(resource_url, headers=headers, params=params, timeout=300)
+            response.raise_for_status() # Raises HTTPError for 4xx/5xx responses
+            data = response.json()
+            return data
+
+        except requests.exceptions.RequestException as e:
+            print(f"Error: {e}")
+            return None            
+
+    def _update_cities(self):
+
+        resource_url = f"{self.api_base_url}/method/arteris_app.api.measurement.update_cities"
+        headers = {
+            "Authorization": self.api_token,
+            "Content-Type": "application/json",
+        }
+
+        try:
+
+            response = requests.post(resource_url, headers=headers, timeout=300)
             response.raise_for_status() # Raises HTTPError for 4xx/5xx responses
             data = response.json()
             return data
@@ -263,4 +281,8 @@ class UpdateFrappe(EngineLogger):
     def create_contract_items_balance(self, contract: str):
 
         self.log_info(f"Apply contract performance conditions", indent=1)
-        self._create_contract_items_balance(contract)                
+        self._create_contract_items_balance(contract)     
+
+    def update_cities(self):
+        self.log_info(f"Updating cities and highways", indent=1)
+        self._update_cities()
