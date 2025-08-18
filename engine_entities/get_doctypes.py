@@ -334,6 +334,8 @@ class Mappings:
             "TestPut",
             "TestPutChild",
             "Work Role Config Kartado",
+            "Contract Measurement Productivity",
+            "Contract Measurement Productivity Total"
         ]
 
         # Placeholder for specific mapping logic

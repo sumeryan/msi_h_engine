@@ -5,166 +5,19 @@ import os
 from engine_logger import EngineLogger
 
 class UpdateFrappe(EngineLogger):
+
     def __init__(self):
         self.api_token = os.getenv("ARTERIS_API_TOKEN")
         self.api_base_url = os.getenv("ARTERIS_API_BASE_URL")
         self.logger = log.get_logger("Engine - Update Frappe")
 
-    def _update_measurement_records(self, contract: str):
-
-        resource_url = f"{self.api_base_url}/method/arteris_app.api.measurement.update_contract_measurement_records"
-        params = {
-            "contract": contract
-        }
-        headers = {
-            "Authorization": self.api_token,
-            "Content-Type": "application/json",
-        }
-
-        try:
-
-            response = requests.post(resource_url, headers=headers, params=params, timeout=300)
-            response.raise_for_status() # Raises HTTPError for 4xx/5xx responses
-            data = response.json()
-            return data
-
-        except requests.exceptions.RequestException as e:
-            print(f"Error: {e}")
-            return None
-
-    def _update_hours_measurement_records(self, contract: str):
-
-        resource_url = f"{self.api_base_url}/method/arteris_app.api.measurement.update_hours_contract_records"
-        params = {
-            "contract": contract
-        }
-        headers = {
-            "Authorization": self.api_token,
-            "Content-Type": "application/json",
-        }
-
-        try:
-
-            response = requests.post(resource_url, headers=headers, params=params, timeout=300)
-            response.raise_for_status() # Raises HTTPError for 4xx/5xx responses
-            data = response.json()
-            return data
-
-        except requests.exceptions.RequestException as e:
-            print(f"Error: {e}")
-            return None            
-
-    def _update_reidi_measurement_records(self, contract: str):
-
-        resource_url = f"{self.api_base_url}/method/arteris_app.api.measurement.update_reidi_contract_records"
-        params = {
-            "contract": contract
-        }
-        headers = {
-            "Authorization": self.api_token,
-            "Content-Type": "application/json",
-        }
-
-        try:
-
-            response = requests.post(resource_url, headers=headers, params=params, timeout=300)
-            response.raise_for_status() # Raises HTTPError for 4xx/5xx responses
-            data = response.json()
-            return data
-
-        except requests.exceptions.RequestException as e:
-            print(f"Error: {e}")
-            return None            
-        
-    def _apply_contract_performance_conditions(self, contract: str):
-
-        resource_url = f"{self.api_base_url}/method/arteris_app.api.measurement.apply_contract_performance_conditions"
-        params = {
-            "contract": contract
-        }
-        headers = {
-            "Authorization": self.api_token,
-            "Content-Type": "application/json",
-        }
-
-        try:
-
-            response = requests.post(resource_url, headers=headers, params=params, timeout=300)
-            response.raise_for_status() # Raises HTTPError for 4xx/5xx responses
-            data = response.json()
-            return data
-
-        except requests.exceptions.RequestException as e:
-            print(f"Error: {e}")
-            return None            
-        
-    def _apply_contract_items_factor(self, contract: str):
-
-        resource_url = f"{self.api_base_url}/method/arteris_app.api.measurement.apply_contract_items_factor"
-        params = {
-            "contract": contract
-        }
-        headers = {
-            "Authorization": self.api_token,
-            "Content-Type": "application/json",
-        }
-
-        try:
-
-            response = requests.post(resource_url, headers=headers, params=params, timeout=300)
-            response.raise_for_status() # Raises HTTPError for 4xx/5xx responses
-            data = response.json()
-            return data
-
-        except requests.exceptions.RequestException as e:
-            print(f"Error: {e}")
-            return None            
-         
-    def _create_contract_items_balance(self, contract: str):
-
-        resource_url = f"{self.api_base_url}/method/arteris_app.api.measurement.create_contract_items_balance"
-        params = {
-            "contract": contract
-        }
-        headers = {
-            "Authorization": self.api_token,
-            "Content-Type": "application/json",
-        }
-
-        try:
-
-            response = requests.post(resource_url, headers=headers, params=params, timeout=300)
-            response.raise_for_status() # Raises HTTPError for 4xx/5xx responses
-            data = response.json()
-            return data
-
-        except requests.exceptions.RequestException as e:
-            print(f"Error: {e}")
-            return None            
-
-    def _update_cities(self):
-
-        resource_url = f"{self.api_base_url}/method/arteris_app.api.measurement.update_cities"
-        headers = {
-            "Authorization": self.api_token,
-            "Content-Type": "application/json",
-        }
-
-        try:
-
-            response = requests.post(resource_url, headers=headers, timeout=300)
-            response.raise_for_status() # Raises HTTPError for 4xx/5xx responses
-            data = response.json()
-            return data
-
-        except requests.exceptions.RequestException as e:
-            print(f"Error: {e}")
-            return None            
-
-    def _sumarize(self, contract):
-
-        resource_url = f"{self.api_base_url}/method/arteris_app.api.measurement.sumarize_contract_measurements?contract={contract}"
+    def _call_post(self, url: str, contract):
+        resource_url = f"{self.api_base_url}/method/arteris_app.api.{url}"
         params = {}
+        if contract:
+            params = {
+                "contract": contract
+            }
         headers = {
             "Authorization": self.api_token,
             "Content-Type": "application/json",
@@ -179,7 +32,7 @@ class UpdateFrappe(EngineLogger):
 
         except requests.exceptions.RequestException as e:
             print(f"Error: {e}")
-            return None
+            return None          
 
     def _post(self, doctype: str, fields: Dict, values: Dict, id: str):
 
@@ -250,39 +103,54 @@ class UpdateFrappe(EngineLogger):
 
     def sumarize(self, contract):
 
-        self.log_info(f"Sumarizing values", indent=1)
-        self._sumarize(contract)
+        self.log_info(f"Totalizando medição", indent=1)
+        self._call_post('measurement.update_contract_productivity', contract)
 
     def update_contract_records(self, contract: str):
 
-        self.log_info(f"Uodating measurement records", indent=1)
-        self._update_measurement_records(contract)
+        self.log_info(f"Atualizando os registros de medição", indent=1)
+        self._call_post('measurement.update_contract_measurement_records', contract)
 
     def update_hours_contract_record(self, contract: str):
 
-        self.log_info(f"Updating measurement hours records", indent=1)
-        self._update_hours_measurement_records(contract)
+        self.log_info(f"Atualizando os registros de horas da medição", indent=1)
+        self._call_post('measurement.update_hours_contract_records', contract)
 
     def update_reidi_contract_records(self, contract: str):
 
-        self.log_info(f"Updating measurement REIDI records", indent=1)
-        self._update_reidi_measurement_records(contract)
+        self.log_info(f"Calculandop os valores de REIDI para a medição", indent=1)
+        self._call_post('measurement.update_reidi_contract_records', contract)
 
     def apply_contract_performance_conditions(self, contract: str):
 
-        self.log_info(f"Apply contract performance conditions", indent=1)
-        self._apply_contract_performance_conditions(contract)
+        self.log_info(f"Aplicando as condições de produtividade compensatoria para a medição", indent=1)
+        self._call_post('apply_contract_performance_conditions', contract)
 
     def apply_contract_items_factor(self, contract: str):
 
-        self.log_info(f"Apply contract performance conditions", indent=1)
-        self._apply_contract_items_factor(contract)        
+        self.log_info(f"Aplicando condições de fator de produtividade para a medição", indent=1)
+        self._call_post('measurement.apply_contract_items_factor', contract)        
 
     def create_contract_items_balance(self, contract: str):
 
-        self.log_info(f"Apply contract performance conditions", indent=1)
-        self._create_contract_items_balance(contract)     
+        self.log_info(f"Criando registros de saldo de pagamento de itens contratuais para a medição", indent=1)
+        self._call_post('measurement.create_contract_items_balance', contract)     
 
     def update_cities(self):
-        self.log_info(f"Updating cities and highways", indent=1)
-        self._update_cities()
+        self.log_info(f"Atualizando registro de cidades e rodovias", indent=1)
+        self._call_post('measurement.update_cities', None)
+
+    def update_contract_productivity(self, contract: str):
+
+        self.log_info(f"Atualizando registros de produtividade compensatoria", indent=1)
+        self._call_post('measurement.update_contract_productivity', contract)
+
+    def create_contract_sap_orders_records(self, contract: str):
+
+        self.log_info(f"Criando registros de pedidos SAP para a medição", indent=1)
+        self._call_post('measurement.create_contract_sap_orders_records', contract)
+
+    def update_sap_orders_balance(self, contract: str):
+
+        self.log_info(f"Atualizando saldo dos pedidos SAP", indent=1)
+        self._call_post('measurement.update_sap_orders_balance')

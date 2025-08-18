@@ -384,21 +384,21 @@ class EngineProcessor(EngineLogger):
             # 31824 019745f1-31b2-7bf3-9ed4-610c56cb4644
             # 32904-RB 019745f1-b460-7603-9885-3df32abd1390
             # 36534 01974601-6908-7420-9ec1-4c8851a0baca
+            # 43135 0197460a-8f40-7483-9041-2d4e812b194d
+            # 10000 01987fd2-8753-7cd0-8662-f3a2eae9ad4a
 
         # Update highways and cities records
         ufrappe.update_cities()
         
-        for k in ['01974601-6908-7420-9ec1-4c8851a0baca']:
+        for k in ['01987fd2-8753-7cd0-8662-f3a2eae9ad4a']:
 
             engine_results_converted = []
 
             ufrappe.update_contract_records(k) 
             ufrappe.update_hours_contract_record(k)
-            ufrappe.update_reidi_contract_records(k)
-
+            ufrappe.update_contract_productivity(k)
             ufrappe.apply_contract_performance_conditions(k)
             ufrappe.apply_contract_items_factor(k)
-
             ufrappe.sumarize(k)
 
             self.log_info("=" * 80)
@@ -548,7 +548,11 @@ class EngineProcessor(EngineLogger):
                 ufrappe.update(engine_results_converted, to_update_formula)       
 
             ufrappe.sumarize(k)
+            ufrappe.update_reidi_contract_records(k)
             ufrappe.create_contract_items_balance(k)
+            ufrappe.create_contract_sap_orders_records(k)
+        
+        ufrappe.update_sap_orders_balance()
 
 if __name__ == "__main__":
     processor = EngineProcessor()
