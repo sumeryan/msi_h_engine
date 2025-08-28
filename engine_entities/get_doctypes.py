@@ -60,14 +60,12 @@ class Field:
         """Convert to dictionary, excluding None values"""
         return {k: v for k, v in self.__dict__.items() if v is not None}
 
-
 @dataclass
 class ParentMapping:
     """Represents a parent-child relationship between DocTypes"""
     child: str
     parent: str
     type: str
-
 
 class StringNormalizer:
     """Handles string normalization"""
@@ -93,7 +91,6 @@ class StringNormalizer:
         # Convert to lowercase
         return s.lower()
 
-
 class FieldFilter:
     """Filters fields based on business rules"""
     
@@ -113,7 +110,6 @@ class FieldFilter:
             return False
         
         return True
-
 
 class ArterisApiClient:
     """Wrapper for Arteris API operations"""
@@ -169,7 +165,6 @@ class ArterisApiClient:
             logger.error(f"Failed to get data for {doctype_name}:{key}: {e}")
             return None
 
-
 class DataManager:
     """Manages file I/O operations"""
     
@@ -214,7 +209,6 @@ class DataManager:
             logger.error(f"Failed to create directory {path}: {e}")
             raise
 
-
 class DoctypeFieldExtractor:
     """Extracts and processes doctype fields"""
     
@@ -231,7 +225,6 @@ class DoctypeFieldExtractor:
                 fields.append(field)
         
         return fields
-
 
 class ParentMappingExtractor:
     """Extracts parent-child relationships between doctypes"""
@@ -257,7 +250,6 @@ class ParentMappingExtractor:
                     mappings.append(mapping)
         
         return mappings
-
 
 class DoctypeDataRetriever:
     """Retrieves actual data for doctypes"""
@@ -290,6 +282,9 @@ class DoctypeDataRetriever:
         """Save doctype data to file"""
         self.data_manager.save_json(path, data, doctype_name)
 
+    def get_contracts(self) -> List[Dict]:
+        """Get contract doctype data"""
+        return self.api_client.get_contracts()
 
 class Mappings:
     
@@ -401,7 +396,6 @@ class Mappings:
 
         return main_doctypes    
 
-
 class Translations:
     def get_translations(self):
         return{
@@ -499,7 +493,6 @@ class DoctypeRetriever:
             "all_doctypes": all_doctypes
         }
 
-
 class DoctypeProcessor:
     """Main processor for doctype operations"""
     
@@ -581,7 +574,6 @@ class DoctypeProcessor:
             if dt["data"]:
                 all_doctype_structure["main_doctypes"].pop(dt["doctype"], [])
 
-    
     def get_default_data(self, using_cached_data = False) -> List[Dict]:
         """Retrieve default data for all doctypes"""
         logger.info("Starting data retrieval for default doctypes...")
@@ -628,7 +620,6 @@ class DoctypeProcessor:
             "structure": all_doctype_structure["all_doctypes"]
         }
 
-    # Get data for main doctypes
     def get_data_main_doctypes(self, all_doctype_data: List[Dict], doctypes: List[Dict], main_keys: List[str]) -> None:
 
         # Process main doctypes
@@ -753,59 +744,3 @@ class DoctypeProcessor:
 
         with open("data/formula_group.json", "r", encoding="utf-8") as f:
             return json.load(f)
-        
-    def get_contracts(self) -> List[Dict]:
-        """Retrieve contract data"""
-        logger.info("Retrieving contract data...")
-
-        keys = self.get_keys("Contract", filters='[["contratoencerrado","=",null],["datainiciomedicao",">=","2025-01-01"]]')
-
-        return keys
-
-
-# def main():
-#     """Main entry point"""
-#     try:
-#         processor = DoctypeProcessor()
-        
-#         #processor.get_default_data(using_cached_data=True)
-
-#         # Uncomment to get data for specific contract
-#         contract_data = processor.get_data("0196b01a-2163-7cb2-93b9-c8b1342e3a4e")
-
-#         formulas = processor.get_formula_data(using_cached_data=True)
-
-#          # Get formula to contract
-#         group_formula = [item for item in contract_data['data'] if 'Contract' in item][0]['Contract'][0]['grupoformulas']
-
-#         # Filter formulas based on group
-#         contract_formula = [f for f in formulas if f.get("name") in group_formula]    
-
-#         # Build engine data
-#         builder = EngineDataBuilder(
-#             contract_data['hierarchical'], 
-#             contract_formula, 
-#             contract_data['data'], 
-#             "data",
-#             compact_mode=True
-#         )
-#         engine_data = builder.build()
-
-#         # save engine data to tree_data.json
-#         processor.data_manager.save_json("data", engine_data, "tree_data")
-
-#         # # Get formula data
-#         # processor.get_formula_data()
-        
-#         # # Get hierarchical structure
-#         # processor.get_hierarchical_structure()
-                
-#         # logger.info("Processing completed successfully!")
-        
-#     except Exception as e:
-#         logger.error(f"Processing failed: {e}")
-#         raise
-
-
-# if __name__ == "__main__":
-#     main()

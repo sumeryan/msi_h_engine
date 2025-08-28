@@ -25,7 +25,6 @@ import re
 from typing import Dict, List, Any, Optional, Tuple
 from config import get_config
 from log.logger import get_logger
-from engine_dag import get_ordered_formulas
 
 # Initialize logger for this module
 logger = get_logger("formula_parser")
@@ -671,45 +670,5 @@ class FormulaParser:
 
         # Order formulas based on dependencies
         logger.info("Ordering formulas based on dependencies")
-        try:
-            ordered_results = get_ordered_formulas(results)
-            logger.info("Formula ordering complete")
-        except Exception as e:
-            logger.error(f"Error ordering formulas: {e}", exc_info=True)
-            ordered_results = results
-            logger.warning("Using unordered formulas due to ordering error")
 
-        return ordered_results
-
-# # Function for direct module testing
-# if __name__ == "__main__":
-#     # Configure logging for console output
-#     logger = get_logger("Formula Parser")
-#     logger.info("Starting formula parser module test")
-    
-#     input_path = "tree_data.json"
-#     output_path = "extracted_formulas.json"
-
-#     logger.info(f"Loading data from {input_path}")
-#     try:
-#         with open(input_path, 'r', encoding='utf-8') as f:
-#             logger.debug("Reading input file")
-#             data = json.load(f)
-#         logger.info(f"Successfully loaded data from {input_path}")
-        
-#         logger.info("Parsing and ordering formulas")
-#         results = parse_formulas(data)
-#         logger.info(f"Successfully parsed and ordered {len(results)} formula groups")
-
-#         logger.info(f"Writing results to {output_path}")
-#         with open(output_path, 'w', encoding='utf-8') as f:
-#             logger.debug("Writing output file")
-#             json.dump(results, f, indent=4, ensure_ascii=False)        
-#         logger.info(f"Successfully wrote results to {output_path}")
-        
-#         print(f"Processed formulas saved to: {output_path}")
-#     except Exception as e:
-#         logger.error(f"Error processing formulas: {e}", exc_info=True)
-#         print(f"Error: {e}")
-    
-#     logger.info("Formula parser completed")
+        return results

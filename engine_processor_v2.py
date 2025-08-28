@@ -41,7 +41,6 @@ from sqlite3.dbapi2 import Timestamp
 import engine_entities
 import engine_parser
 import engine_eval
-import update_frappe
 import update_tree
 import engine_entities.engine_data, engine_entities.get_doctypes, engine_parser 
 from typing import Dict, List, Any
@@ -50,6 +49,7 @@ from log.logger import get_logger
 from variable_filter import FilterVariableExtractor
 from engine_logger import EngineLogger
 from formula_classifier import FormulaExecutionClassifier
+from engine_entities.arteris_frappe import ArterisApi
 
 class EngineProcessor(EngineLogger):
 
@@ -362,13 +362,13 @@ class EngineProcessor(EngineLogger):
         # Engine processor
         entities_processor = engine_entities.get_doctypes.DoctypeProcessor()
         
-        # Get contract keys
-        contract_keys = entities_processor.get_contracts()
-
         # Get formulas
         formulas = entities_processor.get_formula_data(using_cached_data=False)
 
-        ufrappe = update_frappe.UpdateFrappe()
+        ufrappe = ArterisApi()
+
+        # Get contract keys
+        contracts = ufrappe.get_contracts()
 
         # Load and calculate tree data for each contract
         #for k in contract_keys:
@@ -386,50 +386,53 @@ class EngineProcessor(EngineLogger):
             # 36534 01974601-6908-7420-9ec1-4c8851a0baca
             # 43135 0197460a-8f40-7483-9041-2d4e812b194d
             # 10000 01987fd2-8753-7cd0-8662-f3a2eae9ad4a
-
-        # Update highways and cities records
-        ufrappe.update_cities()
         
-        for k in ['01987fd2-8753-7cd0-8662-f3a2eae9ad4a']:
+        for c in contracts['contracts']: # ['01987fd2-8753-7cd0-8662-f3a2eae9ad4a']:
 
             engine_results_converted = []
 
-            ufrappe.update_contract_records(k) 
-            ufrappe.update_hours_contract_record(k)
-            ufrappe.update_contract_productivity(k)
-            ufrappe.apply_contract_performance_conditions(k)
-            ufrappe.apply_contract_items_factor(k)
-            ufrappe.sumarize(k)
+            # # Update highways and cities records
+            # ufrappe.update_cities(c['boletimmedicao'])
+
+            ufrappe.update_measurement_records(c['boletimmedicao']) 
+            ufrappe.update_hours_measurement_record(c['boletimmedicao'])
+            ufrappe.update_measurement_productivity(c['boletimmedicao'])
+            ufrappe.apply_measurement_performance_conditions(c['boletimmedicao'])
+            ufrappe.apply_measurement_items_factor(c['boletimmedicao'])
+            ufrappe.sumarize_measurement(c['boletimmedicao'])
+            ufrappe.check_orphans_records(c['boletimmedicao'])
 
             self.log_info("=" * 80)
-            self.log_info(f"Processing contract: {k}\n\n")
+            self.log_info(f"Processing contract: {c['contrato']}\n\n")
             self.log_info("=" * 80)
             
             if use_cached_data:
                 # Load cached contract data
-                self.log_info(f"Using cached data for contract {k}")
+                self.log_info(f"Using cached data for contract {c['contrato']}")
 
-                # Reading contract data from cache from file contract_data_{k}.json
+                # Reading contract data from cache from file contract_data_{c['contrato']}.json
                 try:
-                    with open(f"contract_data_{k}.json", 'r', encoding='utf-8') as f:
+                    with open(f"contract_data_{c['contrato']}.json", 'r', encoding='utf-8') as f:
                         contract_data = json.load(f)
                 except FileNotFoundError:
                     use_cached_data = False
 
+            contract_data = None
             if not use_cached_data:
                 # Get contract data
-                contract_data = entities_processor.get_data(k)
+                contract_data = entities_processor.get_data(c['contrato'])
 
-                # Write contract data to a file for debugging
-                with open(f"contract_data_{k}.json", 'w', encoding='utf-8') as f:
-                    json.dump(contract_data, f, indent=4, ensure_ascii=False)
+                # Removida a gravacao para calculo geral
+                # # Write contract data to a file for debugging
+                # with open(f"contract_data_{c['contrato']}.json", 'w', encoding='utf-8') as f:
+                #     json.dump(contract_data, f, indent=4, ensure_ascii=False)
 
             # Get contract formula group 
             find_contract = [item for item in contract_data['data'] if 'Contract' in item]
 
             # Check if contract data is found
             if not find_contract:
-                self.log_error(f"No contract data found for {k}. Skipping.")
+                self.log_error(f"No contract data found for {c['contrato']}. Skipping.")
                 continue
 
             # Extract contract formula IDs
@@ -438,11 +441,11 @@ class EngineProcessor(EngineLogger):
             try: 
                 contract_formula_id = find_formula_group(find_contract[0])               
             except Exception as e:
-                self.log_error(f"Error extracting contract formula IDs for {k}: {e}")
+                self.log_error(f"Error extracting contract formula IDs for {c['contrato']}: {e}")
                 continue
 
             if not contract_formula_id:
-                self.log_error(f"No formula group IDs found for contract {k}. Skipping.")
+                self.log_error(f"No formula group IDs found for contract {c['contrato']}. Skipping.")
                 continue   
 
             # Filter formulas based on group
@@ -458,16 +461,19 @@ class EngineProcessor(EngineLogger):
             )
             #Create data tree for the contract
             engine_data_tree = data_builder.build()
-                    
-            with open(f"data_tree_{k}.json", 'w', encoding='utf-8') as f:
-                json.dump(engine_data_tree, f, indent=4, ensure_ascii=False)        
+            
+            # Removida a gravacao para calculo geral
+            # with open(f"data_tree_{c['contrato']}.json", 'w', encoding='utf-8') as f:
+            #     json.dump(engine_data_tree, f, indent=4, ensure_ascii=False)        
 
             # Parse formulas
             parser = engine_parser.FormulaParser()
             extract_formulas = parser.parse_formulas(engine_data_tree)
-            # Save the parsed formulas to a file
-            with open(f"extract_formulas_{k}.json", 'w', encoding='utf-8') as f:
-                json.dump(extract_formulas, f, indent=4, ensure_ascii=False)        
+
+            # Removida a gravacao para calculo geral
+            # # Save the parsed formulas to a file
+            # with open(f"extract_formulas_{c['contrato']}.json", 'w', encoding='utf-8') as f:
+            #     json.dump(extract_formulas, f, indent=4, ensure_ascii=False)        
 
             classifier = FormulaExecutionClassifier(extract_formulas)
             classifier_groups = classifier.get_execution_order()
@@ -499,8 +505,9 @@ class EngineProcessor(EngineLogger):
                 # Process formula variables
                 enrich_formulas = self.enrich_formulas_with_values(group_extract_formulas, engine_data_tree)
 
-                with open(f"enrich_formulas_{g}_{k}.json", 'w', encoding='utf-8') as f:
-                    json.dump(enrich_formulas, f, indent=4, ensure_ascii=False)                 
+                # Removida a gravacao para calculo geral
+                # with open(f"enrich_formulas_{g}_{k}.json", 'w', encoding='utf-8') as f:
+                #     json.dump(enrich_formulas, f, indent=4, ensure_ascii=False)                 
 
                 engine = engine_eval.EngineEval()
 
@@ -513,19 +520,23 @@ class EngineProcessor(EngineLogger):
                 error_count = sum(1 for entity in engine_results for fr in entity["results"] if fr["status"] == "error")
                 engine.log_info(f"Formula evaluation complete. Successful: {success_count}, Errors: {error_count}")
                 if error_count > 0:
+                    str_errors = []
                     for r in engine_results:
                         for error in r["results"]:
                             if error["status"] == "error":
-                                engine.log_info(f"Error in formula: {error['path']}, Id: {r['id']}, Error: {error['error']}")
+                                str_erro = f"Error in formula: {error['path']}, Id: {r['id']}, Error: {error['error']}"
+                                str_errors.append(str_erro)
+                                engine.log_info(str_erro)
+                    if len(str_errors)>0:
+                        ufrappe.write_errors(c['boletimmedicao'], str_errors)
                         
                 # Convert numpy types to native Python types before saving
-                _engine_results = engine.convert_numpy_types(engine_results)            
+                _engine_results = engine.convert_numpy_types(engine_results)
                 engine_results_converted.extend(_engine_results)
 
-                # Write the results to a JSON file
-                # with open(f"engine_result_{k}_{i}.json", 'w', encoding='utf-8') as f:
-                #     json.dump(engine_results_converted, f, indent=4, ensure_ascii=False)
-                with open(f"engine_result_g{g}_{k}.json", 'w', encoding='utf-8') as f:
+                # Removida a gravacao para calculo geral
+                # # Write the results to a JSON file
+                with open(f"engine_result_g{g}_{c['contrato']}.json", 'w', encoding='utf-8') as f:
                     json.dump(_engine_results, f, indent=4, ensure_ascii=False)
 
                 # Select the first formula to update
@@ -539,7 +550,7 @@ class EngineProcessor(EngineLogger):
                     )
                     engine_data_tree = utree.update_tree()
 
-                # with open(f"data_tree_{k}_{i}.json", 'w', encoding='utf-8') as f:
+                # with open(f"data_tree_{c['contrato']}_{i}.json", 'w', encoding='utf-8') as f:
                 #     json.dump(engine_data_tree, f, indent=4, ensure_ascii=False)                           
 
             # Select the first formula to update
@@ -547,11 +558,13 @@ class EngineProcessor(EngineLogger):
                 # Save data to Frappe
                 ufrappe.update(engine_results_converted, to_update_formula)       
 
-            ufrappe.sumarize(k)
-            ufrappe.update_reidi_contract_records(k)
-            ufrappe.create_contract_items_balance(k)
-            ufrappe.create_contract_sap_orders_records(k)
-        
+            ufrappe.sumarize_measurement(c['boletimmedicao'])
+            ufrappe.update_reidi_measurement_record(c['boletimmedicao'])
+            ufrappe.create_measurement_items_balance(c['boletimmedicao'])
+            ufrappe.create_measurement_sap_orders_records(c['boletimmedicao'])
+            print(c['boletimmedicao'])
+            print('...')
+
         ufrappe.update_sap_orders_balance()
 
 if __name__ == "__main__":

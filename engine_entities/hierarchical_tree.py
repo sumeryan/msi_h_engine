@@ -65,7 +65,6 @@ class Entity:
         """Remove a child by its key"""
         self.children = [child for child in self.children if child.key != key]
 
-
 class StringNormalizer:
     """Handles string normalization for paths and keys"""
     
@@ -95,7 +94,6 @@ class StringNormalizer:
         """Create a key from a name"""
         return name.replace(" ", "_")
 
-
 class FieldTypeMapper:
     """Maps field types from doctypes to hierarchical model types"""
     
@@ -119,7 +117,6 @@ class FieldTypeMapper:
     def map_type(cls, fieldtype: str) -> str:
         """Map field type to hierarchical model type"""
         return cls.TYPE_MAPPING.get(fieldtype, "string")
-
 
 class MappingManager:
     """Manages parent-child relationships and mappings"""
@@ -183,7 +180,6 @@ class MappingManager:
         normalizer = StringNormalizer()
         return {normalizer.create_key(mapping["child"]) 
                 for mapping in self.specified_mappings}
-
 
 class EntityFactory:
     """Factory for creating different types of entities"""
@@ -270,7 +266,6 @@ class EntityFactory:
 
         return icon
 
-
 class PathManager:
     """Manages path updates in the hierarchical structure"""
     
@@ -289,7 +284,6 @@ class PathManager:
             child_path = self.normalizer.normalize(child.description)
             child.path = f"{parent_path}.{child_path}"
             self._update_child_paths(child, child.path)
-
 
 class EntityTreeNavigator:
     """Navigates and searches entities in the tree"""
@@ -334,7 +328,6 @@ class EntityTreeNavigator:
         for child in parent.children:
             child.remove_child_by_key(key)
             EntityTreeNavigator._remove_from_children(child, key)
-
 
 class DoctypeProcessor:
     """Processes doctypes and builds entities"""
@@ -443,7 +436,6 @@ class DoctypeProcessor:
             if child_entity:
                 entity.add_child(child_entity)
 
-
 class MappingEnforcer:
     """Enforces specified mappings on the tree structure"""
     
@@ -515,7 +507,6 @@ class MappingEnforcer:
         # Recurse into children
         for child in entity.children:
             self._enforce_mappings_recursive(child)
-
 
 class HierarchicalTreeBuilder:
     """Main class for building hierarchical tree structures"""
@@ -589,7 +580,6 @@ class HierarchicalTreeBuilder:
         children_to_remove = mapping_manager.get_children_to_remove_from_root()
         return [entity for entity in entities if entity.key not in children_to_remove]
 
-
 class FileManager:
     """Handles file I/O operations"""
     
@@ -613,28 +603,3 @@ class FileManager:
         except Exception as e:
             logger.error(f"Failed to save JSON to {file_path}: {e}")
             raise
-
-
-# def main():
-#     """Main entry point"""
-#     try:
-
-#         processor = get_doctypes.DoctypeProcessor()
-#         all_doctypes = processor.process_doctypes()
-
-#         # Build tree
-#         builder = HierarchicalTreeBuilder()
-#         hierarchical_data = builder.build_tree(all_doctypes)
-        
-#         # Save result
-#         FileManager.save_json(hierarchical_data, "output/hierarquical_doctypes_refactored.json")
-        
-#         logger.info("Hierarchical tree built successfully!")
-        
-#     except Exception as e:
-#         logger.error(f"Error building hierarchical tree: {e}")
-#         raise
-
-
-# if __name__ == "__main__":
-#     main()

@@ -5,14 +5,12 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from abc import ABC, abstractmethod
 
-
 @dataclass
 class FieldData:
     """Represents a field with its path, type and value"""
     path: str
     type: str
     value: Any
-
 
 @dataclass
 class EngineDataItem:
@@ -52,7 +50,6 @@ class EngineDataItem:
         """Check if item has any children"""
         return len(self.childs) > 0
 
-
 @dataclass
 class FormulaData:
     """Represents a formula configuration"""
@@ -67,7 +64,6 @@ class FormulaData:
             "value": self.value,
             "update": self.update
         }
-
 
 @dataclass
 class EngineDataHead:
@@ -103,7 +99,6 @@ class EngineDataHead:
             "data": filtered_data
         }
 
-
 class DefaultValueProvider:
     """Provides default values for different field types"""
     
@@ -126,7 +121,6 @@ class DefaultValueProvider:
     def get_default(cls, field_type: str) -> Any:
         """Get default value for field type"""
         return cls.DEFAULT_VALUES.get(field_type, "")
-
 
 class PathManager:
     """Manages path references and replacements"""
@@ -159,7 +153,6 @@ class PathManager:
         
         replacer = PathReplacer(sorted_refs)
         return replacer.replace(data)
-
 
 class PathReplacer:
     """Handles path replacement logic"""
@@ -212,7 +205,6 @@ class PathReplacer:
         
         return result
 
-
 class FormulaProcessor:
     """Processes formulas for doctypes"""
     
@@ -247,7 +239,6 @@ class FormulaProcessor:
         
         return doctype_formulas
 
-
 class FieldPathFinder:
     """Finds field paths in doctype tree"""
     
@@ -280,7 +271,6 @@ class FieldPathFinder:
         
         return None
 
-
 class DoctypeIndexManager:
     """Manages doctype processing indices"""
     
@@ -296,7 +286,6 @@ class DoctypeIndexManager:
     def increment_index(self, path: str) -> None:
         """Increment index for path"""
         self.indices[path] = self.indices.get(path, 0) + 1
-
 
 class PathAnalyzer:
     """Analyzes formula paths to determine required fields"""
@@ -356,7 +345,6 @@ class PathAnalyzer:
                     return True
         
         return False
-
 
 class DataTraverser:
     """Traverses and processes doctype data"""
@@ -549,7 +537,6 @@ class DataTraverser:
         
         return engine_item
 
-
 class EngineDataBuilder:
     """Main class for building engine data structure"""
     
@@ -664,7 +651,6 @@ class EngineDataBuilder:
         
         return unique_paths
 
-
 class FileManager:
     """Handles file I/O operations"""
     
@@ -685,52 +671,4 @@ class FileManager:
                 json.dump(data, f, indent=4, ensure_ascii=False)
         except Exception as e:
             raise RuntimeError(f"Failed to save JSON to {file_path}: {e}")
-        
-def main(compact_mode: bool = True):
-    """Main entry point"""
-    try:
-        # Load required data
-        formulas = FileManager.load_json("data/formula_group.json")
-        doctype_tree = FileManager.load_json("output/hierarquical_doctypes_refactored.json")
-        all_doctype_data = FileManager.load_json("data/all_doctypes.json")
 
-        # Get formula to contract
-        group_formula = [item for item in all_doctype_data if 'Contract' in item][0]['Contract'][0]['grupoformulas']
-
-        # Filter formulas based on group
-        contract_formula = [f for f in formulas if f.get("name") in group_formula]        
-
-        # Build engine data
-        builder = EngineDataBuilder(
-            doctype_tree, 
-            contract_formula, 
-            all_doctype_data, 
-            "data",
-            compact_mode=compact_mode
-        )
-        engine_data = builder.build()
-        
-        # Save result
-        output_file = "output/tree_data_compact.json" if compact_mode else "output/tree_data_full.json"
-        FileManager.save_json(engine_data, output_file)
-        
-        mode = "compact" if compact_mode else "full"
-        print(f"Dados gravados em {output_file} (modo {mode})")
-        
-        # Print statistics if in compact mode
-        if compact_mode:
-            print(f"\nEstatísticas do modo compacto:")
-            print(f"- Paths únicos das fórmulas: {len(builder.unique_formulas)}")
-            print(f"- Paths totais carregados: {len(builder.path_manager.paths)}")
-            
-    except Exception as e:
-        print(f"Error: {e}")
-        raise
-
-
-if __name__ == "__main__":
-    import sys
-    
-    # Check if --full flag is passed
-    compact = "--full" not in sys.argv
-    main(compact_mode=compact)

@@ -11,7 +11,6 @@ import json
 from engine_logger import EngineLogger
 from asteval import Interpreter
 from update_tree import UpdateTreeData
-from update_frappe import UpdateFrappe
 
 class EngineEval(EngineLogger):
     """
@@ -577,79 +576,3 @@ class EngineEval(EngineLogger):
         self.log_info(f"Total entities processed: {len(results)}")
         self.log_info("=" * 80)
         return results
-
-if __name__ == "__main__":
-    """
-    Main entry point for formula evaluation when script is run directly.
-    
-    Loads formula and entity data from JSON files and evaluates formulas.
-    """
-
-    engine = EngineEval()
-
-    engine.log_info("Starting formula evaluation from main")
-
-    # Load tree data
-    tree_data_path = "tree_data.json"
-    with open(tree_data_path, 'r', encoding='utf-8') as f:
-        tree_data = json.load(f)
-
-    # Get the current directory for file paths
-    current_dir = os.path.dirname(os.path.abspath(__file__))
-    engine.log_debug(f"Current directory: {current_dir}")
-
-    # Paths for input and output files
-    formulas_json = "extracted_formulas.json"
-    entities_eval_json = "processed_formulas_with_variables.json"
-    engine_result_json = "engine_result.json"
-    
-    engine.log_info(f"Loading formula definitions from: {formulas_json}")
-    engine.log_info(f"Loading entity data from: {entities_eval_json}")
-
-    try:
-        with open(formulas_json, 'r', encoding='utf-8') as f:
-            engine.log_debug(f"Reading formulas file: {formulas_json}")
-            formulas = json.load(f)
-            engine.log_info(f"Loaded {len(formulas)} formula collections")
-    except Exception as e:
-        engine.log_error(f"Error loading formulas file: {str(e)}")
-        formulas = []
-
-    try:
-        with open(entities_eval_json, 'r', encoding='utf-8') as f:
-            engine.log_debug(f"Reading entities evaluation file: {entities_eval_json}")
-            entities_eval = json.load(f)
-            engine.log_info(f"Loaded {len(entities_eval)} entities for evaluation")
-    except Exception as e:
-        engine.log_error(f"Error loading entities evaluation file: {str(e)}")
-        entities_eval = []
-
-    # Evaluate formulas
-    if formulas and entities_eval:
-        engine.log_info("Starting formula evaluation")
-        results = engine.eval_formula(entities_eval, formulas)
-        
-        # Print summary of results
-        success_count = sum(1 for entity in results for fr in entity["results"] if fr["status"] == "success")
-        error_count = sum(1 for entity in results for fr in entity["results"] if fr["status"] == "error")
-        
-        engine.log_info(f"Formula evaluation complete. Successful: {success_count}, Errors: {error_count}")
-    else:
-        engine.log_error("Cannot perform evaluation: missing formula definitions or entity data")
-
-    # Convert numpy types to native Python types before saving
-    results_converted = engine.convert_numpy_types(results)
-
-    with open(engine_result_json, 'w', encoding='utf-8') as f:
-        json.dump(results_converted, f, indent=4, ensure_ascii=False)
-
-    # Update tree_data and database
-    update_tree = UpdateTreeData(tree_data, formulas[0], results_converted)
-    tree_data = update_tree.update_tree()
-    
-
-    update_frappe = UpdateFrappe(results_converted, formulas[0])
-    update_frappe.update()
-
-    with open("tree_data_updated.json", 'w', encoding='utf-8') as f:
-        json.dump(tree_data, f, indent=4, ensure_ascii=False)
