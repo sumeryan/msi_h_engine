@@ -10,8 +10,16 @@ import json
 from typing import Any, Optional
 from ast import Dict
 import requests
+import urllib3
+from dotenv import load_dotenv
 import log
 from engine_logger import EngineLogger
+
+# Carregar variáveis de ambiente
+load_dotenv()
+
+# Desabilitar avisos de SSL se necessário
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 class ArterisApi(EngineLogger):
     """
@@ -48,12 +56,25 @@ class ArterisApi(EngineLogger):
             "Authorization": self.api_token,
             "Content-Type": "application/json",
         }
+
+        # Configuração SSL
+        verify_ssl = True
+        cert_path = None
+        
+        # Verificar configuração SSL (prioridade: DISABLE_SSL_VERIFY)
+        ssl_disable = os.getenv("DISABLE_SSL_VERIFY", "false").lower()
+        if ssl_disable == "true":
+            verify_ssl = False
+        elif os.path.exists("../ssl-certs/arteris_com_br.crt"):
+            cert_path = "../ssl-certs/arteris_com_br.crt"
+            verify_ssl = cert_path
+
         try:
 
             if body:
-                response = requests.post(resource_url, headers=headers, params=params, json=body, timeout=300)
+                response = requests.post(resource_url, headers=headers, params=params, json=body, timeout=300, verify=verify_ssl)
             else:
-                response = requests.post(resource_url, headers=headers, params=params, timeout=300)
+                response = requests.post(resource_url, headers=headers, params=params, timeout=300, verify=verify_ssl)
             response.raise_for_status() # Raises HTTPError for 4xx/5xx responses
             data = response.json()
             return data
@@ -69,11 +90,23 @@ class ArterisApi(EngineLogger):
 
         headers = {"Authorization": self.api_token}
 
+        # Configuração SSL
+        verify_ssl = True
+        cert_path = None
+        
+        # Verificar configuração SSL (prioridade: DISABLE_SSL_VERIFY)
+        ssl_disable = os.getenv("DISABLE_SSL_VERIFY", "false").lower()
+        if ssl_disable == "true":
+            verify_ssl = False
+        elif os.path.exists("../ssl-certs/arteris_com_br.crt"):
+            cert_path = "../ssl-certs/arteris_com_br.crt"
+            verify_ssl = cert_path
+
         try:
             if body:
-                response = requests.get(url, headers=headers, params=params, json=body, timeout=30)
+                response = requests.get(url, headers=headers, params=params, json=body, timeout=30, verify=verify_ssl)
             else:
-                response = requests.get(url, headers=headers, params=params, timeout=30)
+                response = requests.get(url, headers=headers, params=params, timeout=30, verify=verify_ssl)
             response.raise_for_status() # Raises HTTPError for 4xx/5xx responses
             data = response.json()
             return data
@@ -102,13 +135,26 @@ class ArterisApi(EngineLogger):
             "id": id,
         }
 
+        # Configuração SSL
+        verify_ssl = True
+        cert_path = None
+        
+        # Verificar configuração SSL (prioridade: DISABLE_SSL_VERIFY)
+        ssl_disable = os.getenv("DISABLE_SSL_VERIFY", "false").lower()
+        if ssl_disable == "true":
+            verify_ssl = False
+        elif os.path.exists("../ssl-certs/arteris_com_br.crt"):
+            cert_path = "../ssl-certs/arteris_com_br.crt"
+            verify_ssl = cert_path
+
         try:
             response = requests.post(
                 resource_url,
                 headers=headers,
                 params=params,
                 json=body,
-                timeout=300)
+                timeout=300,
+                verify=verify_ssl)
             # Raises HTTPError for 4xx/5xx responses
             response.raise_for_status()
             data = response.json()
