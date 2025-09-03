@@ -50,6 +50,7 @@ from variable_filter import FilterVariableExtractor
 from engine_logger import EngineLogger
 from formula_classifier import FormulaExecutionClassifier
 from engine_entities.arteris_frappe import ArterisApi
+from pathlib import Path
 
 class EngineProcessor(EngineLogger):
 
@@ -310,6 +311,16 @@ class EngineProcessor(EngineLogger):
             None
         """
 
+        # Pasta atual
+        pasta = Path(".")
+        for arquivo in pasta.glob("*.json"):
+            arquivo.unlink()
+            print(f"Arquivo {arquivo} excluído")    
+        pasta = Path("./data")
+        for arquivo in pasta.glob("*.json"):
+            arquivo.unlink()
+            print(f"Arquivo {arquivo} excluído")             
+
         def find_formula_group(structure):
             # Check if the structure is a list
             if isinstance(structure, list):
@@ -386,13 +397,15 @@ class EngineProcessor(EngineLogger):
             # 36534 01974601-6908-7420-9ec1-4c8851a0baca
             # 43135 0197460a-8f40-7483-9041-2d4e812b194d
             # 10000 01987fd2-8753-7cd0-8662-f3a2eae9ad4a
+
+        contracts = {'contracts':[{'boletimmedicao':'BM-CW33039-003','contrato':'019745f1-bc6d-7040-9aec-76654d38aa42'}]}
         
         for c in contracts['contracts']: # ['01987fd2-8753-7cd0-8662-f3a2eae9ad4a']:
 
             engine_results_converted = []
 
             # # Update highways and cities records
-            # ufrappe.update_cities(c['boletimmedicao'])
+            ufrappe.update_cities(c['boletimmedicao'])
 
             ufrappe.update_measurement_records(c['boletimmedicao']) 
             ufrappe.update_hours_measurement_record(c['boletimmedicao'])
