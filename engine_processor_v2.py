@@ -380,27 +380,8 @@ class EngineProcessor(EngineLogger):
 
         # Get contract keys
         contracts = ufrappe.get_contracts()
-
-        # Load and calculate tree data for each contract
-        #for k in contract_keys:
-            # 44149 10b3cd58-d02b-48f7-990f-78c7d3b3b741
-            # 38733 ad3fb0c7-4e6b-4213-a59a-b57a21fe49ee      
-            # 34540 019745f2-cb96-7782-9699-d5223234d984  
-            # 40812 01974609-0a12-70e1-a32c-4fba54fa8939
-            # 33287 019745f2-05db-7a62-8c75-619498b296e2
-            # 32148 019745f1-74f1-7ba0-9b6b-c51aea37e953
-            # 32904-RB 019745f1-b460-7603-9885-3df32abd1390
-            # 34092 019745f2-7b66-7792-ad0f-8b1d17cdbe5f
-            # 32570 019745f1-9759-72c2-a010-90c9d3dfeef3
-            # 31824 019745f1-31b2-7bf3-9ed4-610c56cb4644
-            # 32904-RB 019745f1-b460-7603-9885-3df32abd1390
-            # 36534 01974601-6908-7420-9ec1-4c8851a0baca
-            # 43135 0197460a-8f40-7483-9041-2d4e812b194d
-            # 10000 01987fd2-8753-7cd0-8662-f3a2eae9ad4a
-
-        contracts = {'contracts':[{'boletimmedicao':'BM-CW33039-003','contrato':'019745f1-bc6d-7040-9aec-76654d38aa42'}]}
         
-        for c in contracts['contracts']: # ['01987fd2-8753-7cd0-8662-f3a2eae9ad4a']:
+        for c in contracts['contracts']: 
 
             engine_results_converted = []
 
@@ -434,11 +415,6 @@ class EngineProcessor(EngineLogger):
             if not use_cached_data:
                 # Get contract data
                 contract_data = entities_processor.get_data(c['contrato'])
-
-                # Removida a gravacao para calculo geral
-                # # Write contract data to a file for debugging
-                # with open(f"contract_data_{c['contrato']}.json", 'w', encoding='utf-8') as f:
-                #     json.dump(contract_data, f, indent=4, ensure_ascii=False)
 
             # Get contract formula group 
             find_contract = [item for item in contract_data['data'] if 'Contract' in item]
@@ -474,19 +450,10 @@ class EngineProcessor(EngineLogger):
             )
             #Create data tree for the contract
             engine_data_tree = data_builder.build()
-            
-            # Removida a gravacao para calculo geral
-            # with open(f"data_tree_{c['contrato']}.json", 'w', encoding='utf-8') as f:
-            #     json.dump(engine_data_tree, f, indent=4, ensure_ascii=False)        
 
             # Parse formulas
             parser = engine_parser.FormulaParser()
             extract_formulas = parser.parse_formulas(engine_data_tree)
-
-            # Removida a gravacao para calculo geral
-            # # Save the parsed formulas to a file
-            # with open(f"extract_formulas_{c['contrato']}.json", 'w', encoding='utf-8') as f:
-            #     json.dump(extract_formulas, f, indent=4, ensure_ascii=False)        
 
             classifier = FormulaExecutionClassifier(extract_formulas)
             classifier_groups = classifier.get_execution_order()
@@ -518,10 +485,6 @@ class EngineProcessor(EngineLogger):
                 # Process formula variables
                 enrich_formulas = self.enrich_formulas_with_values(group_extract_formulas, engine_data_tree)
 
-                # Removida a gravacao para calculo geral
-                # with open(f"enrich_formulas_{g}_{k}.json", 'w', encoding='utf-8') as f:
-                #     json.dump(enrich_formulas, f, indent=4, ensure_ascii=False)                 
-
                 engine = engine_eval.EngineEval()
 
                 self.log_info("Starting formula evaluation")
@@ -547,8 +510,6 @@ class EngineProcessor(EngineLogger):
                 _engine_results = engine.convert_numpy_types(engine_results)
                 engine_results_converted.extend(_engine_results)
 
-                # Removida a gravacao para calculo geral
-                # # Write the results to a JSON file
                 with open(f"engine_result_g{g}_{c['contrato']}.json", 'w', encoding='utf-8') as f:
                     json.dump(_engine_results, f, indent=4, ensure_ascii=False)
 
@@ -562,9 +523,6 @@ class EngineProcessor(EngineLogger):
                         _engine_results
                     )
                     engine_data_tree = utree.update_tree()
-
-                # with open(f"data_tree_{c['contrato']}_{i}.json", 'w', encoding='utf-8') as f:
-                #     json.dump(engine_data_tree, f, indent=4, ensure_ascii=False)                           
 
             # Select the first formula to update
             for to_update_formula in extract_formulas:
