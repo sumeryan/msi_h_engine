@@ -116,29 +116,6 @@ if [ ! -f ".env" ]; then
     fi
 fi
 
-# Verificar se todos os módulos necessários estão presentes
-print_info "Verificando módulos obrigatórios..."
-
-required_modules=(
-    "engine_entities"
-    "engine_parser"
-    "engine_eval"
-    "update_tree"
-    "filters"
-    "log"
-    "variable_filter.py"
-    "formula_classifier.py"
-    "engine_logger.py"
-)
-
-for module in "${required_modules[@]}"; do
-    if [ ! -e "$module" ]; then
-        print_error "Módulo obrigatório não encontrado: $module"
-        exit 1
-    fi
-done
-
-print_info "Todos os módulos obrigatórios encontrados"
 
 print_info "Iniciando execução do engine_processor_v2.py..."
 echo "=== EXECUÇÃO DO H ENGINE ==="
