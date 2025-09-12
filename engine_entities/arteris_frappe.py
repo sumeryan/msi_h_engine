@@ -217,9 +217,13 @@ class ArterisApi(EngineLogger):
         self.log_info(f"Verificando registros órfãos", indent=1)
         self._call_post('measurement.check_orphans_records', measurement)
 
+    def create_measurement_items(self, measurement: str):
+        self.log_info(f"Recriando os itens de medição", indent=1)
+        self._call_post('measurement.create_measurement_items', measurement)
+
     def update_measurement_records(self, measurement: str):
         self.log_info(f"Atualizando os registros de medição", indent=1)
-        self._call_post('measurement.update_measurement_records', measurement)
+        self._call_post('measurement.update_measurement_records', measurement)        
 
     def update_hours_measurement_record(self, measurement: str):
         self.log_info(f"Atualizando os registros de horas da medição", indent=1)

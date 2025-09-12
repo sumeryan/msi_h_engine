@@ -388,6 +388,10 @@ class EngineProcessor(EngineLogger):
             # # Update highways and cities records
             ufrappe.update_cities(c['boletimmedicao'])
 
+            # Recarrega os itens do boletim de medição
+            ufrappe.create_measurement_items(c['boletimmedicao'])
+
+            # Update measurement records
             ufrappe.update_measurement_records(c['boletimmedicao']) 
             ufrappe.update_hours_measurement_record(c['boletimmedicao'])
             ufrappe.update_measurement_productivity(c['boletimmedicao'])
