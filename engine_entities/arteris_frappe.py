@@ -259,7 +259,7 @@ class ArterisApi(EngineLogger):
 
     def update_sap_orders_balance(self):
         self.log_info(f"Atualizando saldo dos pedidos SAP", indent=1)
-        self._call_post('measurement.update_sap_orders_balance', None)
+        self._call_post('saporder.update_sap_orders_balance', None)
 
     def get_arteris_doctypes(self, child: bool = False):
         """
