@@ -2,6 +2,12 @@
 
 # Script para executar engine_processor_v2.py com ambiente virtual
 # Autor: Script automatizado para execução do projeto msi_h_engine
+#
+# Uso: ./run_h_engine.sh [measurement]
+#
+# Exemplos:
+#   ./run_h_engine.sh                    # Executa para todos os measurements
+#   ./run_h_engine.sh BM-CW33039-003     # Executa apenas para o measurement específico
 
 set -e  # Para o script se houver erro
 
@@ -121,7 +127,13 @@ print_info "Iniciando execução do engine_processor_v2.py..."
 echo "=== EXECUÇÃO DO H ENGINE ==="
 
 # Executar engine_processor_v2.py
-python engine_processor_v2.py
+if [ "$1" != "" ]; then
+    print_info "Executando com measurement específico: $1"
+    python engine_processor_v2.py "$1"
+else
+    print_info "Executando para todos os measurements"
+    python engine_processor_v2.py
+fi
 
 # Status da execução
 if [ $? -eq 0 ]; then

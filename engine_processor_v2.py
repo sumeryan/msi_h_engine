@@ -553,10 +553,20 @@ class EngineProcessor(EngineLogger):
         ufrappe.update_sap_orders_balance()
 
 if __name__ == "__main__":
+    import sys
+
+    measurement = None
+    if len(sys.argv) > 1:
+        measurement = sys.argv[1]
+
     processor = EngineProcessor()
     try:
-        # processor.calculate_measurements(use_cached_data=True, measurement="BM-CW33039-003")
-        processor.calculate_measurements(use_cached_data=True)
+        if measurement:
+            processor.log_info(f"Processing specific measurement: {measurement}")
+            processor.calculate_measurements(use_cached_data=True, measurement=measurement)
+        else:
+            processor.log_info("Processing all measurements")
+            processor.calculate_measurements(use_cached_data=True)
     except Exception as e:
         processor.log_error(f"An error occurred during formula processing: {e}")
         raise
