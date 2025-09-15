@@ -330,7 +330,10 @@ class Mappings:
             "TestPutChild",
             "Work Role Config Kartado",
             "Contract Measurement Productivity",
-            "Contract Measurement Productivity Total"
+            "Contract Measurement Productivity Total",
+            "Kartado Config",
+            "Osiris Config",
+            "SMI Config"
         ]
 
         # Placeholder for specific mapping logic
@@ -341,6 +344,63 @@ class Mappings:
         Return main data for the entity structure.
         """
 
+        # Antes de passar a medicao como parametro
+        # main_doctypes = [
+        #     {
+        #         "doctype": "Contract",
+        #         "key": "name",
+        #         "data": True,
+        #         "childs": [
+        #             {   
+        #                 "doctype": "Contract Adjustment", 
+        #                 "data": True,
+        #                 "key": "contrato"
+        #             },
+        #             {   
+        #                 "doctype": "Contract Item", 
+        #                 "data": True,
+        #                 "key": "contrato"
+        #             },
+        #             {   
+        #                 "doctype": "Contract Measurement", 
+        #                 "data": True,
+        #                 "key": "contrato",
+        #                 "filters": [{"field":"medicaovigente", "value": "Sim"},
+        #                             {"field":"name", "value": "#MEASUREMENT#"}]
+        #             },
+        #             {
+        #                 "doctype": "Contract Measurement Record", 
+        #                 "data": True,
+        #                 "key": "contrato",
+        #                 "filters": [{"field":"medicaovigente", "value": "Sim"},
+        #                             {"field":"boletimmedicao", "value": "#MEASUREMENT#"}]
+        #             }
+        #         ]
+        #     },
+        #     {
+        #         "doctype": "Contract Item",
+        #         "data": False,
+        #         "key": "contrato",
+        #         "childs": [
+        #             {
+        #                 "doctype": "Contract Item Order", 
+        #                 "data": False,
+        #                 "key": "parent",
+        #                 "customapi": True,
+        #                 "customapi_field": "pedidosap",
+        #                 "childs":[
+        #                     {
+        #                         "doctype": "SAP Order", 
+        #                         "key": "name",
+        #                         "data": True
+        #                     }                            
+        #                 ]
+        #             }                    
+        #         ]                
+        #     }
+        # ]
+
+        # Usando a medicao como parametro
         main_doctypes = [
             {
                 "doctype": "Contract",
@@ -361,15 +421,13 @@ class Mappings:
                         "doctype": "Contract Measurement", 
                         "data": True,
                         "key": "contrato",
-                        "filters": [{"field":"medicaovigente", "value": "Sim"},
-                                    {"field":"name", "value": "#MEASUREMENT#"}]
+                        "filters": [{"field":"name", "value": "#MEASUREMENT#"}]
                     },
                     {
                         "doctype": "Contract Measurement Record", 
                         "data": True,
                         "key": "contrato",
-                        "filters": [{"field":"medicaovigente", "value": "Sim"},
-                                    {"field":"boletimmedicao", "value": "#MEASUREMENT#"}]
+                        "filters": [{"field":"boletimmedicao", "value": "#MEASUREMENT#"}]
                     }
                 ]
             },
