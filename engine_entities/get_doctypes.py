@@ -361,13 +361,15 @@ class Mappings:
                         "doctype": "Contract Measurement", 
                         "data": True,
                         "key": "contrato",
-                        "filters": [{"field":"medicaovigente", "value": "Sim"}]
+                        "filters": [{"field":"medicaovigente", "value": "Sim"},
+                                    {"field":"name", "value": "#MEASUREMENT#"}]
                     },
                     {
                         "doctype": "Contract Measurement Record", 
                         "data": True,
                         "key": "contrato",
-                        "filters": [{"field":"medicaovigente", "value": "Sim"}]
+                        "filters": [{"field":"medicaovigente", "value": "Sim"},
+                                    {"field":"boletimmedicao", "value": "#MEASUREMENT#"}]
                     }
                 ]
             },
@@ -620,7 +622,7 @@ class DoctypeProcessor:
             "structure": all_doctype_structure["all_doctypes"]
         }
 
-    def get_data_main_doctypes(self, all_doctype_data: List[Dict], doctypes: List[Dict], main_keys: List[str]) -> None:
+    def get_data_main_doctypes(self, all_doctype_data: List[Dict], doctypes: List[Dict], main_keys: List[str], parameters: List[Dict[str, str]]) -> None:
 
         # Process main doctypes
         for dt in doctypes:
@@ -649,7 +651,12 @@ class DoctypeProcessor:
                     filters = f'["{dt["key"]}","=","{k}"]'
                     if "filters" in dt:
                         for filter in dt["filters"]:
-                            filters += f',["{filter["field"]}","=","{filter["value"]}"]'
+                            value = filter["value"]
+                            # Check if value is a parameter
+                            for p in parameters:
+                                if value == p["parameter"]:
+                                    value = p["value"]
+                            filters += f',["{filter["field"]}","=","{value}"]'
                     filters = f'[{filters}]'
                     # Retrieve data using filters``
                     get_data, keys = self.data_retriever.get_doctype_data(dt["doctype"], filters)
@@ -669,10 +676,11 @@ class DoctypeProcessor:
                 self.get_data_main_doctypes(
                     all_doctype_data, 
                     dt["childs"], 
-                    dt_keys
+                    dt_keys,
+                    parameters
                 )   
     
-    def get_data(self, main_id: str) -> List[Dict]:
+    def get_data(self, main_id: str, parameters: List[Dict[str, str]] = []) -> List[Dict]:
         """Retrieve and save all doctype data"""
         logger.info("Starting data retrieval...")
         
@@ -692,7 +700,7 @@ class DoctypeProcessor:
         main_doctypes = self.mappings.get_main_data()
 
         # Get main doctypes data
-        self.get_data_main_doctypes(all_doctype_data, main_doctypes, [main_id])
+        self.get_data_main_doctypes(all_doctype_data, main_doctypes, [main_id], parameters)
         # Save all doctype data
         self.data_manager.save_json("data", all_doctype_data, f"all_doctype_data_{main_id}")
                                 

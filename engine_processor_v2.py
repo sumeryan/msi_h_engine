@@ -292,7 +292,7 @@ class EngineProcessor(EngineLogger):
         self.log_info(f"Formula variable processing complete. Processed {len(group_result)} ID results")
         return group_result
 
-    def calculate_measurements(self, use_cached_data: bool = False):
+    def calculate_measurements(self, use_cached_data: bool = False, measurement = None):
         """
         Main function to orchestrate the formula pre-processing workflow.
         
@@ -380,6 +380,12 @@ class EngineProcessor(EngineLogger):
 
         # Get contract keys
         contracts = ufrappe.get_contracts()
+
+        if measurement:
+            for c in contracts['contracts']:
+                if c['boletimmedicao'] == measurement:
+                    contracts = {'contracts': [c]}
+                    break
         
         for c in contracts['contracts']: 
 
@@ -418,7 +424,7 @@ class EngineProcessor(EngineLogger):
             contract_data = None
             if not use_cached_data:
                 # Get contract data
-                contract_data = entities_processor.get_data(c['contrato'])
+                contract_data = entities_processor.get_data(c['contrato'], [{"parameter": "#MEASUREMENT#", "value": c['boletimmedicao']}])
 
             # Get contract formula group 
             find_contract = [item for item in contract_data['data'] if 'Contract' in item]
@@ -454,6 +460,10 @@ class EngineProcessor(EngineLogger):
             )
             #Create data tree for the contract
             engine_data_tree = data_builder.build()
+
+            # Save tree data to JSON for inspection
+            # with open(f"tree_data_{c['contrato']}.json", 'w', encoding='utf-8') as f:
+            #     json.dump(engine_data_tree, f, indent=4, ensure_ascii=False)
 
             # Parse formulas
             parser = engine_parser.FormulaParser()
@@ -545,6 +555,7 @@ class EngineProcessor(EngineLogger):
 if __name__ == "__main__":
     processor = EngineProcessor()
     try:
+        # processor.calculate_measurements(use_cached_data=True, measurement="BM-CW33039-003")
         processor.calculate_measurements(use_cached_data=True)
     except Exception as e:
         processor.log_error(f"An error occurred during formula processing: {e}")
