@@ -499,6 +499,10 @@ class EngineProcessor(EngineLogger):
                 # Process formula variables
                 enrich_formulas = self.enrich_formulas_with_values(group_extract_formulas, engine_data_tree)
 
+                # # Save enriched data to JSON for inspection
+                # with open(f"enriched_data_{c['contrato']}-{g}.json", 'w', encoding='utf-8') as f:
+                #     json.dump(enrich_formulas, f, indent=4, ensure_ascii=False)
+
                 engine = engine_eval.EngineEval()
 
                 self.log_info("Starting formula evaluation")
@@ -524,8 +528,8 @@ class EngineProcessor(EngineLogger):
                 _engine_results = engine.convert_numpy_types(engine_results)
                 engine_results_converted.extend(_engine_results)
 
-                with open(f"engine_result_g{g}_{c['contrato']}.json", 'w', encoding='utf-8') as f:
-                    json.dump(_engine_results, f, indent=4, ensure_ascii=False)
+                # with open(f"engine_result_g{g}_{c['contrato']}.json", 'w', encoding='utf-8') as f:
+                #     json.dump(_engine_results, f, indent=4, ensure_ascii=False)
 
                 # Select the first formula to update
                 for to_update_formula in group_extract_formulas:
